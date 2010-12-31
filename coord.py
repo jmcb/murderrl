@@ -42,77 +42,109 @@ class Coord (object):
     def __repr__ (self):
         return "<Coord %s,%s>" % (self.x, self.y)
     def __add__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return Coord(self.x+other.x, self.y+other.y)
     def __iadd__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         self.x += other.x
         self.y += other.y
         return self
     def __sub__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return Coord(self.x-other.x, self.y-other.y)
     def __isub__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         self.x -= other.x
         self.y -= other.y
         return self
     def __mul__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return Coord(self.x*other.x, self.y*other.y)
     def __imul__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         self.x *= other.x
         self.y *= other.y
         return self
     def __div__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return Coord(self.x/other.x, self.y/other.y)
     def __floordiv__(self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return Coord(floor(self.x/other.x), floor(self.y/other.y))
     def __idiv__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         self.x /= other.x
         self.y /= other.y
         return self
     def __ifloordiv__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         self.x = floor(self.x/other.x)
         self.y = floor(self.y/other.y)
         return self
     def __lt__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return (self.x<other.x and self.y<other.y)
     def __le__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return (self.x<=other.x and self.y<=other.y)
     def __eq__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return (self.x==other.x and self.y==other.y)
     def __ne__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return (self.x!=other.x and self.y!=other.y)
     def __gt__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return (self.x>other.x and self.y>other.y)
     def __ge__ (self, other):
-        if not isinstance(other, Coord):
+        if isinstance(other, tuple):
+            other = Coord(other[0], other[1])
+        elif not isinstance(other, Coord):
             other = Coord(other, other)
         return (self.x>=other.x and self.y>=other.y)
 
