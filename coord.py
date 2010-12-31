@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-class RectangleIterator:
+class RectangleIterator (object):
     def __init__ (self, start_point, stop_point=None):
         """
         Iterator over a rectangle of points starting at ``start_point``, finishing
@@ -21,7 +21,7 @@ class RectangleIterator:
     def __repr__ (self):
         return "<RectangleIterator: %s to %s>" % (self.start_point, self.stop_point)
 
-class Coord:
+class Coord (object):
     """
     Simple representation of a co-ordinate. 0,0 is assumed to be the top-left
     base co-ordinate. A co-ordinate defined as -1,-1 is assumed to be invalid.
