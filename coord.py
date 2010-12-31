@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 class RectangleIterator:
-    """
-    Iterator over a rectangle of points starting at `start_point`, finishing
-    at `stop_point`. If `stop_point` is undefined, will instead use Coord(0, 0)
-    as `start_point` and then generate a rectangle Coord(0,0) -> `start_point`.
-    """
     def __init__ (self, start_point, stop_point=None):
+        """
+        Iterator over a rectangle of points starting at ``start_point``, finishing
+        at ``stop_point``. If ``stop_point`` is undefined, will instead use Coord(0, 0)
+        as ``start_point`` and then generate a rectangle Coord(0,0) -> ``start_point``.
+        """
         if stop_point is None:
             stop_point = start_point
             start_point = Coord(0, 0)
