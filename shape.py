@@ -1,8 +1,22 @@
 #!/usr/bin/env python
+"""
+Shape, *a collection of clases and functions relating to Shapes*.
+
+Shapes are a grid representation of ASCII graphics. Each point is denoted by an
+x and y co-ordinate, where the co-ordinate 0, 0 is the top-left corner of any
+shape. These shapes can be of any size, can be drawn onto each other, combined
+into a single canvas, collected, split, sectioned, and iterated over.
+
+See the `Shapes`_ section for ``Shape``, ``Box``, ``Column`` and related
+classes.
+
+See the `Collections`_ section for ``ShapeCollection`` and ``ShapeCoord``.
+
+"""
 from coord import *
 from collections import namedtuple
 
-class ShapeError (Exception): 
+class ShapeError (Exception):
     """
     A generic Shape-related error.
     """
