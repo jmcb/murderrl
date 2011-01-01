@@ -450,7 +450,7 @@ class Shape (object):
         possible to have varying lengths of rows, with the 'gap' being
         represented on the right side of the object.*
         """
-        return (self.width(), self.height())
+        return Size(self.width(), self.height())
 
     def column (self, column):
         """
@@ -543,10 +543,10 @@ class Shape (object):
         assert width is None or isinstance(width, int)
         assert height is None or isinstance(height, int)
 
-        if width is not None and width > self.size()[0]:
+        if width is not None and width > self.width():
             raise ShapeError, "can't normalise to less than maximum width."
 
-        if height is not None and height > self.size()[1]:
+        if height is not None and height > self.height():
             raise ShapeError, "can't normalise to less than maximum height."
 
         if fill is not None and len(fill) != 1:
@@ -625,7 +625,7 @@ class Shape (object):
                               *Default False*.
         """
         assert isinstance(shape, Shape)
-        assert (offset+shape.size()) <= self.size()
+        assert Size(offset)+shape.size() <= self.size()
         for xy, char in shape:
             nxy = xy+offset
             if check_conflict and self[nxy] != None:
@@ -718,7 +718,7 @@ class Shape (object):
         return self.width()
 
     def __repr__ (self):
-        return "<Shape width=%s,height=%s>" % self.size()
+        return "<Shape width=%s height=%s>" % self.size().as_tuple()
 
     def __str__ (self):
         """

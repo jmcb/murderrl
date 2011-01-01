@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+class CoordError (Exception): pass
+
 class RectangleIterator (object):
     def __init__ (self, start_point, stop_point=None):
         """
@@ -32,119 +34,143 @@ class Coord (object):
     def __init__ (self, x=-1, y=-1):
         if isinstance(x, tuple):
             self.x, self.y = x
+        elif isinstance(x, Coord):
+            self.x = x.as_tuple()
         else:
             self.x = x
             self.y = y
     def valid (self):
         return (self.x > -1 and self.y > -1)
+    def as_tuple (self):
+        return (self.x, self.y)
     def __str__ (self):
         return "%s,%s" % (self.x, self.y)
     def __repr__ (self):
         return "<Coord %s,%s>" % (self.x, self.y)
     def __add__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
-        return Coord(self.x+other.x, self.y+other.y)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
+        return self.__class__(self.x+other.x, self.y+other.y)
     def __iadd__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         self.x += other.x
         self.y += other.y
         return self
     def __sub__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
-        return Coord(self.x-other.x, self.y-other.y)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
+        return self.__class__(self.x-other.x, self.y-other.y)
     def __isub__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         self.x -= other.x
         self.y -= other.y
         return self
     def __mul__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
-        return Coord(self.x*other.x, self.y*other.y)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
+        return self.__class__(self.x*other.x, self.y*other.y)
     def __imul__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         self.x *= other.x
         self.y *= other.y
         return self
     def __div__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
-        return Coord(self.x/other.x, self.y/other.y)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
+        return self.__class__(self.x/other.x, self.y/other.y)
     def __floordiv__(self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
-        return Coord(floor(self.x/other.x), floor(self.y/other.y))
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
+        return self.__class__(floor(self.x/other.x), floor(self.y/other.y))
     def __idiv__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         self.x /= other.x
         self.y /= other.y
         return self
     def __ifloordiv__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         self.x = floor(self.x/other.x)
         self.y = floor(self.y/other.y)
         return self
     def __lt__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         return (self.x<other.x and self.y<other.y)
     def __le__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         return (self.x<=other.x and self.y<=other.y)
     def __eq__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         return (self.x==other.x and self.y==other.y)
     def __ne__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         return (self.x!=other.x and self.y!=other.y)
     def __gt__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         return (self.x>other.x and self.y>other.y)
     def __ge__ (self, other):
         if isinstance(other, tuple):
-            other = Coord(other[0], other[1])
-        elif not isinstance(other, Coord):
-            other = Coord(other, other)
+            other = self.__class__(other[0], other[1])
+        elif not isinstance(other, self.__class__):
+            other = self.__class__(other, other)
         return (self.x>=other.x and self.y>=other.y)
+    def __iter__ (self):
+        yield self.x
+        yield self.y
 
+class Size (Coord):
+    """
+    A specific representation of size using width and height.
+    """
+    width = property(lambda self: self.x, lambda self, width: self.__setattr__(x, width))
+    height = property(lambda self: self.y, lambda self, width: self.__setattr__(y, width))
+    def __init__ (self, width=-1, height=-1):
+        if isinstance(width, tuple):
+            height = width[1]
+            width = width[0]
+        elif isinstance(width, Coord):
+            width, height = width.as_tuple()
+        elif not isinstance(width, int):
+            raise CoordError, "Can't use '%s' as a width." % width
+        Coord.__init__(self, width, height)
+    def __repr__ (self):
+        return "<Size width=%s height=%s>" % (self.width, self.height)
