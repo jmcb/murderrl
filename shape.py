@@ -817,3 +817,94 @@ class Column (Shape):
             for column in shape:
                 nshape.append([column])
             Shape.__init__(self, nshape, height=height, fill=fill)
+
+def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False):
+    """
+    Take two shapes and combine them into one. This method places shapes
+    side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
+    ``overlap`` is greater than zero, ``shape2`` will overlap ``shape1`` on the
+    left by ``overlap``. Finally, the resultant shape will be padded using
+    ``fill``.
+
+    ``shape1``         = The first shape. *Required*.
+    ``shape2``         = The second shape. *Required*.
+    ``overlap``        = How much to overlap ``shape1`` with ``shape2``. *Default
+                         0*.
+    ``fill``           = The character to pad out the rest of the canvas if
+                         ``shape1.height() < shape2.height()`` or vice versa.
+    ``join_left``      = If true, will instead join ``shape2`` to the left of
+                         ``shape1``. This is achieved by swapping the parameters.
+                         *Default False*.
+    ``skip_conflicts`` = If true and ``overlap`` > 0, will not draw the parts of
+                         ``shape2`` where they overlap with the parts of ``shape1``.
+    """
+    if join_left:
+        s1 = shape2
+        shape2 = shape1
+        shape1 = s1
+
+    new_size = Size(width=shape1.width()+shape2.width(), height=max(shape1.height(), shape2.height()))
+    new_canvas = Shape(width=new_size.width-overlap, height=new_size.height, fill=fill)
+    new_canvas.draw_on(shape1, check_conflict=skip_conflicts)
+    new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, 0), check_conflict=skip_conflicts)
+    return new_canvas
+
+def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True):
+    """
+    Take two shapes and combine them into one by drawing ``shape1`` and then
+    drawing ``shape2`` directly beneath it.
+
+    ``shape1``         = The first shape to be drawn. *Required*.
+    ``shape2``         = The second shape to be drawn; this will be drawn
+                         underneath ``shape1``. *Required*.
+    ``left_offset``    = How many columns to offset the shapes by. *Default 0*.
+    ``overlap``        = How many rows ``shape2`` should overlap ``shape1``.
+                         *Default 0*.
+    ``fill``           = Character to be used in filling out the canvas.
+                        *Default None*.
+    ``join_top``       = Draw ``shape2`` on top of ``shape1`` instead. *Default
+                         False*.
+    ``skip_conflicts`` = Where ``shape2`` conflicts with ``shape1``, keep
+                         ``shape1``'s glyphs. *Default False*
+    ``offset_first``   = Offset ``shape1`` by ``left_offset``. *Default False*.
+    ``offset_second``  = Offset ``shape2`` by ``left_offset``. *Default True*.
+    """
+    if join_top:
+        s1 = shape2
+        shape2 = shape1
+        shape1 = s1
+
+    new_size = Size(width=max(shape1.width()+left_offset, shape2.width()+left_offset), height=shape1.height()+shape2.height())
+    new_canvas = Shape(width=new_size.width, height=new_size.height-overlap, fill=fill)
+    shape1_offset = Coord(0, 0)
+    shape2_offset = Coord(0, shape1.height()-overlap)
+    if offset_first:
+        shape1_offset = Coord(left_offset, 0)
+    if offset_second:
+        shape2_offset.x = left_offset
+    new_canvas.draw_on(shape1, offset=shape1_offset)
+    new_canvas.draw_on(shape2, offset=shape2_offset, skip_conflicts)
+    return new_canvas
+
+def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True):
+    """
+    Take two shapes and combine them into one by drawing ``shape1`` and then
+    drawing ``shape2`` directly above it. This is an alias for ``underneath``
+    with the ``join_top`` flag set to True.
+
+    ``shape1``         = The first shape to be drawn. *Required*.
+    ``shape2``         = The second shape to be drawn; this will be drawn
+                         above ``shape1``. *Required*.
+    ``left_offset``    = How many columns to offset the shapes by. *Default 0*.
+    ``overlap``        = How many rows ``shape2`` should overlap ``shape1``.
+                         *Default 0*.
+    ``fill``           = Character to be used in filling out the canvas.
+                        *Default None*.
+    ``join_bottom``    = Draw ``shape2`` beneath of ``shape1`` instead. *Default
+                         False*.
+    ``skip_conflicts`` = Where ``shape2`` conflicts with ``shape1``, keep
+                         ``shape1``'s glyphs. *Default False*
+    ``offset_first``   = Offset ``shape1`` by ``left_offset``. *Default False*.
+    ``offset_second``  = Offset ``shape2`` by ``left_offset``. *Default True*.
+    """
+    return underneath(shape1, shape2, left_offset, overlap, fill, not join_bottom, skip_conflicts, offset_first, offset_second)
