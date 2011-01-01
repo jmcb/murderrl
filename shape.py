@@ -882,8 +882,8 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
         shape1_offset = Coord(left_offset, 0)
     if offset_second:
         shape2_offset.x = left_offset
-    new_canvas.draw_on(shape1, offset=shape1_offset)
-    new_canvas.draw_on(shape2, offset=shape2_offset, skip_conflicts)
+    new_canvas.draw_on(shape1, shape1_offset)
+    new_canvas.draw_on(shape2, shape2_offset, skip_conflicts)
     return new_canvas
 
 def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True):
