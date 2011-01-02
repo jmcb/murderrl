@@ -86,16 +86,18 @@ def docparser (filename, verbose=False):
             if cur_section is not None and cur_section not in cur_module.sections:
                 cur_module.sections.append(cur_section)
                 cur_section = None
-            if cur_module is not None:
+            if cur_module is not None and cur_module not in doc.modules:
                 doc.modules.append(cur_module)
+                cur_module = None
             cur_module = Module()
             cur_module.module = __import__(line.split(" ", 2)[1])
             cur_module.name = line.split(" ", 2)[2]
             if verbose:
                 print cur_module
         elif line.startswith("$section"):
-            if cur_section is not None:
+            if cur_section is not None and cur_section not in cur_module.sections:
                 cur_module.sections.append(cur_section)
+                cur_section = None
             cur_section = Section()
             cur_section.name = line.split()[1]
             if verbose:
@@ -125,9 +127,13 @@ def docparser (filename, verbose=False):
         else:
             if verbose:
                 print "Unknown symbol: " + line
+
     if cur_section is not None and cur_section not in cur_module.sections:
         cur_module.sections.append(cur_section)
-    doc.modules.append(cur_module)
+
+    if cur_module is not None and cur_module not in doc.modules:
+        doc.modules.append(cur_module)
+
     return doc
 
 #####################################################################
@@ -138,6 +144,8 @@ def main ():
     snum = 0
     num = 0
     cnum = 0
+
+    index = []
 
     toc = """\nTable of Contents\n=================\n"""
     contents = ""
@@ -164,9 +172,23 @@ def main ():
             contents += "\n.. _"+section.name+":\n\n"
             contents += section.name+"\n"
             contents += "-" * len(section.name)+"\n"
+            if len(section.classes) != 0:
+                contents += "\nClasses\n#######\n"
+                tree = inspect.getclasstree(section.classes)
+                this_toc = "\n"
+                for tier in tree[1]:
+                    if isinstance(tier, list):
+                        this_toc += "\n"
+                        for subclass in tier:
+                            this_toc += " - `%s`_.\n" % subclass[0].__name__
+                        this_toc += "\n"
+                    elif isinstance(tier, tuple):
+                        this_toc += "- `%s`_.\n" % tier[0].__name__
+                contents += this_toc
         elif obj is not None:
             cnum += 1
             cur_object = obj.__name__
+            index.append(cur_object)
             toc += ("    %s. `"+cur_object+"`_\n") % chr(cnum + 96)
             contents += "\n.. _"+cur_object+":\n\n"
             if inspect.isclass(obj):
@@ -193,17 +215,20 @@ def main ():
                 for attr in attrs:
                     method = getattr(obj, attr.name)
                     name = attr.name
+                    qname = "%s::%s" % (obj.__name__, name)
 
                     if not method.__doc__ and name in parsed.ignore:
                         continue
 
-                    if "%s::%s" % (obj.__name__, name) in parsed.ignore:
+                    if qname in parsed.ignore:
                         continue
 
+                    index.append(qname)
+
                     clnum += 1
-                    this_toc += "%s. `%s::%s`_.\n" % (clnum, obj.__name__, name)
-                    this_contents += "\n.. _%s::%s:\n\n" % (obj.__name__, name)
-                    this_contents += "**%s::%s** " % (obj.__name__, name)
+                    this_toc += "%s. `%s`_.\n" % (clnum, qname)
+                    this_contents += "\n.. _%s:\n\n" % qname
+                    this_contents += "**%s** " % qname
                     this_contents += inspect.formatargspec(*inspect.getargspec(method)).replace("*", "\*") + "\n"
                     if method.__doc__:
                         this_contents += "\n" + inspect.getdoc(method) + "\n"
@@ -216,7 +241,40 @@ def main ():
             else:
                 contents += divider
 
+    toc += "\n%s. `Index`_" % (num+1)
+
     print toc, "\n", contents.rstrip(divider)
+
+    index.sort(cmp=lambda a, b: cmp(a.upper().replace("__INIT__", "A"*10), b.upper().replace("__INIT__", "A"*10)))
+    side_a = index[0::2]
+    a_size = sorted([len(x) for x in side_a], reverse=True)[0]
+    side_b = index[1::2]
+    b_size = sorted([len(x) for x in side_b], reverse=True)[0]
+
+    total_size = a_size + b_size + 10
+    column_size = total_size/2
+
+    index_term = "`%s`_"
+
+    def pad (term):
+        while len(term) < column_size:
+            term += " "
+        return term
+
+    table = "+" + "-" * (total_size/2) + "+" + "-" * (total_size/2) + "+\n"
+    for terms in zip(side_a, side_b):
+        for term in terms:
+            table += "|" + pad(index_term % term)
+        table += "|\n+" + "-" * (total_size/2) + "+" + "-" * (total_size/2) + "+\n"
+
+    print
+    print ".. _Index:"
+    print
+    print "Index"
+    print "====="
+    print
+
+    print table
 
 if __name__=="__main__":
     main()

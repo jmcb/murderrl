@@ -32,34 +32,34 @@ class ShapeColumn (object):
     Modifying via index (ShapeColumn[1]=None, for instance) will in fact
     modify the Shape.
     """
-    def copy (s):
+    def copy (self):
         """
         Returns the actual column object as a list. This column object is a
         copy, and any edits made to it are not reflected in the Shape.
         """
         return []
-    def parent (s):
+    def parent (self):
         """
         Returns the Shape to which this column belongs.
         """
         return None
-    def col (s):
+    def col (self):
         """
         Returns the column number that this column is a representation of.
         """
         return -1
-    def __str__ (s):
+    def __str__ (self):
         """
         Returns a string representation of the column, where each glyph is
         followed by a new line.
         """
         return ""
-    def __repr__ (s):
+    def __repr__ (self):
         """
         Returns a representation of the column as an object.
         """
         return "<ShapeColumn None: 'None'>"
-    def __setitem__ (s, row, value):
+    def __setitem__ (self, row, value):
         """
         Performs in-place assignation via ``self.parent()[Coord(self.column, row)]``
         ``= value`` (roughly). In fact, as the class is a closure, it does none of
@@ -74,14 +74,14 @@ class ShapeColumn (object):
 
         """
         pass
-    def __getitem__ (s, row):
+    def __getitem__ (self, row):
         """
         Returns the glpyh located at ``row``.
 
         :``row``: The row being requested for.
         """
         pass
-    def __iter__ (s):
+    def __iter__ (self):
         """
         Provides iteration over the content of the column in the format of:
         tuple(Coord, glyph), where Coord equates to the glyph location in the
@@ -89,30 +89,30 @@ class ShapeColumn (object):
         """
         pass
 
-    def __eq__ (s, other):
+    def __eq__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return s.col() == other.col()
-    def __ne__ (s, other):
+        return self.col() == other.col()
+    def __ne__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return s.col() == other.col()
-    def __lt__ (s, other):
+        return self.col() == other.col()
+    def __lt__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return s.col() < other.col()
-    def __le__ (s, other):
+        return self.col() < other.col()
+    def __le__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return s.col() <= other.col()
-    def __gt__ (s, other):
+        return self.col() <= other.col()
+    def __gt__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return s.col() > other.col()
-    def __ge__ (s, other):
+        return self.col() > other.col()
+    def __ge__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return s.col() >= other.col()
+        return self.col() >= other.col()
 
 _ShapeColumn = ShapeColumn
 
@@ -126,33 +126,33 @@ class ShapeRow (object):
     Modifying via index (ShapeRow[1]=None, for instance) will in fact modify the
     Shape.
     """
-    def copy (s):
+    def copy (self):
         """
         Returns the actual row object as a list. This row object is a
         copy, and any edits made to it are not reflected in the Shape.
         """
         return []
-    def parent (s):
+    def parent (self):
         """
         Returns the Shape to which this row belongs.
         """
         return None
-    def row (s):
+    def row (self):
         """
         Returns the row number that this row is a representation of.
         """
         return -1
-    def __str__ (s):
+    def __str__ (self):
         """
         Returns a string representation of the row.
         """
         return ""
-    def __repr__ (s):
+    def __repr__ (self):
         """
         Returns a representation of the row as an object.
         """
         return "<ShapeRow None: 'None'>"
-    def __setitem__ (s, column, value):
+    def __setitem__ (self, column, value):
         """
         Performs in-place assignation via self.parent()[Coord(self.row, column)]
         = value (roughly). In fact, as the class is a closure, it does none of
@@ -166,14 +166,14 @@ class ShapeRow (object):
                     be successful.
         """
         pass
-    def __getitem__ (s, column):
+    def __getitem__ (self, column):
         """
         Returns the glpyh located at ``column``.
 
         :``column``: The column being requested for.
         """
         pass
-    def __iter__ (s):
+    def __iter__ (self):
         """
         Provides iteration over the content of the row in the format of:
         tuple(Coord, glyph), where Coord equates to the glyph location in the
@@ -181,30 +181,30 @@ class ShapeRow (object):
         """
         pass
 
-    def __eq__ (s, other):
+    def __eq__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return s.row() == other.row()
-    def __ne__ (s, other):
+        return self.row() == other.row()
+    def __ne__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return s.row() == other.row()
-    def __lt__ (s, other):
+        return self.row() == other.row()
+    def __lt__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return s.row() < other.row()
-    def __le__ (s, other):
+        return self.row() < other.row()
+    def __le__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return s.row() <= other.row()
-    def __gt__ (s, other):
+        return self.row() <= other.row()
+    def __gt__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return s.row() > other.row()
-    def __ge__ (s, other):
+        return self.row() > other.row()
+    def __ge__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return s.row() >= other.row()
+        return self.row() >= other.row()
 
 _ShapeRow = ShapeRow
 
