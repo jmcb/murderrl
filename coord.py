@@ -6,8 +6,13 @@ class RectangleIterator (object):
     def __init__ (self, start_point, stop_point=None):
         """
         Iterator over a rectangle of points starting at ``start_point``, finishing
-        at ``stop_point``. If ``stop_point`` is undefined, will instead use Coord(0, 0)
-        as ``start_point`` and then generate a rectangle Coord(0,0) -> ``start_point``.
+        at ``stop_point``.
+
+        :``start_point``: The starting location of rectangle; if ``stop_point``
+                          is undefined, ``start_point`` will become ``Coord(0,0)``
+                          and the original start point will be used as the stop
+                          point. *Required*.
+        :``stop_point``: The finishing location of the rectangle. *Default None*.
         """
         if stop_point is None:
             stop_point = start_point

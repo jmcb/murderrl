@@ -6,18 +6,7 @@ sys.path.append('../')
 
 conf_file = open("doc.conf", "r")
 
-toc = """
-Table of Contents
-=================
-"""
-contents = ""
-cur_module = ""
-cur_module_name = ""
-cur_section = ""
-cur_object = ""
-
-num = 0
-snum = 0
+divider = "\n" + "~" * 80 + "\n"
 
 class c(object): pass
 def f (): pass
@@ -30,10 +19,12 @@ class Document:
             yield module, None, None
             for section in module.sections:
                 yield module, section, None
-                for classes in section.classes:
-                    yield module, section, classes
-                for method in section.methods:
-                    yield module, section, method
+                if len(section.classes) != 0:
+                    for classes in section.classes:
+                        yield module, section, classes
+                if len(section.methods) != 0:
+                    for method in section.methods:
+                        yield module, section, method
 
     def __str__ (self):
         result = "Document:\n"
@@ -92,6 +83,9 @@ def docparser (filename, verbose=False):
     for line in filename:
         line = line.strip()
         if line.startswith("$module"):
+            if cur_section is not None and cur_section not in cur_module.sections:
+                cur_module.sections.append(cur_section)
+                cur_section = None
             if cur_module is not None:
                 doc.modules.append(cur_module)
             cur_module = Module()
@@ -112,16 +106,15 @@ def docparser (filename, verbose=False):
                 if verbose:
                     print "<Class %s>" % c
                 if c == "None":
-                    cur_section.classes.append(None)
                     break
                 else:
                     cur_section.classes.append(getattr(cur_module.module, c))
         elif line.startswith("$methods"):
             method_list = line.split(" ", 1)[1].split(", ")
             for m in method_list:
-                print "Methods: " + m
+                if verbose:
+                    print "Methods: " + m
                 if m == "None":
-                    cur_section.methods.append(None)
                     break
                 else:
                     cur_section.methods.append(getattr(cur_module.module, m))
@@ -132,78 +125,98 @@ def docparser (filename, verbose=False):
         else:
             if verbose:
                 print "Unknown symbol: " + line
+    if cur_section is not None and cur_section not in cur_module.sections:
+        cur_module.sections.append(cur_section)
+    doc.modules.append(cur_module)
     return doc
+
+#####################################################################
+#####################################################################
+# Actual doc generation goes from here down.
 
 def main ():
     snum = 0
     num = 0
     cnum = 0
 
-    parsed = docparser("doc.conf")
-    toc = ""
+    toc = """\nTable of Contents\n=================\n"""
     contents = ""
+
+    parsed = docparser("doc.conf")
 
     for module, section, obj in parsed:
         if section is None and obj is None:
             snum = 0
             num += 1
             toc += "\n"
-            toc += ("%s. `"+module.name+"`_\n\n") % num
-            contents += ".. _" +module.name+":\n\n"
+            toc += ("%s. `"+module.name+"`_\n") % num
+            contents += "\n.. _" +module.name+":\n\n"
             contents += module.name+"\n"
-            contents += "=" * len(module.name)+"\n\n"
+            contents += "=" * len(module.name)+"\n"
             if module.module.__doc__:
-                for l in module.module.__doc__.split("\n"):
-                    contents += l.lstrip() + "\n"
-                contents += "\n\n"
+                contents += "\n" + inspect.getdoc(module.module) + "\n"
+            contents += divider
         elif section is not None and obj is None:
             cnum = 0
             snum += 1
             toc += "\n"
-            toc += (" %s. `"+section.name+"`_\n") % chr(snum + 64)
-            contents += ".. _"+section.name+":\n\n"
+            toc += ("%s. `"+section.name+"`_\n") % chr(snum + 64)
+            contents += "\n.. _"+section.name+":\n\n"
             contents += section.name+"\n"
             contents += "-" * len(section.name)+"\n"
         elif obj is not None:
+            cnum += 1
             cur_object = obj.__name__
-            toc += "\n"
             toc += ("   %s. `"+cur_object+"`_\n") % chr(cnum + 96)
-            contents += ".. _"+cur_object+":\n\n"
+            contents += "\n.. _"+cur_object+":\n\n"
             if inspect.isclass(obj):
-                desc = "class *"
+                desc = "class *%s*" % cur_object
             elif inspect.isfunction(obj):
-                desc = "function *"
+                desc = "function *%s* %s" % (cur_object, inspect.formatargspec(*inspect.getargspec(obj)))
             else:
-                desc = "*"
-            contents += desc + cur_object+"*\n"
-            contents += "^" * (len(desc + cur_object)+1) +"\n"
+                desc = "*%s*" % cur_object
+            contents += desc + "\n"
+            contents += ("^" * len(desc)) +"\n"
             if obj.__doc__:
-                for l in obj.__doc__.split("\n"):
-                    contents += l.lstrip() + "\n"
-                contents += "\n\n"
+                contents += "\n" + inspect.getdoc(obj) + "\n"
             if inspect.isclass(obj):
-                contents += "Methods\n"
-                contents += "#######\n\n"
                 clnum = 0
                 this_toc = ""
                 this_contents = ""
-                for method in dir(obj):
-                    method = getattr(obj, method)
-                    if hasattr(method, "im_class"):
-                        clnum += 1
-                        this_toc += "%s. `%s::%s`_.\n" % (clnum, obj.__name__, method.__name__)
-                        this_contents += ".. _%s::%s:\n\n" % (obj.__name__, method.__name__)
-                        this_contents += "**%s::%s**\n" % (obj.__name__, method.__name__)
-                        if method.__doc__:
-                            for l in method.__doc__.split("\n"):
-                                this_contents += l.strip() + "\n"
-                            this_contents += "\n"
-                        else:
-                            this_contents += "Method undocumented.\n\n"
-                contents += this_toc + "\n\n"
-                contents += this_contents
+                attrs = inspect.classify_class_attrs(obj)
+                attrs = [x for x in attrs if x.kind == "method" and inspect.ismethod(getattr(obj, x.name)) and x.defining_class == obj]
+                attrs.sort(cmp=lambda a, b: cmp(a.name.upper().replace("__INIT__", "A"*10), b.name.upper().replace("__INIT__", "A"*10)))
+                if len(attrs) != 0:
+                    contents += "\nMethods\n"
+                    contents += "#######\n\n"
 
-    print toc, "\n", contents
+                for attr in attrs:
+                    method = getattr(obj, attr.name)
+                    name = attr.name
+
+                    if not method.__doc__ and name in parsed.ignore:
+                        continue
+
+                    if "%s::%s" % (obj.__name__, name) in parsed.ignore:
+                        continue
+
+                    clnum += 1
+                    this_toc += "%s. `%s::%s`_.\n" % (clnum, obj.__name__, name)
+                    this_contents += "\n.. _%s::%s:\n\n" % (obj.__name__, name)
+                    this_contents += "**%s::%s** " % (obj.__name__, name)
+                    this_contents += inspect.formatargspec(*inspect.getargspec(method)).replace("*", "\*") + "\n"
+                    if method.__doc__:
+                        this_contents += "\n" + inspect.getdoc(method) + "\n"
+                    else:
+                        this_contents += "\n*Method undocumented*.\n"
+                    this_contents += divider
+                contents += this_toc
+                contents += divider
+                contents += this_contents
+            else:
+                contents += divider
+
+    print toc, "\n", contents.rstrip(divider)
 
 if __name__=="__main__":
     main()
