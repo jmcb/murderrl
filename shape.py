@@ -61,23 +61,24 @@ class ShapeColumn (object):
         return "<ShapeColumn None: 'None'>"
     def __setitem__ (s, row, value):
         """
-        Performs in-place assignation via self.parent()[Coord(self.column, row)]
-        = value (roughly). In fact, as the class is a closure, it does none of
+        Performs in-place assignation via ``self.parent()[Coord(self.column, row)]``
+        ``= value`` (roughly). In fact, as the class is a closure, it does none of
         these.
 
         Provides index-based row access to the column, ie, column[1]="x".
 
-        ``row``   = The row that you wish to assign a value to.
-        ``value`` = The glyph you want to place. Either len(``value``) == 1
+        :``row``: The row that you wish to assign a value to.
+        :``value``: The glyph you want to place. Either len(``value``) == 1
                     or ``value`` is None must be true for the assignation to
                     be successful.
+
         """
         pass
     def __getitem__ (s, row):
         """
         Returns the glpyh located at ``row``.
 
-        ``row`` = The row being requested for.
+        :``row``: The row being requested for.
         """
         pass
     def __iter__ (s):
@@ -159,17 +160,17 @@ class ShapeRow (object):
 
         Provides index-based column access to the row, ie, row[1]="x".
 
-        ``column`` = The column that you wish to assign a value to.
-        ``value``  = The glyph you want to place. Either len(``value``) == 1
-                     or ``value`` is None must be true for the assignation to
-                     be successful.
+        :``column``: The column that you wish to assign a value to.
+        :``value``: The glyph you want to place. Either len(``value``) == 1
+                    or ``value`` is None must be true for the assignation to
+                    be successful.
         """
         pass
     def __getitem__ (s, column):
         """
         Returns the glpyh located at ``column``.
 
-        ``column`` = The row being requested for.
+        :``column``: The column being requested for.
         """
         pass
     def __iter__ (s):
@@ -279,7 +280,7 @@ class ShapeCollection (object):
         """
         Pop index ``index`` item from the collection of ShapeCoords.
 
-        ``index`` = The index in question. *Default -1*.
+        :``index``: The index in question. *Default -1*.
         """
         item = self._shapes.pop(index)
         self.sort()
@@ -290,7 +291,7 @@ class ShapeCollection (object):
         Fetch item index ``item`` from the collection of ShapeCoords after
         performing an in-place sort based on Shape size.
 
-        ``item`` = The item to be fetched.
+        :``item``: The item to be fetched.
         """
         self.sort()
         return self._shapes.__getitem__(self, item)
@@ -300,8 +301,8 @@ class ShapeCollection (object):
         Insert ``value`` at ``item``, replacing whatever ShapeCoord is existent
         there. Afterwards, an in-place sort is performed.
 
-        ``item``  = The index the value is to be inserted at.
-        ``value`` = The value to be inserted. This is automatically cased
+        :``item``: The index the value is to be inserted at.
+        :``value``: The value to be inserted. This is automatically cased
                     from a Shape into a ShapeCoord(Shape, Coord(0, 0)).
                     Otherwise it is assumed to be a ShapeCoord. All other
                     types will cause an error.
@@ -344,18 +345,18 @@ class Shape (object):
         """
         Create a new shape.
 
-        ``sh_list`` = A list (or otherwise iterable) representation of a shape.
+        :``sh_list``: A list (or otherwise iterable) representation of a shape.
                       For example, passing [list("...."), list("....")] will
                       result in a 4x2 shape. If passed a Shape, will copy it and
                       create a new shape. *Default None*.
-        ``width``   = The width of the shape. If not 0, and ``sh_list`` has been
-                      provided, and the width is greater than the shape instatiated
-                      from ``sh_list``, the shape will be normalised to this width
-                      and ``fill``. If ``sh_list`` is not provided, the shape
-                      will be padded with ``fill``. *Default 0*.
-        ``height``  = Likewise with ``width``. *Default 0*.
-        ``fill``    = For padding purposes or blank, sized shapes, this character
-                      will be used to fill the canvas. *Default None*.
+        :``width``: The width of the shape. If not 0, and ``sh_list`` has been
+                    provided, and the width is greater than the shape instatiated
+                    from ``sh_list``, the shape will be normalised to this width
+                    and ``fill``. If ``sh_list`` is not provided, the shape
+                    will be padded with ``fill``. *Default 0*.
+        :``height``: Likewise with ``width``. *Default 0*.
+        :``fill``: For padding purposes or blank, sized shapes, this character
+                   will be used to fill the canvas. *Default None*.
         """
         sh_list, width, height, fill = None, 0, 0, None
         if kwargs:
@@ -425,7 +426,7 @@ class Shape (object):
     def width (self):
         """
         Returns the smallest width that can contain the largest row of the
-        shape. *Note: rows padded with ``None`` are not equivalent in length
+        shape. *Note: rows padded with None are not equivalent in length
         to rows without padding.*
         """
         width = 0
@@ -440,15 +441,16 @@ class Shape (object):
         """
         Returns the smallest height that can contain the largest column of
         the shape. *Note: columns are uniform in size across the shape; as with
-        rows, ``None`` padding is counted.*"""
+        rows, None padding is counted.*
+        """
         return len(self._canvas)
 
     def size (self):
         """
         Returns the smallest box that can contain the shape. *Note: this counts
-        padding characters (``None``) as normal glyphs. Thus, it is only
-        possible to have varying lengths of rows, with the 'gap' being
-        represented on the right side of the object.*
+        padding characters (None) as normal glyphs. Thus, it is only possible
+        to have varying lengths of rows, with the 'gap' being represented on
+        the right side of the object.*
         """
         return Size(self.width(), self.height())
 
@@ -457,7 +459,7 @@ class Shape (object):
         Returns a ShapeColumn containing all the glyphs in ``column``. See the
         ShapeColumn (closure) class definition for more information.
 
-        ``column`` = The column to return. Required.
+        :``column``: The column to return. Required.
         """
         class ShapeColumn (_ShapeColumn):
             __doc__ = _ShapeColumn.__doc__
@@ -497,7 +499,7 @@ class Shape (object):
         Returns a ShapeRow containing all the glyphs in ``row``. See the
         ShapeRow (closure) class definition for more information.
 
-        ``row`` = The row to return. Required.
+        :``row``: The row to return. Required.
         """
         class ShapeRow (_ShapeRow):
             __doc__ = _ShapeRow.__doc__
@@ -531,14 +533,14 @@ class Shape (object):
         Extend either the width, the height, or both, of a Shape to the relevant
         value, using the provided fill value.
 
-        ``width``  = The width to which the Shape should be extended. This
-                     integer value should be greater than the current width
-                     of the Shape, or None to perform no width normalisation.
-                     *Default None*.
-        ``height`` = The height to which the Shape should be extended. As per
+        :``width``: The width to which the Shape should be extended. This
+                    integer value should be greater than the current width
+                    of the Shape, or None to perform no width normalisation.
+                    *Default None*.
+        :``height``: The height to which the Shape should be extended. As per
                      ``width`` above. *Default None*.
-        ``fill``   = The fill character which should be used when extending
-                     rows and columns. *Default None*.
+        :``fill``: The fill character which should be used when extending
+                   rows and columns. *Default None*.
         """
         assert width is None or isinstance(width, int)
         assert height is None or isinstance(height, int)
@@ -572,14 +574,14 @@ class Shape (object):
         height, it can remove rows from the bottom (default) or the top of the
         shape.
 
-        ``width``     = As per normalise, the number of columns to reduce the
-                        shape to. Note: this is not the number of columns to
-                        remove. *Default None*.
-        ``height``    = As per width, only regarding rows.
-        ``trim_left`` = Instead remove columns from the left of the shape.
+        :``width``: As per normalise, the number of columns to reduce the
+                    shape to. Note: this is not the number of columns to
+                    remove. *Default None*.
+        :``height``: As per width, only regarding rows.
+        :``trim_left``: Instead remove columns from the left of the shape.
                         *Default False*.
-        ``trim_top``  = Instead remove rows from the top of the shape. *Default
-                        False*.
+        :``trim_top``: Instead remove rows from the top of the shape. *Default*
+                       *False*.
         """
         assert trim_left == False or trim_left == True
         assert trim_top == False or trim_top == True
@@ -611,17 +613,17 @@ class Shape (object):
         only draw glyphs from ``shape`` onto self if the relevant co-ordinate is
         None), but by default it will simply ignore errors.
 
-        ``shape``           = The shape which will be drawn upon this one. It is
-                              presumed that this shape can be contained by self.
-                              *Required*.
-        ``offset``          = The co-ordinates to begin drawing at (ie, starting with
-                              the top left corner of ``shape`` (0, 0), it will begin
-                              drawing from here). *Default 0, 0*.
-        ``check_conflict``  = Check for conflict before drawing. If true, it
-                              will only copy a glyph from ``shape`` onto self if
-                              self contains None at that location. *Default
-                              True*.
-        ``conflict_except`` = If true, will raise a ShapeError upon conflicts.
+        :``shape``: The shape which will be drawn upon this one. It is
+                    presumed that this shape can be contained by self.
+                    *Required*.
+        :``offset``: The co-ordinates to begin drawing at (ie, starting with
+                     the top left corner of ``shape`` (0, 0), it will begin
+                     drawing from here). *Default 0, 0*.
+        :``check_conflict``: Check for conflict before drawing. If true, it
+                             will only copy a glyph from ``shape`` onto self if
+                             self contains None at that location. *Default
+                             True*.
+        :``conflict_except``: If true, will raise a ShapeError upon conflicts.
                               *Default False*.
         """
         assert isinstance(shape, Shape)
@@ -640,12 +642,12 @@ class Shape (object):
         Return a new Shape containing within it the content of the current shape
         from ``section_start`` to ``section_stop``.
 
-        ``section_start`` = The top left co-ordinates of the rectangle. If
+        :``section_start``: The top left co-ordinates of the rectangle. If
                             ``section_stop`` has not been provided, it will be
                             assumed that the section should instead consist of
                             Coord(0, 0) to ``section_stop``.
-        ``section_stop``  = The bottom right co-ordinates of the rectangle. See
-                            note regarding ``section_start``. *Default None*.
+        :``section_stop``: The bottom right co-ordinates of the rectangle. See
+                           note regarding ``section_start``. *Default None*.
         """
         if section_stop is None:
             section_stop = section_start
@@ -675,7 +677,7 @@ class Shape (object):
         Return either a glyph (if ``item`` is a Coord), or a column (if ``item``
         is an integer). Does **not** support slicing!
 
-        ``item`` = Either a Coord, in which case we return the actual item, or
+        :``item``: Either a Coord, in which case we return the actual item, or
                    an "x" axis integer. The latter will return a ShapeColumn
                    object that references the column.
         """
@@ -691,11 +693,11 @@ class Shape (object):
         Alter the glyph at ``item`` by replacing with ``value``. Does **not**
         support slicing.
 
-        ``item``  = A co-ordinate, in which case we perform direct assignation
-                    of ``value`` to ``item``. The syntax of Shape[x][y] will not
-                    actually be parsed by this function. Instead, it is parsed
-                    as Shape.column(x)[y].
-        ``value`` = Either None, a single-character string, or a list, instance
+        :``item``: A co-ordinate, in which case we perform direct assignation
+                   of ``value`` to ``item``. The syntax of Shape[x][y] will not
+                   actually be parsed by this function. Instead, it is parsed
+                   as Shape.column(x)[y].
+        :``value``: Either None, a single-character string, or a list, instance
                     of Shape or its subclass, Column. If passed a 1*x Shape it
                     will attempt to draw the Shape on top of itself (without
                     checking for conflict).
@@ -743,13 +745,13 @@ class Box (Shape):
     """
     def __init__ (self, width, height, border=1, fill=None, border_fill=None):
         """
-        Create a box
-        .
-        ``width``       = How many characters wide the box should be.
-        ``height``      = How many characters tall the box should be.
-        ``border``      = The size of border to place. *Default 1*.
-        ``fill``        = The fill character of the box. *Default None*.
-        ``border_fill`` = The character to use when generating the border which
+        Create a box.
+
+        :``width``: How many characters wide the box should be.
+        :``height``: How many characters tall the box should be.
+        :``border``: The size of border to place. *Default 1*.
+        :``fill``: The fill character of the box. *Default None*.
+        :``border_fill``: The character to use when generating the border which
                           is drawn on top of the fill character (regardless of
                           conflicts).
         """
@@ -793,11 +795,11 @@ class Column (Shape):
         """
         Create a column.
 
-        ``shape``  = List of characters (or Shape or ShapeColumn) to fill our
-                     column with.
-        ``height`` = Height to pad the column to. *Default None*.
-        ``fill``   = Padding character to use when padding the column. *Default
-                     None*.
+        :``shape``: List of characters (or Shape or ShapeColumn) to fill our
+                    column with.
+        :``height``: Height to pad the column to. *Default None*.
+        :``fill``: Padding character to use when padding the column. *Default
+                   None*.
         """
         if isinstance(shape, ShapeColumn):
             shape = shape.copy()
@@ -826,16 +828,16 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     left by ``overlap``. Finally, the resultant shape will be padded using
     ``fill``.
 
-    ``shape1``         = The first shape. *Required*.
-    ``shape2``         = The second shape. *Required*.
-    ``overlap``        = How much to overlap ``shape1`` with ``shape2``. *Default
-                         0*.
-    ``fill``           = The character to pad out the rest of the canvas if
-                         ``shape1.height() < shape2.height()`` or vice versa.
-    ``join_left``      = If true, will instead join ``shape2`` to the left of
-                         ``shape1``. This is achieved by swapping the parameters.
-                         *Default False*.
-    ``skip_conflicts`` = If true and ``overlap`` > 0, will not draw the parts of
+    :``shape1``: The first shape. *Required*.
+    :``shape2``: The second shape. *Required*.
+    :``overlap``: How much to overlap ``shape1`` with ``shape2``. *Default*
+                  *0*.
+    :``fill``: The character to pad out the rest of the canvas if
+               ``shape1.height() < shape2.height()`` or vice versa.
+    :``join_left``: If true, will instead join ``shape2`` to the left of
+                    ``shape1``. This is achieved by swapping the parameters.
+                    *Default False*.
+    :``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
                          ``shape2`` where they overlap with the parts of ``shape1``.
     """
     if join_left:
@@ -854,20 +856,20 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     Take two shapes and combine them into one by drawing ``shape1`` and then
     drawing ``shape2`` directly beneath it.
 
-    ``shape1``         = The first shape to be drawn. *Required*.
-    ``shape2``         = The second shape to be drawn; this will be drawn
-                         underneath ``shape1``. *Required*.
-    ``left_offset``    = How many columns to offset the shapes by. *Default 0*.
-    ``overlap``        = How many rows ``shape2`` should overlap ``shape1``.
-                         *Default 0*.
-    ``fill``           = Character to be used in filling out the canvas.
-                        *Default None*.
-    ``join_top``       = Draw ``shape2`` on top of ``shape1`` instead. *Default
-                         False*.
-    ``skip_conflicts`` = Where ``shape2`` conflicts with ``shape1``, keep
+    :``shape1``: The first shape to be drawn. *Required*.
+    :``shape2``: The second shape to be drawn; this will be drawn
+                 underneath ``shape1``. *Required*.
+    :``left_offset``: How many columns to offset the shapes by. *Default 0*.
+    :``overlap``: How many rows ``shape2`` should overlap ``shape1``.
+                  *Default 0*.
+    :``fill``: Character to be used in filling out the canvas.
+               *Default None*.
+    :``join_top``: Draw ``shape2`` on top of ``shape1`` instead. *Default*
+                   *False*.
+    :``skip_conflicts``: Where ``shape2`` conflicts with ``shape1``, keep
                          ``shape1``'s glyphs. *Default False*
-    ``offset_first``   = Offset ``shape1`` by ``left_offset``. *Default False*.
-    ``offset_second``  = Offset ``shape2`` by ``left_offset``. *Default True*.
+    :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
+    :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
     """
     if join_top:
         s1 = shape2
@@ -892,19 +894,19 @@ def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False
     drawing ``shape2`` directly above it. This is an alias for ``underneath``
     with the ``join_top`` flag set to True.
 
-    ``shape1``         = The first shape to be drawn. *Required*.
-    ``shape2``         = The second shape to be drawn; this will be drawn
-                         above ``shape1``. *Required*.
-    ``left_offset``    = How many columns to offset the shapes by. *Default 0*.
-    ``overlap``        = How many rows ``shape2`` should overlap ``shape1``.
-                         *Default 0*.
-    ``fill``           = Character to be used in filling out the canvas.
-                        *Default None*.
-    ``join_bottom``    = Draw ``shape2`` beneath of ``shape1`` instead. *Default
-                         False*.
-    ``skip_conflicts`` = Where ``shape2`` conflicts with ``shape1``, keep
+    :``shape1``: The first shape to be drawn. *Required*.
+    :``shape2``: The second shape to be drawn; this will be drawn
+                 above ``shape1``. *Required*.
+    :``left_offset``: How many columns to offset the shapes by. *Default 0*.
+    :``overlap``: How many rows ``shape2`` should overlap ``shape1``.
+                  *Default 0*.
+    :``fill``: Character to be used in filling out the canvas.
+               *Default None*.
+    :``join_bottom``: Draw ``shape2`` beneath of ``shape1`` instead. *Default*
+                      *False*.
+    :``skip_conflicts``: Where ``shape2`` conflicts with ``shape1``, keep
                          ``shape1``'s glyphs. *Default False*
-    ``offset_first``   = Offset ``shape1`` by ``left_offset``. *Default False*.
-    ``offset_second``  = Offset ``shape2`` by ``left_offset``. *Default True*.
+    :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
+    :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
     """
     return underneath(shape1, shape2, left_offset, overlap, fill, not join_bottom, skip_conflicts, offset_first, offset_second)
