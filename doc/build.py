@@ -160,14 +160,14 @@ def main ():
             cnum = 0
             snum += 1
             toc += "\n"
-            toc += ("%s. `"+section.name+"`_\n") % chr(snum + 64)
+            toc += ("  %s. `"+section.name+"`_\n\n") % chr(snum + 64)
             contents += "\n.. _"+section.name+":\n\n"
             contents += section.name+"\n"
             contents += "-" * len(section.name)+"\n"
         elif obj is not None:
             cnum += 1
             cur_object = obj.__name__
-            toc += ("   %s. `"+cur_object+"`_\n") % chr(cnum + 96)
+            toc += ("    %s. `"+cur_object+"`_\n") % chr(cnum + 96)
             contents += "\n.. _"+cur_object+":\n\n"
             if inspect.isclass(obj):
                 desc = "class *%s*" % cur_object
