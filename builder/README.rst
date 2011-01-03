@@ -52,7 +52,7 @@ likewise been segregated; the presumably large stair case in the "formal"
 section provided access to the owner's rooms, guest rooms, and so-on, while the
 stair case located in the kitchen provided access to the "staff" areas.
 
-Hermann Muthesius[Muthesius]_ simply states that every room in the English house is
+Hermann Muthesius [Muthesius]_ simply states that every room in the English house is
 either a bedroom or a sitting room. Presumably he is here referring to purely
 domestic rooms, rather than utility rooms.
 
@@ -146,9 +146,108 @@ Utilitarian rooms are as follows:
 - The servant's hall would appear to be a formal dining room but also an area
   where the servants might mingle in their free time.
 
+Example layouts
+---------------
 
+Dixton Manor ala MurderRL
+#########################
 
+This is how Dixton Manor might look were it to be rendered as a map in
+MurderRL::
 
+   #####       ###################
+   #13.#       #12.......#11.....#
+   #...#       #.........#.......#
+   #...#       #.........#.......#
+   ###+#########.........#.......#
+   #14........######+######+##########
+   #..........+15....+......+7...#<<.######################################
+   ############......###...##....###.#6..............#5.........#4........#
+              #......#16....#........#...............#..........#.........#
+              #......#......#........#...............#........###.........#
+              ########......#........#...............#......#####.........#
+                     ############++##########################...+.........#
+                                +...............................#++########
+                                ##++###############+#########.............+
+                                #8...#       #9...+...+>>#<<#...#++########
+                                #....#       #....#...####<<#...#3........#
+                                ######       ######...+.?#<<#...#.........#
+                                             #10......#..#......#.........#
+                                             ####++###########++#.........#
+                                                #2..............#.........#
+                                                #...............#.........#
+                                                #...............#.........#
+                                                #...............#.........#
+                                                #...............#.........#
+                                                #...............#.........#
+                                                #########++################
+                                                       #1...#
+                                                       #....#
+                                                       #....#
+                                                       ##++##
+
+1. Vestibule.
+2. Entrance hall.
+3. Drawing room
+4. Library
+5. Study
+6. Dining room
+7. Kitchen
+8. Pantry
+9. Cloak room
+10. Cloak room area
+11. Larder
+12. Snooker room
+13. Utility
+14. Lobby
+15. Boot room
+16. Scullery/laundry room.
+
+As demonstrated, the implementation is not perfect; the house itself does not
+present all of the rooms described by Muthesius (nor would it). Likewise, some
+of the rooms are obviously not described as their original purpose; the snooker
+room is clearly the servant's hall, the laundry room the scullery, etc.
+
+I don't think this is a layout that we necessarily want our builder to be able
+to come up with, but it is certainly the most complicated of them.
+
+Simple layouts we could use
+###########################
+
+It has been suggested that we could start by generating a "main corridor".
+Obviously, this main corridor would require a kick in it to denote the
+difference between the main areas of the house and the servant areas of the
+house.
+
+The generations we could thus presume would be as follows:
+
+- A single line. Rooms are placed above and below it. The corridor forms the
+  main thorough fare through the house. This is the most simple and possibly the
+  easiest to generate, though not necessarily the nicest. See `single line
+  example`_.
+- An L-shape.
+
+Examples
+^^^^^^^^
+
+.. _single line example:
+
+An example of a single-line layout could be::
+
+  ###############################################
+  #.........#......#........#.........#.........#
+  #.........#......#........#.........#.........#
+  #.........#......#........#.........#.........#
+  #.........#......#........#.........#.........#
+  #########+####+######+###########+###+#########
+  #.......+......+......................+.......#
+  #.......######+######+#.......#######+#.......#
+  #.......#......#......#<<#....#.......#.......#
+  #.......#......#......#<<#....#.......#.......#
+  #.......#......#......####....+.......#.......#
+  #.......#......#......#..+....#.......#.......#
+  ##########################....#################
+                           ##++##
 
 .. [Muthesius] Muthesius, Hermann. *The English House, Volume 2*. `Web`_. December, 2010.
 
