@@ -6,9 +6,20 @@ MurderRL
 Support and Documentation
 =========================
 
-There currently isn't much in the way of documentation. What future
-documentation will mainly exist as Python doc-strings and probably some
-explanations of plot generation methodology.
+Documentation can be found in the ``doc/`` sub-directory. A complete index
+sorted by module can be found in ``doc/index.rst``, while per-module
+documentation can be found in ``doc/<module>.rst``.
+
+You can access the documentation for trunk on-line via github's wonderful
+rst2html conversion:
+
+- `Index`_
+ - `shape module`_
+ - `coord module`_
+
+*Nota bene: Due to limitations of github, anchors are suppressed, therefore
+internal hyperlink sare non-functioning. You can view the complete but possibly
+outdated documentation at the `MurderRL page`_ on github pages.*
 
 General information
 ===================
@@ -84,3 +95,11 @@ Footnotes
 .. _Rogue: http://en.wikipedia.org/wiki/Rogue_(computer_game)
 
 .. _Gosford Park: http://en.wikipedia.org/wiki/Gosford_Park
+
+.. _Index: https://github.com/jmcb/murderrl/tree/master/doc/index.rst
+
+.. _shape module: https://github.com/jmcb/murderrl/tree/master/doc/shape.rst
+
+.. _coord module: https://github.com/jmcb/murderrl/tree/master/doc/coord.rst
+
+.. _Murder RL page: http://jmcb.github.com/murderrl/index.html
