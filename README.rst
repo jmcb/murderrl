@@ -19,7 +19,7 @@ rst2html conversion:
 
 *Nota bene: Due to limitations of github, anchors are suppressed, therefore
 internal hyperlink sare non-functioning. You can view the complete but possibly
-outdated documentation at the `MurderRL page`_ on github pages.*
+outdated documentation at the* `MurderRL page`_ *on github pages.*
 
 General information
 ===================
