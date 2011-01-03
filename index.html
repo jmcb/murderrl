@@ -1,0 +1,1239 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
+<title></title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5951 2009-05-18 18:03:10Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left{
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document">
+
+
+<div class="section" id="table-of-contents">
+<h1>Table of Contents</h1>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#shape-module">Shape module</a></li>
+</ol>
+<blockquote>
+<ol class="upperalpha simple">
+<li><a class="reference internal" href="#shapes">Shapes</a></li>
+</ol>
+<blockquote>
+<ol class="loweralpha simple">
+<li><a class="reference internal" href="#shape">Shape</a></li>
+<li><a class="reference internal" href="#box">Box</a></li>
+<li><a class="reference internal" href="#column">Column</a></li>
+<li><a class="reference internal" href="#shapecolumn">ShapeColumn</a></li>
+<li><a class="reference internal" href="#shaperow">ShapeRow</a></li>
+<li><a class="reference internal" href="#adjoin">adjoin</a></li>
+<li><a class="reference internal" href="#underneath">underneath</a></li>
+<li><a class="reference internal" href="#atop">atop</a></li>
+</ol>
+</blockquote>
+<ol class="upperalpha simple" start="2">
+<li><a class="reference internal" href="#collections">Collections</a></li>
+</ol>
+<blockquote>
+<ol class="loweralpha simple">
+<li><a class="reference internal" href="#shapecollection">ShapeCollection</a></li>
+<li><a class="reference internal" href="#shapecoord">ShapeCoord</a></li>
+</ol>
+</blockquote>
+<ol class="upperalpha simple" start="3">
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ol>
+<blockquote>
+<ol class="loweralpha simple">
+<li><a class="reference internal" href="#shapeerror">ShapeError</a></li>
+</ol>
+</blockquote>
+</blockquote>
+<ol class="arabic simple" start="2">
+<li><a class="reference internal" href="#coord-module">Coord module</a></li>
+</ol>
+<blockquote>
+<ol class="upperalpha simple">
+<li><a class="reference internal" href="#co-ordinates">Co-ordinates</a></li>
+</ol>
+<blockquote>
+<ol class="loweralpha simple">
+<li><a class="reference internal" href="#coord">Coord</a></li>
+</ol>
+</blockquote>
+<ol class="upperalpha simple" start="2">
+<li><a class="reference internal" href="#iterators">Iterators</a></li>
+</ol>
+<blockquote>
+<ol class="loweralpha simple">
+<li><a class="reference internal" href="#rectangleiterator">RectangleIterator</a></li>
+</ol>
+</blockquote>
+</blockquote>
+<ol class="arabic simple" start="3">
+<li><a class="reference internal" href="#index">Index</a></li>
+</ol>
+</div>
+<div class="section" id="id1">
+<span id="shape-module"></span><h1>Shape module</h1>
+<p>Shape, <em>a collection of clases and functions relating to Shapes</em>.</p>
+<p>Shapes are a grid representation of ASCII graphics. Each point is denoted by an
+x and y co-ordinate, where the co-ordinate 0, 0 is the top-left corner of any
+shape. These shapes can be of any size, can be drawn onto each other, combined
+into a single canvas, collected, split, sectioned, and iterated over.</p>
+<p>See the <a class="reference internal" href="#shapes">Shapes</a> section for <tt class="docutils literal">Shape</tt>, <tt class="docutils literal">Box</tt>, <tt class="docutils literal">Column</tt> and related
+classes.</p>
+<p>See the <a class="reference internal" href="#collections">Collections</a> section for <tt class="docutils literal">ShapeCollection</tt> and <tt class="docutils literal">ShapeCoord</tt>.</p>
+<hr class="docutils" />
+<div class="section" id="id2">
+<span id="shapes"></span><h2>Shapes</h2>
+<div class="section" id="classes">
+<h3>Classes</h3>
+<ul class="simple">
+<li><a class="reference internal" href="#shape">Shape</a>.</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li><a class="reference internal" href="#box">Box</a>.</li>
+<li><a class="reference internal" href="#column">Column</a>.</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li><a class="reference internal" href="#shapecolumn">ShapeColumn</a>.</li>
+<li><a class="reference internal" href="#shaperow">ShapeRow</a>.</li>
+</ul>
+<div class="section" id="class-shape">
+<span id="shape"></span><h4>class <em>Shape</em></h4>
+<p>Shapes consist of a canvas grid (with relative Coords). The shape can be
+anything. Shapes can be drawn onto other shapes and have shapes drawn onto
+them.</p>
+<p>Direct glyph access is provided by Shape[x][y], Shape[Coord(x, y)].</p>
+<p>Row and column access by <tt class="docutils literal">row(number)</tt> and <tt class="docutils literal">column(number)</tt>. The ShapeRow
+and ShapeColumns respectively returned by these are references to the Shape.
+Modifications made to these will be reflected in the Shape.</p>
+</div>
+</div>
+<div class="section" id="methods">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#shape-init">Shape::__init__</a>.</li>
+<li><a class="reference internal" href="#shape-column">Shape::column</a>.</li>
+<li><a class="reference internal" href="#shape-draw-on">Shape::draw_on</a>.</li>
+<li><a class="reference internal" href="#shape-height">Shape::height</a>.</li>
+<li><a class="reference internal" href="#shape-normalise">Shape::normalise</a>.</li>
+<li><a class="reference internal" href="#shape-row">Shape::row</a>.</li>
+<li><a class="reference internal" href="#shape-section">Shape::section</a>.</li>
+<li><a class="reference internal" href="#shape-size">Shape::size</a>.</li>
+<li><a class="reference internal" href="#shape-trim">Shape::trim</a>.</li>
+<li><a class="reference internal" href="#shape-width">Shape::width</a>.</li>
+<li><a class="reference internal" href="#shape-getitem">Shape::__getitem__</a>.</li>
+<li><a class="reference internal" href="#shape-iter">Shape::__iter__</a>.</li>
+<li><a class="reference internal" href="#shape-setitem">Shape::__setitem__</a>.</li>
+<li><a class="reference internal" href="#shape-str">Shape::__str__</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="shape-init"><strong>Shape::__init__</strong> (self, *args, **kwargs)</p>
+<p>Create a new shape.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">sh_list</tt>:</th><td class="field-body">A list (or otherwise iterable) representation of a shape.
+For example, passing [list(&quot;....&quot;), list(&quot;....&quot;)] will
+result in a 4x2 shape. If passed a Shape, will copy it and
+create a new shape. <em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">width</tt>:</th><td class="field-body">The width of the shape. If not 0, and <tt class="docutils literal">sh_list</tt> has been
+provided, and the width is greater than the shape instatiated
+from <tt class="docutils literal">sh_list</tt>, the shape will be normalised to this width
+and <tt class="docutils literal">fill</tt>. If <tt class="docutils literal">sh_list</tt> is not provided, the shape
+will be padded with <tt class="docutils literal">fill</tt>. <em>Default 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">height</tt>:</th><td class="field-body">Likewise with <tt class="docutils literal">width</tt>. <em>Default 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">For padding purposes or blank, sized shapes, this character
+will be used to fill the canvas. <em>Default None</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-column"><strong>Shape::column</strong> (self, column)</p>
+<p>Returns a ShapeColumn containing all the glyphs in <tt class="docutils literal">column</tt>. See the
+ShapeColumn (closure) class definition for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">column</tt>:</th><td class="field-body">The column to return. Required.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-draw-on"><strong>Shape::draw_on</strong> (self, shape, offset=&lt;Coord 0,0&gt;, check_conflict=True, conflict_except=False)</p>
+<p>Attempt to draw Shape instance <tt class="docutils literal">shape</tt> on top of self, starting at
+offset <tt class="docutils literal">offset</tt>. Conflict checking is enable by default (ie, it will
+only draw glyphs from <tt class="docutils literal">shape</tt> onto self if the relevant co-ordinate is
+None), but by default it will simply ignore errors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape</tt>:</th><td class="field-body">The shape which will be drawn upon this one. It is
+presumed that this shape can be contained by self.
+<em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">offset</tt>:</th><td class="field-body">The co-ordinates to begin drawing at (ie, starting with
+the top left corner of <tt class="docutils literal">shape</tt> (0, 0), it will begin
+drawing from here). <em>Default 0, 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">check_conflict</tt>:</th><td class="field-body">Check for conflict before drawing. If true, it
+will only copy a glyph from <tt class="docutils literal">shape</tt> onto self if
+self contains None at that location. <em>Default
+True</em>.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2"><tt class="docutils literal">conflict_except</tt>:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">If true, will raise a ShapeError upon conflicts.
+<em>Default False</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-height"><strong>Shape::height</strong> (self)</p>
+<p>Returns the smallest height that can contain the largest column of
+the shape. <em>Note: columns are uniform in size across the shape; as with
+rows, None padding is counted.</em></p>
+<hr class="docutils" />
+<p id="shape-normalise"><strong>Shape::normalise</strong> (self, width=None, height=None, fill=None)</p>
+<p>Extend either the width, the height, or both, of a Shape to the relevant
+value, using the provided fill value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">width</tt>:</th><td class="field-body">The width to which the Shape should be extended. This
+integer value should be greater than the current width
+of the Shape, or None to perform no width normalisation.
+<em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">height</tt>:</th><td class="field-body">The height to which the Shape should be extended. As per
+<tt class="docutils literal">width</tt> above. <em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">The fill character which should be used when extending
+rows and columns. <em>Default None</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-row"><strong>Shape::row</strong> (self, row)</p>
+<p>Returns a ShapeRow containing all the glyphs in <tt class="docutils literal">row</tt>. See the
+ShapeRow (closure) class definition for more information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">row</tt>:</th><td class="field-body">The row to return. Required.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-section"><strong>Shape::section</strong> (self, section_start, section_stop=None)</p>
+<p>Return a new Shape containing within it the content of the current shape
+from <tt class="docutils literal">section_start</tt> to <tt class="docutils literal">section_stop</tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">section_start</tt>:</th><td class="field-body">The top left co-ordinates of the rectangle. If
+<tt class="docutils literal">section_stop</tt> has not been provided, it will be
+assumed that the section should instead consist of
+Coord(0, 0) to <tt class="docutils literal">section_stop</tt>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">section_stop</tt>:</th><td class="field-body">The bottom right co-ordinates of the rectangle. See
+note regarding <tt class="docutils literal">section_start</tt>. <em>Default None</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-size"><strong>Shape::size</strong> (self)</p>
+<p>Returns the smallest box that can contain the shape. <em>Note: this counts
+padding characters (None) as normal glyphs. Thus, it is only possible
+to have varying lengths of rows, with the 'gap' being represented on
+the right side of the object.</em></p>
+<hr class="docutils" />
+<p id="shape-trim"><strong>Shape::trim</strong> (self, width=None, height=None, trim_left=False, trim_top=False)</p>
+<p>The opposite of normalise in that it reduces the size of a Shape to the
+relevant width or height provided. For reducing width, it can remove
+columns from the right (default) or the left of the shape. For reducing
+height, it can remove rows from the bottom (default) or the top of the
+shape.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">width</tt>:</th><td class="field-body">As per normalise, the number of columns to reduce the
+shape to. Note: this is not the number of columns to
+remove. <em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">height</tt>:</th><td class="field-body">As per width, only regarding rows.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">trim_left</tt>:</th><td class="field-body">Instead remove columns from the left of the shape.
+<em>Default False</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">trim_top</tt>:</th><td class="field-body">Instead remove rows from the top of the shape. <em>Default</em>
+<em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-width"><strong>Shape::width</strong> (self)</p>
+<p>Returns the smallest width that can contain the largest row of the
+shape. <em>Note: rows padded with None are not equivalent in length
+to rows without padding.</em></p>
+<hr class="docutils" />
+<p id="shape-getitem"><strong>Shape::__getitem__</strong> (self, item)</p>
+<p>Return either a glyph (if <tt class="docutils literal">item</tt> is a Coord), or a column (if <tt class="docutils literal">item</tt>
+is an integer). Does <strong>not</strong> support slicing!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">item</tt>:</th><td class="field-body">Either a Coord, in which case we return the actual item, or
+an &quot;x&quot; axis integer. The latter will return a ShapeColumn
+object that references the column.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-iter"><strong>Shape::__iter__</strong> (self)</p>
+<p>Provide an iterator that returns (Coord(x, y), self[x][y]) for each
+glyph within the Shape.</p>
+<hr class="docutils" />
+<p id="shape-setitem"><strong>Shape::__setitem__</strong> (self, item, value)</p>
+<p>Alter the glyph at <tt class="docutils literal">item</tt> by replacing with <tt class="docutils literal">value</tt>. Does <strong>not</strong>
+support slicing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">item</tt>:</th><td class="field-body">A co-ordinate, in which case we perform direct assignation
+of <tt class="docutils literal">value</tt> to <tt class="docutils literal">item</tt>. The syntax of Shape[x][y] will not
+actually be parsed by this function. Instead, it is parsed
+as Shape.column(x)[y].</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">value</tt>:</th><td class="field-body">Either None, a single-character string, or a list, instance
+of Shape or its subclass, Column. If passed a 1*x Shape it
+will attempt to draw the Shape on top of itself (without
+checking for conflict).</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shape-str"><strong>Shape::__str__</strong> (self)</p>
+<p>Translate a Shape into a string. None values are replaced with &quot; &quot;, and
+new lines (&quot;n&quot;) are inserted at the end of each row.</p>
+<hr class="docutils" />
+<div class="section" id="class-box">
+<span id="box"></span><h4>class <em>Box</em></h4>
+<p>A rectangular Shape that provides borders and perimeter access.</p>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#box-init">Box::__init__</a>.</li>
+<li><a class="reference internal" href="#box-perimeter">Box::perimeter</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="box-init"><strong>Box::__init__</strong> (self, width, height, border=1, fill=None, border_fill=None)</p>
+<p>Create a box.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">width</tt>:</th><td class="field-body">How many characters wide the box should be.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">height</tt>:</th><td class="field-body">How many characters tall the box should be.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">border</tt>:</th><td class="field-body">The size of border to place. <em>Default 1</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">The fill character of the box. <em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">border_fill</tt>:</th><td class="field-body">The character to use when generating the border which
+is drawn on top of the fill character (regardless of
+conflicts).</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="box-perimeter"><strong>Box::perimeter</strong> (self)</p>
+<p>Returns an iterator of Coords corresponding to the perimeter of the box,
+specifically the border define when initialising the box. If
+<tt class="docutils literal">self.border</tt> == 0 then will return nothing.</p>
+<hr class="docutils" />
+<div class="section" id="class-column">
+<span id="column"></span><h4>class <em>Column</em></h4>
+<p>A single-character column of characters.</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#column-init">Column::__init__</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="column-init"><strong>Column::__init__</strong> (self, shape=None, height=None, fill=None)</p>
+<p>Create a column.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape</tt>:</th><td class="field-body">List of characters (or Shape or ShapeColumn) to fill our
+column with.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">height</tt>:</th><td class="field-body">Height to pad the column to. <em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">Padding character to use when padding the column. <em>Default
+None</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<div class="section" id="class-shapecolumn">
+<span id="shapecolumn"></span><h4>class <em>ShapeColumn</em></h4>
+<p>ShapeColumn is merely a reference to a specific column of glyphs in a parent
+Shape class. It's implemented thus to allow swapping of the x and y
+co-ordinates when accessing a Shape as though it were a multi-dimensional
+array.</p>
+<p>Modifying via index (ShapeColumn[1]=None, for instance) will in fact
+modify the Shape.</p>
+</div>
+</div>
+<div class="section" id="id5">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#shapecolumn-col">ShapeColumn::col</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-copy">ShapeColumn::copy</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-parent">ShapeColumn::parent</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-getitem">ShapeColumn::__getitem__</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-iter">ShapeColumn::__iter__</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-repr">ShapeColumn::__repr__</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-setitem">ShapeColumn::__setitem__</a>.</li>
+<li><a class="reference internal" href="#shapecolumn-str">ShapeColumn::__str__</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="shapecolumn-col"><strong>ShapeColumn::col</strong> (self)</p>
+<p>Returns the column number that this column is a representation of.</p>
+<hr class="docutils" />
+<p id="shapecolumn-copy"><strong>ShapeColumn::copy</strong> (self)</p>
+<p>Returns the actual column object as a list. This column object is a
+copy, and any edits made to it are not reflected in the Shape.</p>
+<hr class="docutils" />
+<p id="shapecolumn-parent"><strong>ShapeColumn::parent</strong> (self)</p>
+<p>Returns the Shape to which this column belongs.</p>
+<hr class="docutils" />
+<p id="shapecolumn-getitem"><strong>ShapeColumn::__getitem__</strong> (self, row)</p>
+<p>Returns the glpyh located at <tt class="docutils literal">row</tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">row</tt>:</th><td class="field-body">The row being requested for.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shapecolumn-iter"><strong>ShapeColumn::__iter__</strong> (self)</p>
+<p>Provides iteration over the content of the column in the format of:
+tuple(Coord, glyph), where Coord equates to the glyph location in the
+Shape (rather than in this column), and the glyph is the relevant glyph.</p>
+<hr class="docutils" />
+<p id="shapecolumn-repr"><strong>ShapeColumn::__repr__</strong> (self)</p>
+<p>Returns a representation of the column as an object.</p>
+<hr class="docutils" />
+<p id="shapecolumn-setitem"><strong>ShapeColumn::__setitem__</strong> (self, row, value)</p>
+<p>Performs in-place assignation via <tt class="docutils literal"><span class="pre">self.parent()[Coord(self.column,</span> row)]</tt>
+<tt class="docutils literal">= value</tt> (roughly). In fact, as the class is a closure, it does none of
+these.</p>
+<p>Provides index-based row access to the column, ie, column[1]=&quot;x&quot;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">row</tt>:</th><td class="field-body">The row that you wish to assign a value to.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">value</tt>:</th><td class="field-body">The glyph you want to place. Either len(<tt class="docutils literal">value</tt>) == 1
+or <tt class="docutils literal">value</tt> is None must be true for the assignation to
+be successful.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shapecolumn-str"><strong>ShapeColumn::__str__</strong> (self)</p>
+<p>Returns a string representation of the column, where each glyph is
+followed by a new line.</p>
+<hr class="docutils" />
+<div class="section" id="class-shaperow">
+<span id="shaperow"></span><h4>class <em>ShapeRow</em></h4>
+<p>ShapeRow is merely a reference to a specific row of glyphs in a parent Shape
+class. It reflects the implementation of the ShapeColumn which is thus
+implemented to allow swapping x and y co-ordinates when accessing a shape as
+though it were a multi-dimensional list.</p>
+<p>Modifying via index (ShapeRow[1]=None, for instance) will in fact modify the
+Shape.</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#shaperow-copy">ShapeRow::copy</a>.</li>
+<li><a class="reference internal" href="#shaperow-parent">ShapeRow::parent</a>.</li>
+<li><a class="reference internal" href="#shaperow-row">ShapeRow::row</a>.</li>
+<li><a class="reference internal" href="#shaperow-getitem">ShapeRow::__getitem__</a>.</li>
+<li><a class="reference internal" href="#shaperow-iter">ShapeRow::__iter__</a>.</li>
+<li><a class="reference internal" href="#shaperow-repr">ShapeRow::__repr__</a>.</li>
+<li><a class="reference internal" href="#shaperow-setitem">ShapeRow::__setitem__</a>.</li>
+<li><a class="reference internal" href="#shaperow-str">ShapeRow::__str__</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="shaperow-copy"><strong>ShapeRow::copy</strong> (self)</p>
+<p>Returns the actual row object as a list. This row object is a
+copy, and any edits made to it are not reflected in the Shape.</p>
+<hr class="docutils" />
+<p id="shaperow-parent"><strong>ShapeRow::parent</strong> (self)</p>
+<p>Returns the Shape to which this row belongs.</p>
+<hr class="docutils" />
+<p id="shaperow-row"><strong>ShapeRow::row</strong> (self)</p>
+<p>Returns the row number that this row is a representation of.</p>
+<hr class="docutils" />
+<p id="shaperow-getitem"><strong>ShapeRow::__getitem__</strong> (self, column)</p>
+<p>Returns the glpyh located at <tt class="docutils literal">column</tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">column</tt>:</th><td class="field-body">The column being requested for.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shaperow-iter"><strong>ShapeRow::__iter__</strong> (self)</p>
+<p>Provides iteration over the content of the row in the format of:
+tuple(Coord, glyph), where Coord equates to the glyph location in the
+Shape (rather than in this row), and the glyph is the relevant glyph.</p>
+<hr class="docutils" />
+<p id="shaperow-repr"><strong>ShapeRow::__repr__</strong> (self)</p>
+<p>Returns a representation of the row as an object.</p>
+<hr class="docutils" />
+<p id="shaperow-setitem"><strong>ShapeRow::__setitem__</strong> (self, column, value)</p>
+<p>Performs in-place assignation via self.parent()[Coord(self.row, column)]
+= value (roughly). In fact, as the class is a closure, it does none of
+these.</p>
+<p>Provides index-based column access to the row, ie, row[1]=&quot;x&quot;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">column</tt>:</th><td class="field-body">The column that you wish to assign a value to.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">value</tt>:</th><td class="field-body">The glyph you want to place. Either len(<tt class="docutils literal">value</tt>) == 1
+or <tt class="docutils literal">value</tt> is None must be true for the assignation to
+be successful.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shaperow-str"><strong>ShapeRow::__str__</strong> (self)</p>
+<p>Returns a string representation of the row.</p>
+<hr class="docutils" />
+<div class="section" id="function-adjoin-shape1-shape2-overlap-0-fill-none-join-left-false-skip-conflicts-false">
+<span id="adjoin"></span><h4>function <em>adjoin</em> (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False)</h4>
+<p>Take two shapes and combine them into one. This method places shapes
+side-by-side with <tt class="docutils literal">shape1</tt> on the left and <tt class="docutils literal">shape2</tt> on the right. If
+<tt class="docutils literal">overlap</tt> is greater than zero, <tt class="docutils literal">shape2</tt> will overlap <tt class="docutils literal">shape1</tt> on the
+left by <tt class="docutils literal">overlap</tt>. Finally, the resultant shape will be padded using
+<tt class="docutils literal">fill</tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape1</tt>:</th><td class="field-body">The first shape. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape2</tt>:</th><td class="field-body">The second shape. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">overlap</tt>:</th><td class="field-body">How much to overlap <tt class="docutils literal">shape1</tt> with <tt class="docutils literal">shape2</tt>. <em>Default</em>
+<em>0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">The character to pad out the rest of the canvas if
+<tt class="docutils literal">shape1.height() &lt; shape2.height()</tt> or vice versa.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">join_left</tt>:</th><td class="field-body">If true, will instead join <tt class="docutils literal">shape2</tt> to the left of
+<tt class="docutils literal">shape1</tt>. This is achieved by swapping the parameters.
+<em>Default False</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">skip_conflicts</tt>:</th><td class="field-body">If true and <tt class="docutils literal">overlap</tt> &gt; 0, will not draw the parts of
+<tt class="docutils literal">shape2</tt> where they overlap with the parts of <tt class="docutils literal">shape1</tt>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+</div>
+<div class="section" id="function-underneath-shape1-shape2-left-offset-0-overlap-0-fill-none-join-top-false-skip-conflicts-false-offset-first-false-offset-second-true">
+<span id="underneath"></span><h4>function <em>underneath</em> (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True)</h4>
+<p>Take two shapes and combine them into one by drawing <tt class="docutils literal">shape1</tt> and then
+drawing <tt class="docutils literal">shape2</tt> directly beneath it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape1</tt>:</th><td class="field-body">The first shape to be drawn. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape2</tt>:</th><td class="field-body">The second shape to be drawn; this will be drawn
+underneath <tt class="docutils literal">shape1</tt>. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">left_offset</tt>:</th><td class="field-body">How many columns to offset the shapes by. <em>Default 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">overlap</tt>:</th><td class="field-body">How many rows <tt class="docutils literal">shape2</tt> should overlap <tt class="docutils literal">shape1</tt>.
+<em>Default 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">Character to be used in filling out the canvas.
+<em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">join_top</tt>:</th><td class="field-body">Draw <tt class="docutils literal">shape2</tt> on top of <tt class="docutils literal">shape1</tt> instead. <em>Default</em>
+<em>False</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">skip_conflicts</tt>:</th><td class="field-body">Where <tt class="docutils literal">shape2</tt> conflicts with <tt class="docutils literal">shape1</tt>, keep
+<tt class="docutils literal">shape1</tt>'s glyphs. <em>Default False</em></td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">offset_first</tt>:</th><td class="field-body">Offset <tt class="docutils literal">shape1</tt> by <tt class="docutils literal">left_offset</tt>. <em>Default False</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">offset_second</tt>:</th><td class="field-body">Offset <tt class="docutils literal">shape2</tt> by <tt class="docutils literal">left_offset</tt>. <em>Default True</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+</div>
+<div class="section" id="function-atop-shape1-shape2-left-offset-0-overlap-0-fill-none-join-bottom-false-skip-conflicts-false-offset-first-false-offset-second-true">
+<span id="atop"></span><h4>function <em>atop</em> (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True)</h4>
+<p>Take two shapes and combine them into one by drawing <tt class="docutils literal">shape1</tt> and then
+drawing <tt class="docutils literal">shape2</tt> directly above it. This is an alias for <tt class="docutils literal">underneath</tt>
+with the <tt class="docutils literal">join_top</tt> flag set to True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape1</tt>:</th><td class="field-body">The first shape to be drawn. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">shape2</tt>:</th><td class="field-body">The second shape to be drawn; this will be drawn
+above <tt class="docutils literal">shape1</tt>. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">left_offset</tt>:</th><td class="field-body">How many columns to offset the shapes by. <em>Default 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">overlap</tt>:</th><td class="field-body">How many rows <tt class="docutils literal">shape2</tt> should overlap <tt class="docutils literal">shape1</tt>.
+<em>Default 0</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">fill</tt>:</th><td class="field-body">Character to be used in filling out the canvas.
+<em>Default None</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">join_bottom</tt>:</th><td class="field-body">Draw <tt class="docutils literal">shape2</tt> beneath of <tt class="docutils literal">shape1</tt> instead. <em>Default</em>
+<em>False</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">skip_conflicts</tt>:</th><td class="field-body">Where <tt class="docutils literal">shape2</tt> conflicts with <tt class="docutils literal">shape1</tt>, keep
+<tt class="docutils literal">shape1</tt>'s glyphs. <em>Default False</em></td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">offset_first</tt>:</th><td class="field-body">Offset <tt class="docutils literal">shape1</tt> by <tt class="docutils literal">left_offset</tt>. <em>Default False</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">offset_second</tt>:</th><td class="field-body">Offset <tt class="docutils literal">shape2</tt> by <tt class="docutils literal">left_offset</tt>. <em>Default True</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+<div class="section" id="id7">
+<span id="collections"></span><h2>Collections</h2>
+<div class="section" id="id8">
+<h3>Classes</h3>
+<ul class="simple">
+<li><a class="reference internal" href="#shapecollection">ShapeCollection</a>.</li>
+</ul>
+<div class="section" id="class-shapecollection">
+<span id="shapecollection"></span><h4>class <em>ShapeCollection</em></h4>
+<p>A sorted collection of Shapes and co-ordinates. Can be initiliased from a list
+of ShapeCoords or Shapes. For the latter, these will be wrapped in a ShapeCoord
+using Coord(0, 0) as their co-ordinate.</p>
+<p>You can also <tt class="docutils literal">append</tt> items, <tt class="docutils literal">pop</tt> items, assign using ShapeCollection[index]
+notation, and fetch via ShapeCollcetion[index] notation.</p>
+</div>
+</div>
+<div class="section" id="id9">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#shapecollection-init">ShapeCollection::__init__</a>.</li>
+<li><a class="reference internal" href="#shapecollection-append">ShapeCollection::append</a>.</li>
+<li><a class="reference internal" href="#shapecollection-combine">ShapeCollection::combine</a>.</li>
+<li><a class="reference internal" href="#shapecollection-pop">ShapeCollection::pop</a>.</li>
+<li><a class="reference internal" href="#shapecollection-sort">ShapeCollection::sort</a>.</li>
+<li><a class="reference internal" href="#shapecollection-getitem">ShapeCollection::__getitem__</a>.</li>
+<li><a class="reference internal" href="#shapecollection-iter">ShapeCollection::__iter__</a>.</li>
+<li><a class="reference internal" href="#shapecollection-len">ShapeCollection::__len__</a>.</li>
+<li><a class="reference internal" href="#shapecollection-setitem">ShapeCollection::__setitem__</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="shapecollection-init"><strong>ShapeCollection::__init__</strong> (self, shapes=None)</p>
+<p><em>Method undocumented</em>.</p>
+<hr class="docutils" />
+<p id="shapecollection-append"><strong>ShapeCollection::append</strong> (self, item, coord=None)</p>
+<p>As with the initialisation function, all Shapes passed in are here
+converted into ShapeCoords, using Coord(0, 0) as their offset. All other
+instances are not allowed.</p>
+<hr class="docutils" />
+<p id="shapecollection-combine"><strong>ShapeCollection::combine</strong> (self)</p>
+<p>Converts a collection into a single Shape by taking the largest contained
+ShapeCoord (or the top-most ShapeCoord determined by sort) and then drawing
+all other ShapeCoords onto it, using their defined Coords as the offset.</p>
+<p>Doesn't currently provide error checking. Should.</p>
+<hr class="docutils" />
+<p id="shapecollection-pop"><strong>ShapeCollection::pop</strong> (self, index=-1)</p>
+<p>Pop index <tt class="docutils literal">index</tt> item from the collection of ShapeCoords.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">index</tt>:</th><td class="field-body">The index in question. <em>Default -1</em>.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shapecollection-sort"><strong>ShapeCollection::sort</strong> (self)</p>
+<p>In-place sorting by size!</p>
+<hr class="docutils" />
+<p id="shapecollection-getitem"><strong>ShapeCollection::__getitem__</strong> (self, item)</p>
+<p>Fetch item index <tt class="docutils literal">item</tt> from the collection of ShapeCoords after
+performing an in-place sort based on Shape size.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">item</tt>:</th><td class="field-body">The item to be fetched.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p id="shapecollection-iter"><strong>ShapeCollection::__iter__</strong> (self)</p>
+<p>Creates an iterator for the ShapeCoords contained within, first
+performing an in-place sort.</p>
+<hr class="docutils" />
+<p id="shapecollection-len"><strong>ShapeCollection::__len__</strong> (self)</p>
+<p>Returns the number of ShapeCoords contained within.</p>
+<hr class="docutils" />
+<p id="shapecollection-setitem"><strong>ShapeCollection::__setitem__</strong> (self, item, value)</p>
+<p>Insert <tt class="docutils literal">value</tt> at <tt class="docutils literal">item</tt>, replacing whatever ShapeCoord is existent
+there. Afterwards, an in-place sort is performed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">item</tt>:</th><td class="field-body">The index the value is to be inserted at.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">value</tt>:</th><td class="field-body">The value to be inserted. This is automatically cased
+from a Shape into a ShapeCoord(Shape, Coord(0, 0)).
+Otherwise it is assumed to be a ShapeCoord. All other
+types will cause an error.</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<div class="section" id="class-shapecoord">
+<span id="shapecoord"></span><h4>class <em>ShapeCoord</em></h4>
+<p>A named tuple pair providing <tt class="docutils literal">shape</tt> and <tt class="docutils literal">coord</tt> members. This is primarily
+used by the ShapeCollection class.</p>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+<div class="section" id="id10">
+<span id="miscellaneous"></span><h2>Miscellaneous</h2>
+<div class="section" id="id11">
+<h3>Classes</h3>
+<ul class="simple">
+<li><a class="reference internal" href="#shapeerror">ShapeError</a>.</li>
+</ul>
+<div class="section" id="class-shapeerror">
+<span id="shapeerror"></span><h4>class <em>ShapeError</em></h4>
+<p>A generic Shape-related error.</p>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id12">
+<span id="coord-module"></span><h1>Coord module</h1>
+<hr class="docutils" />
+<div class="section" id="id13">
+<span id="co-ordinates"></span><h2>Co-ordinates</h2>
+<div class="section" id="id14">
+<h3>Classes</h3>
+<ul class="simple">
+<li><a class="reference internal" href="#coord">Coord</a>.</li>
+</ul>
+<div class="section" id="class-coord">
+<span id="coord"></span><h4>class <em>Coord</em></h4>
+<p>Simple representation of a co-ordinate. 0,0 is assumed to be the top-left
+base co-ordinate. A co-ordinate defined as -1,-1 is assumed to be invalid.
+However, negative co-ordinates may be useful for co-ordinate arithmetic.</p>
+</div>
+</div>
+<div class="section" id="id15">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#coord-init">Coord::__init__</a>.</li>
+<li><a class="reference internal" href="#coord-as-tuple">Coord::as_tuple</a>.</li>
+<li><a class="reference internal" href="#coord-valid">Coord::valid</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="coord-init"><strong>Coord::__init__</strong> (self, x=-1, y=-1)</p>
+<p><em>Method undocumented</em>.</p>
+<hr class="docutils" />
+<p id="coord-as-tuple"><strong>Coord::as_tuple</strong> (self)</p>
+<p><em>Method undocumented</em>.</p>
+<hr class="docutils" />
+<p id="coord-valid"><strong>Coord::valid</strong> (self)</p>
+<p><em>Method undocumented</em>.</p>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="id16">
+<span id="iterators"></span><h2>Iterators</h2>
+<div class="section" id="id17">
+<h3>Classes</h3>
+<ul class="simple">
+<li><a class="reference internal" href="#rectangleiterator">RectangleIterator</a>.</li>
+</ul>
+<div class="section" id="class-rectangleiterator">
+<span id="rectangleiterator"></span><h4>class <em>RectangleIterator</em></h4>
+</div>
+</div>
+<div class="section" id="id18">
+<h3>Methods</h3>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#rectangleiterator-init">RectangleIterator::__init__</a>.</li>
+</ol>
+<hr class="docutils" />
+<p id="rectangleiterator-init"><strong>RectangleIterator::__init__</strong> (self, start_point, stop_point=None)</p>
+<p>Iterator over a rectangle of points starting at <tt class="docutils literal">start_point</tt>, finishing
+at <tt class="docutils literal">stop_point</tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">start_point</tt>:</th><td class="field-body">The starting location of rectangle; if <tt class="docutils literal">stop_point</tt>
+is undefined, <tt class="docutils literal">start_point</tt> will become <tt class="docutils literal">Coord(0,0)</tt>
+and the original start point will be used as the stop
+point. <em>Required</em>.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">stop_point</tt>:</th><td class="field-body">The finishing location of the rectangle. <em>Default None</em>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="id19">
+<span id="index"></span><h1>Index</h1>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><a class="reference internal" href="#adjoin">adjoin</a></td>
+<td><a class="reference internal" href="#atop">atop</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#box">Box</a></td>
+<td><a class="reference internal" href="#box-init">Box::__init__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#box-perimeter">Box::perimeter</a></td>
+<td><a class="reference internal" href="#column">Column</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#column-init">Column::__init__</a></td>
+<td><a class="reference internal" href="#coord">Coord</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#coord-init">Coord::__init__</a></td>
+<td><a class="reference internal" href="#coord-as-tuple">Coord::as_tuple</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#coord-valid">Coord::valid</a></td>
+<td><a class="reference internal" href="#rectangleiterator">RectangleIterator</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#rectangleiterator-init">RectangleIterator::__init__</a></td>
+<td><a class="reference internal" href="#shape">Shape</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-init">Shape::__init__</a></td>
+<td><a class="reference internal" href="#shape-column">Shape::column</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-draw-on">Shape::draw_on</a></td>
+<td><a class="reference internal" href="#shape-height">Shape::height</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-normalise">Shape::normalise</a></td>
+<td><a class="reference internal" href="#shape-row">Shape::row</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-section">Shape::section</a></td>
+<td><a class="reference internal" href="#shape-size">Shape::size</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-trim">Shape::trim</a></td>
+<td><a class="reference internal" href="#shape-width">Shape::width</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-getitem">Shape::__getitem__</a></td>
+<td><a class="reference internal" href="#shape-iter">Shape::__iter__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shape-setitem">Shape::__setitem__</a></td>
+<td><a class="reference internal" href="#shape-str">Shape::__str__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecollection">ShapeCollection</a></td>
+<td><a class="reference internal" href="#shapecollection-init">ShapeCollection::__init__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecollection-append">ShapeCollection::append</a></td>
+<td><a class="reference internal" href="#shapecollection-combine">ShapeCollection::combine</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecollection-pop">ShapeCollection::pop</a></td>
+<td><a class="reference internal" href="#shapecollection-sort">ShapeCollection::sort</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecollection-getitem">ShapeCollection::__getitem__</a></td>
+<td><a class="reference internal" href="#shapecollection-iter">ShapeCollection::__iter__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecollection-len">ShapeCollection::__len__</a></td>
+<td><a class="reference internal" href="#shapecollection-setitem">ShapeCollection::__setitem__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecolumn">ShapeColumn</a></td>
+<td><a class="reference internal" href="#shapecolumn-col">ShapeColumn::col</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecolumn-copy">ShapeColumn::copy</a></td>
+<td><a class="reference internal" href="#shapecolumn-parent">ShapeColumn::parent</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecolumn-getitem">ShapeColumn::__getitem__</a></td>
+<td><a class="reference internal" href="#shapecolumn-iter">ShapeColumn::__iter__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecolumn-repr">ShapeColumn::__repr__</a></td>
+<td><a class="reference internal" href="#shapecolumn-setitem">ShapeColumn::__setitem__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapecolumn-str">ShapeColumn::__str__</a></td>
+<td><a class="reference internal" href="#shapecoord">ShapeCoord</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shapeerror">ShapeError</a></td>
+<td><a class="reference internal" href="#shaperow">ShapeRow</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shaperow-copy">ShapeRow::copy</a></td>
+<td><a class="reference internal" href="#shaperow-parent">ShapeRow::parent</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shaperow-row">ShapeRow::row</a></td>
+<td><a class="reference internal" href="#shaperow-getitem">ShapeRow::__getitem__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shaperow-iter">ShapeRow::__iter__</a></td>
+<td><a class="reference internal" href="#shaperow-repr">ShapeRow::__repr__</a></td>
+</tr>
+<tr><td><a class="reference internal" href="#shaperow-setitem">ShapeRow::__setitem__</a></td>
+<td><a class="reference internal" href="#shaperow-str">ShapeRow::__str__</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>
