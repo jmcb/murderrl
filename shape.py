@@ -96,7 +96,7 @@ class ShapeColumn (object):
     def __ne__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
-        return self.col() == other.col()
+        return self.col() != other.col()
     def __lt__ (self, other):
         if not isinstance(other, ShapeColumn):
             return False
@@ -188,7 +188,7 @@ class ShapeRow (object):
     def __ne__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
-        return self.row() == other.row()
+        return self.row() != other.row()
     def __lt__ (self, other):
         if not isinstance(other, ShapeRow):
             return False
