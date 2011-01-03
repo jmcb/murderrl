@@ -200,7 +200,7 @@ def main (args):
         side_b = s.index[1::2]
         b_size = sorted([len(x) for x in side_b], reverse=True)[0]
 
-        total_size = a_size + b_size + 10
+        total_size = a_size + b_size + 16
         column_size = total_size/2
 
         index_term = "`%s`_"
