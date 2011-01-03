@@ -266,6 +266,12 @@ def main (args):
                     elif isinstance(tier, tuple):
                         this_toc += "- `%s`_.\n" % tier[0].__name__
                 s.contents += this_toc
+            if len(section.methods) != 0:
+                s.contents += "\nMethods\n#######\n"
+                this_toc = "\n"
+                for method in section.methods:
+                    this_toc += "- `%s`_.\n" % method.__name__
+                s.contents == this_toc
         elif obj is not None:
             s.cnum += 1
             cur_object = obj.__name__

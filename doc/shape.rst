@@ -743,6 +743,9 @@ A generic Shape-related error.
 Shape Manipulation
 ------------------
 
+Methods
+#######
+
 .. _adjoin:
 
 function *adjoin* (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False)
