@@ -45,9 +45,11 @@ class Module:
     module = None
     name = None
     sections = None
+    identifier = None
     def __init__ (self, name=None):
         self.name = name
         self.module = None
+        self.identifier = None
         self.sections = []
     def __repr__ (self):
         return "<Module name=%s>" % self.name
@@ -92,6 +94,7 @@ def docparser (filename, verbose=False):
             cur_module = Module()
             cur_module.module = __import__(line.split(" ", 2)[1])
             cur_module.name = line.split(" ", 2)[2]
+            cur_module.identifier = line.split(" ", 2)[1]
             if verbose:
                 print cur_module
         elif line.startswith("$section"):
@@ -140,40 +143,118 @@ def docparser (filename, verbose=False):
 #####################################################################
 # Actual doc generation goes from here down.
 
-def main ():
-    snum = 0
-    num = 0
-    cnum = 0
+def main (args):
+    build_all = False
+    build_modules = False
+    build_index = False
 
-    index = []
-
-    toc = """\nTable of Contents\n=================\n"""
-    contents = ""
+    if "modules" in args:
+        build_all = False
+        output = "%s.rst"
+        build_modules = True
+    else: #if "all" in args
+        output = "index.rst"
+        build_all = True
+    if "index" in args:
+        build_index = True
+    else:
+        build_index = False
 
     parsed = docparser("doc.conf")
 
+    modules = []
+    previous_module = None
+
+    class Scope:
+        num = 0
+        snum = 0
+        cnum = 0
+        toc = ""
+        contents = ""
+        index = ""
+        def __init__ (self):
+            self.index = []
+
+    s = Scope()
+
+    def write_module ():
+        open(output % previous_module, "w").write((s.toc + "\n" + s.contents.rstrip(divider)))
+
+    def write_all ():
+        open(output, "w").write((s.toc + "\n" + s.contents.rstrip(divider)))
+
+    def close_module ():
+        s.num = 0
+        s.snum = 0
+        s.cnum = 0
+        s.toc = """\nTable of Contents\n=================\n"""
+        s.contents = ""
+        s.index = []
+
+    def make_index ():
+        s.toc += "\n%s. `Index`_" % (s.num+1)
+
+        s.index.sort(cmp=lambda a, b: cmp(a.upper().replace("__INIT__", "A"*10), b.upper().replace("__INIT__", "A"*10)))
+        side_a = s.index[0::2]
+        a_size = sorted([len(x) for x in side_a], reverse=True)[0]
+        side_b = s.index[1::2]
+        b_size = sorted([len(x) for x in side_b], reverse=True)[0]
+
+        total_size = a_size + b_size + 10
+        column_size = total_size/2
+
+        index_term = "`%s`_"
+
+        def pad (term):
+            while len(term) < column_size:
+                term += " "
+            return term
+
+        table = "+" + "-" * (total_size/2) + "+" + "-" * (total_size/2) + "+\n"
+        for terms in zip(side_a, side_b):
+            for term in terms:
+                table += "|" + pad(index_term % term)
+            table += "|\n+" + "-" * (total_size/2) + "+" + "-" * (total_size/2) + "+\n"
+
+        s.contents += "\n"
+        s.contents += ".. _Index:\n"
+        s.contents += "\n"
+        s.contents += "Index\n"
+        s.contents += "=====\n"
+        s.contents += "\n"
+        s.contents += table
+
+    close_module()
+
     for module, section, obj in parsed:
         if section is None and obj is None:
-            snum = 0
-            num += 1
-            toc += "\n"
-            toc += ("%s. `"+module.name+"`_\n") % num
-            contents += "\n.. _" +module.name+":\n\n"
-            contents += module.name+"\n"
-            contents += "=" * len(module.name)+"\n"
+            if build_modules and previous_module is not None:
+                if build_index:
+                    make_index()
+                write_module()
+                close_module()
+
+            previous_module = module.identifier
+            s.snum = 0
+            s.num += 1
+            s.toc += "\n"
+            s.toc += ("%s. `"+module.name+"`_\n") % s.num
+            s.contents += "\n.. _" +module.name+":\n\n"
+            s.contents += module.name+"\n"
+            s.contents += "=" * len(module.name)+"\n"
             if module.module.__doc__:
-                contents += "\n" + inspect.getdoc(module.module) + "\n"
-            contents += divider
+                s.contents += "\n" + inspect.getdoc(module.module) + "\n"
+            s.contents += divider
         elif section is not None and obj is None:
-            cnum = 0
-            snum += 1
-            toc += "\n"
-            toc += ("  %s. `"+section.name+"`_\n\n") % chr(snum + 64)
-            contents += "\n.. _"+section.name+":\n\n"
-            contents += section.name+"\n"
-            contents += "-" * len(section.name)+"\n"
+            s.cnum = 0
+            s.snum += 1
+            s.toc += "\n"
+            s.toc += ("  %s. `"+section.name+"`_\n\n") % chr(s.snum + 64)
+            s.contents += "\n.. _"+section.name+":\n\n"
+            s.contents += section.name+"\n"
+            s.contents += "-" * len(section.name)+"\n"
             if len(section.classes) != 0:
-                contents += "\nClasses\n#######\n"
+                s.contents += "\nClasses\n#######\n"
                 tree = inspect.getclasstree(section.classes)
                 this_toc = "\n"
                 for tier in tree[1]:
@@ -184,23 +265,23 @@ def main ():
                         this_toc += "\n"
                     elif isinstance(tier, tuple):
                         this_toc += "- `%s`_.\n" % tier[0].__name__
-                contents += this_toc
+                s.contents += this_toc
         elif obj is not None:
-            cnum += 1
+            s.cnum += 1
             cur_object = obj.__name__
-            index.append(cur_object)
-            toc += ("    %s. `"+cur_object+"`_\n") % chr(cnum + 96)
-            contents += "\n.. _"+cur_object+":\n\n"
+            s.index.append(cur_object)
+            s.toc += ("    %s. `"+cur_object+"`_\n") % chr(s.cnum + 96)
+            s.contents += "\n.. _"+cur_object+":\n\n"
             if inspect.isclass(obj):
                 desc = "class *%s*" % cur_object
             elif inspect.isfunction(obj):
                 desc = "function *%s* %s" % (cur_object, inspect.formatargspec(*inspect.getargspec(obj)))
             else:
                 desc = "*%s*" % cur_object
-            contents += desc + "\n"
-            contents += ("^" * len(desc)) +"\n"
+            s.contents += desc + "\n"
+            s.contents += ("^" * len(desc)) +"\n"
             if obj.__doc__:
-                contents += "\n" + inspect.getdoc(obj) + "\n"
+                s.contents += "\n" + inspect.getdoc(obj) + "\n"
             if inspect.isclass(obj):
                 clnum = 0
                 this_toc = ""
@@ -209,8 +290,8 @@ def main ():
                 attrs = [x for x in attrs if x.kind == "method" and inspect.ismethod(getattr(obj, x.name)) and x.defining_class == obj]
                 attrs.sort(cmp=lambda a, b: cmp(a.name.upper().replace("__INIT__", "A"*10), b.name.upper().replace("__INIT__", "A"*10)))
                 if len(attrs) != 0:
-                    contents += "\nMethods\n"
-                    contents += "#######\n\n"
+                    s.contents += "\nMethods\n"
+                    s.contents += "#######\n\n"
 
                 for attr in attrs:
                     method = getattr(obj, attr.name)
@@ -223,7 +304,7 @@ def main ():
                     if qname in parsed.ignore:
                         continue
 
-                    index.append(qname)
+                    s.index.append(qname)
 
                     clnum += 1
                     this_toc += "%s. `%s`_.\n" % (clnum, qname)
@@ -235,46 +316,20 @@ def main ():
                     else:
                         this_contents += "\n*Method undocumented*.\n"
                     this_contents += divider
-                contents += this_toc
-                contents += divider
-                contents += this_contents
+                s.contents += this_toc
+                s.contents += divider
+                s.contents += this_contents
             else:
-                contents += divider
+                s.contents += divider
 
-    toc += "\n%s. `Index`_" % (num+1)
+    if build_index:
+        make_index()
 
-    print toc, "\n", contents.rstrip(divider)
-
-    index.sort(cmp=lambda a, b: cmp(a.upper().replace("__INIT__", "A"*10), b.upper().replace("__INIT__", "A"*10)))
-    side_a = index[0::2]
-    a_size = sorted([len(x) for x in side_a], reverse=True)[0]
-    side_b = index[1::2]
-    b_size = sorted([len(x) for x in side_b], reverse=True)[0]
-
-    total_size = a_size + b_size + 10
-    column_size = total_size/2
-
-    index_term = "`%s`_"
-
-    def pad (term):
-        while len(term) < column_size:
-            term += " "
-        return term
-
-    table = "+" + "-" * (total_size/2) + "+" + "-" * (total_size/2) + "+\n"
-    for terms in zip(side_a, side_b):
-        for term in terms:
-            table += "|" + pad(index_term % term)
-        table += "|\n+" + "-" * (total_size/2) + "+" + "-" * (total_size/2) + "+\n"
-
-    print
-    print ".. _Index:"
-    print
-    print "Index"
-    print "====="
-    print
-
-    print table
+    if build_modules and previous_module is not None:
+        write_module()
+        close_module()
+    elif build_all:
+        write_all()
 
 if __name__=="__main__":
-    main()
+    main(sys.argv)
