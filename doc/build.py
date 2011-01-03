@@ -1,143 +1,9 @@
 #!/usr/bin/env python
 import sys, os
 import inspect
+from docparser import *
 
 sys.path.append('../')
-
-conf_file = open("doc.conf", "r")
-
-divider = "\n" + "~" * 80 + "\n"
-
-class c(object): pass
-def f (): pass
-
-class Document:
-    modules = []
-    ignore = []
-    def __iter__ (self):
-        for module in self.modules:
-            yield module, None, None
-            for section in module.sections:
-                yield module, section, None
-                if len(section.classes) != 0:
-                    for classes in section.classes:
-                        yield module, section, classes
-                if len(section.methods) != 0:
-                    for method in section.methods:
-                        yield module, section, method
-
-    def __str__ (self):
-        result = "Document:\n"
-        for module, section, obj in self:
-            if section is None and obj is None:
-                result += " -%s\n" % module.name
-            elif section is not None and obj is None:
-                result += "  -%s (classes)\n" % section.name
-                x = True
-            else:
-                if inspect.isfunction(obj) and x == True:
-                    result += "  -%s (methods)\n" % section.name
-                    x = False
-                result += "   -%s\n" % obj.__name__
-        return result
-
-class Module:
-    module = None
-    name = None
-    sections = None
-    identifier = None
-    def __init__ (self, name=None):
-        self.name = name
-        self.module = None
-        self.identifier = None
-        self.sections = []
-    def __repr__ (self):
-        return "<Module name=%s>" % self.name
-
-class Section:
-    name = None
-    classes = None
-    methods = None
-    def __init__ (self, name=None):
-        self.name = name
-        self.classes = []
-        self.methods = []
-    def __repr__ (self):
-        return "<Section name=%s, classes=%s, methods=%s>" % (self.name, self.classes, self.methods)
-
-def docparser (filename, verbose=False):
-    if isinstance(filename, file):
-        x = [x.strip() for x in filename.readlines()]
-        filename.close()
-        filename = x
-    elif isinstance(filename, str):
-        if "\n" in filename:
-            filename = filename.split("\n")
-        else:
-            x = open(filename, 'r')
-            filename = x.readlines()
-            x.close()
-    else:
-        raise Exception, "Unexpected type for docparser: %s." % type(filename)
-    doc = Document()
-    cur_module = None
-    cur_section = None
-    for line in filename:
-        line = line.strip()
-        if line.startswith("$module"):
-            if cur_section is not None and cur_section not in cur_module.sections:
-                cur_module.sections.append(cur_section)
-                cur_section = None
-            if cur_module is not None and cur_module not in doc.modules:
-                doc.modules.append(cur_module)
-                cur_module = None
-            cur_module = Module()
-            cur_module.module = __import__(line.split(" ", 2)[1])
-            cur_module.name = line.split(" ", 2)[2]
-            cur_module.identifier = line.split(" ", 2)[1]
-            if verbose:
-                print cur_module
-        elif line.startswith("$section"):
-            if cur_section is not None and cur_section not in cur_module.sections:
-                cur_module.sections.append(cur_section)
-                cur_section = None
-            cur_section = Section()
-            cur_section.name = line.split(" ", 1)[1]
-            if verbose:
-                print cur_section
-        elif line.startswith("$classes"):
-            class_list = line.split(" ", 1)[1].split(", ")
-            for c in class_list:
-                if verbose:
-                    print "<Class %s>" % c
-                if c == "None":
-                    break
-                else:
-                    cur_section.classes.append(getattr(cur_module.module, c))
-        elif line.startswith("$methods"):
-            method_list = line.split(" ", 1)[1].split(", ")
-            for m in method_list:
-                if verbose:
-                    print "Methods: " + m
-                if m == "None":
-                    break
-                else:
-                    cur_section.methods.append(getattr(cur_module.module, m))
-        elif line.startswith("$ignore"):
-            if verbose:
-                print "<Ignore %s>" % line.split()[1]
-            doc.ignore.append(line.split()[1])
-        else:
-            if verbose:
-                print "Unknown symbol: " + line
-
-    if cur_section is not None and cur_section not in cur_module.sections:
-        cur_module.sections.append(cur_section)
-
-    if cur_module is not None and cur_module not in doc.modules:
-        doc.modules.append(cur_module)
-
-    return doc
 
 #####################################################################
 #####################################################################
@@ -174,6 +40,8 @@ def main (args):
         index = ""
         def __init__ (self):
             self.index = []
+
+    divider = "\n" + "~" * 80 + "\n"
 
     s = Scope()
 
@@ -237,8 +105,11 @@ def main (args):
             previous_module = module.identifier
             s.snum = 0
             s.num += 1
-            s.toc += "\n"
-            s.toc += ("%s. `"+module.name+"`_\n") % s.num
+            if not module.suppress_toc:
+                s.toc += "\n"
+                s.toc += ("%s. `"+module.name+"`_\n") % s.num
+            else:
+                s.toc = ""
             s.contents += "\n.. _" +module.name+":\n\n"
             s.contents += module.name+"\n"
             s.contents += "=" * len(module.name)+"\n"
@@ -248,8 +119,9 @@ def main (args):
         elif section is not None and obj is None:
             s.cnum = 0
             s.snum += 1
-            s.toc += "\n"
-            s.toc += ("  %s. `"+section.name+"`_\n\n") % chr(s.snum + 64)
+            if not module.suppress_toc:
+                s.toc += "\n"
+                s.toc += ("  %s. `"+section.name+"`_\n\n") % chr(s.snum + 64)
             s.contents += "\n.. _"+section.name+":\n\n"
             s.contents += section.name+"\n"
             s.contents += "-" * len(section.name)+"\n"
@@ -259,11 +131,15 @@ def main (args):
                 this_toc = "\n"
                 for tier in tree[1]:
                     if isinstance(tier, list):
+                        if len(tier) == 0:
+                            continue
                         this_toc += "\n"
                         for subclass in tier:
                             this_toc += " - `%s`_.\n" % subclass[0].__name__
                         this_toc += "\n"
                     elif isinstance(tier, tuple):
+                        if len(tier) == 0:
+                            continue
                         this_toc += "- `%s`_.\n" % tier[0].__name__
                 s.contents += this_toc
             if len(section.methods) != 0:
@@ -276,7 +152,8 @@ def main (args):
             s.cnum += 1
             cur_object = obj.__name__
             s.index.append(cur_object)
-            s.toc += ("    %s. `"+cur_object+"`_\n") % chr(s.cnum + 96)
+            if not module.suppress_toc:
+                s.toc += ("    %s. `"+cur_object+"`_\n") % chr(s.cnum + 96)
             s.contents += "\n.. _"+cur_object+":\n\n"
             if inspect.isclass(obj):
                 desc = "class *%s*" % cur_object
@@ -327,6 +204,8 @@ def main (args):
                 s.contents += this_contents
             else:
                 s.contents += divider
+
+    # Whoa, that was a lot!
 
     if build_index:
         make_index()
