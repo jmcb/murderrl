@@ -21,7 +21,7 @@ Table of Contents
 
     a. `ShapeError`_
 
-  D. `Shape`_
+  D. `Shape Manipulation`_
 
     a. `adjoin`_
     b. `underneath`_
@@ -738,10 +738,10 @@ A generic Shape-related error.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Shape:
+.. _Shape Manipulation:
 
-Shape
------
+Shape Manipulation
+------------------
 
 .. _adjoin:
 

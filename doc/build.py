@@ -102,7 +102,7 @@ def docparser (filename, verbose=False):
                 cur_module.sections.append(cur_section)
                 cur_section = None
             cur_section = Section()
-            cur_section.name = line.split()[1]
+            cur_section.name = line.split(" ", 1)[1]
             if verbose:
                 print cur_section
         elif line.startswith("$classes"):
