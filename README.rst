@@ -16,6 +16,7 @@ rst2html conversion:
 - `Index`_
  - `shape module`_
  - `coord module`_
+ - `docparser module`_
 
 *Nota bene: Due to limitations of github, anchors are suppressed, therefore
 internal hyperlink sare non-functioning. You can view the complete but possibly
@@ -101,5 +102,7 @@ Footnotes
 .. _shape module: https://github.com/jmcb/murderrl/tree/master/doc/shape.rst
 
 .. _coord module: https://github.com/jmcb/murderrl/tree/master/doc/coord.rst
+
+.. _docparser module: https://github.com/jmcb/murderrl/tree/master/doc/docparser.rst
 
 .. _Murder RL page: http://jmcb.github.com/murderrl/index.html

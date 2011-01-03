@@ -5,9 +5,9 @@ from docparser import *
 
 sys.path.append('../')
 
-#####################################################################
-#####################################################################
-# Actual doc generation goes from here down.
+# Actual documentation generation happens here.
+# TODO: Clean-up!
+#       ... document
 
 def main (args):
     build_all = False
