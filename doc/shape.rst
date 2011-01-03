@@ -133,7 +133,7 @@ ShapeColumn (closure) class definition for more information.
 
 .. _Shape::draw_on:
 
-**Shape::draw_on** (self, shape, offset=<Coord 0,0>, check_conflict=True, conflict_except=False)
+**Shape::draw_on** (self, shape, offset=<Coord 0,0>, check_conflict=True, conflict_error=False)
 
 Attempt to draw Shape instance ``shape`` on top of self, starting at
 offset ``offset``. Conflict checking is enable by default (ie, it will
@@ -150,8 +150,9 @@ None), but by default it will simply ignore errors.
                      will only copy a glyph from ``shape`` onto self if
                      self contains None at that location. *Default
                      True*.
-:``conflict_except``: If true, will raise a ShapeError upon conflicts.
-                      *Default False*.
+:``conflict_error``: If true, will raise a ShapeError upon conflicts.
+                     Catching this error allows the detection of
+                     accidental overwriting. *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

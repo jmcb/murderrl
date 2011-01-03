@@ -606,7 +606,7 @@ class Shape (object):
             while len(self._canvas) > height:
                 self._canvas.pop(pop)
 
-    def draw_on (self, shape, offset=Coord(0, 0), check_conflict=True, conflict_except=False):
+    def draw_on (self, shape, offset=Coord(0, 0), check_conflict=True, conflict_error=False):
         """
         Attempt to draw Shape instance ``shape`` on top of self, starting at
         offset ``offset``. Conflict checking is enable by default (ie, it will
@@ -623,15 +623,16 @@ class Shape (object):
                              will only copy a glyph from ``shape`` onto self if
                              self contains None at that location. *Default
                              True*.
-        :``conflict_except``: If true, will raise a ShapeError upon conflicts.
-                              *Default False*.
+        :``conflict_error``: If true, will raise a ShapeError upon conflicts.
+                             Catching this error allows the detection of
+                             accidental overwriting. *Default False*.
         """
         assert isinstance(shape, Shape)
         assert Size(offset)+shape.size() <= self.size()
         for xy, char in shape:
             nxy = xy+offset
             if check_conflict and self[nxy] != None:
-                if conflict_except:
+                if conflict_error:
                     raise ShapeError, "Tried to blit foreign '%s' onto '%s' at %s!" % (char, self[nxy], nxy)
                 else:
                     continue
