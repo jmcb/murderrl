@@ -45,22 +45,22 @@ class WeightedString (str):
     """
     A simple collation of a string and a weight.
 
-    The default weight of ``50`` means that the string has no higher or lesser
-    chance of being chosen from a WeightedStringDatabase than any other string.
-    A weight of ``100`` means that it has double the chance, a weight of ``25``
+    The default weight of ``10`` means that the string has no higher or lesser
+    chance of being chosen from a WeightedDatabase than any other string.  A
+    weight of ``20`` means that it has double the chance, a weight of ``5``
     meaning that has half the chance, etc.
     """
-    def __init__ (self, string, weight=50):
+    def __init__ (self, string, weight=10):
         """
         Create a new weighted string.
 
         :``string``: The actual string contents.
-        :``weight``: The weight of the string. *Default 50*.
+        :``weight``: The weight of the string. *Default 10*.
         """
         self.weight = weight
         str.__init__(self, string)
 
-class WeightedStringDatabase (Database):
+class WeightedDatabase (Database):
     def _total_weight (self):
         weight = 0
         for item in self:
