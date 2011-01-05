@@ -61,14 +61,27 @@ class WeightedString (str):
         str.__init__(self, string)
 
 class WeightedDatabase (Database):
-    def _total_weight (self):
+    """
+    A slightly more complicated collection of data stored by weight. The
+    "default" weight of the databse is ``10``. Random choices pick things by
+    weight as well as randomness, etc.
+    """
+    def total_weight (self):
+        """
+        Return the total weight of the database.
+        """
         weight = 0
         for item in self:
             weight += item.weight
         return weight
 
-    def _random_pick (self):
-        tweight = self._total_weight()
+    def random_pick (self):
+        """
+        Randomly pick an item from the database based on its weight in
+        comparison to the total weight of the database. Returns a tuple of
+        (``index``, ``item``).
+        """
+        tweight = self.total_weight()
         n = random.uniform(0, tweight)
         for num, item in enumerate(self):
             if item.weight < n:
@@ -77,11 +90,12 @@ class WeightedDatabase (Database):
 
     def random (self):
         """
-        Returns a random element from the Database.
+        Returns a random element from the Database, picked by weight.
         """
         if len(self) == 0:
             return None
-        return _random_pick(self)[1]
+        return self.random_pick()[1]
+
     def random_pop (self):
         """
         Removes a random element from the Database and then returns it. This is
@@ -89,7 +103,7 @@ class WeightedDatabase (Database):
         """
         if len(self) == 0:
             return None
-        index = self._random_pick()[0]
+        index = self.random_pick()[0]
         return self.pop(item)
 
 def databases ():
