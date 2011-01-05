@@ -20,7 +20,7 @@ Attempt to create a "manor" akin to:
 """
 import sys
 sys.path.append("../")
-import shape, coord, random, data
+import shape, coord, random, database
 
 # Specific build styles:
 ONE_CORRIDOR = "one-corridor"

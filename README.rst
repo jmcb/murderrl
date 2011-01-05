@@ -14,8 +14,9 @@ You can access the documentation for trunk on-line via github's wonderful
 rst2html conversion:
 
 - `Index`_
- - `shape module`_
  - `coord module`_
+ - `shape module`_
+ - `database module`_
  - `docparser module`_
 
 *Nota bene: Due to limitations of github, anchors are suppressed, therefore
@@ -104,5 +105,7 @@ Footnotes
 .. _coord module: https://github.com/jmcb/murderrl/tree/master/doc/coord.rst
 
 .. _docparser module: https://github.com/jmcb/murderrl/tree/master/doc/docparser.rst
+
+.. _database module: https://github.com/jmcb/murderrl/tree/master/doc/database.rst
 
 .. _Murder RL page: http://jmcb.github.com/murderrl/index.html
