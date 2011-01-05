@@ -70,7 +70,11 @@ def num_databases ():
     """
     return len(_dbobjects)
 
-if __name__!="__main__":
+def _do_build ():
+    """
+    Convert the contents of the local directory, or a data directory relevant to
+    the local directory, into a series of Database objects.
+    """
     if os.path.exists("./data"):
         data_path = "./data"
     elif os.path.exists("../data"):
@@ -89,3 +93,6 @@ if __name__!="__main__":
         globals()[name] = Database(name, dbdata)
         dbfile.close()
         _dbobjects.append(globals()[name])
+
+if __name__!="__main__":
+    _do_build()
