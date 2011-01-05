@@ -23,7 +23,7 @@ class Database (list):
         """
         Returns a copy of the database that allows for modification.
         """
-        return Database(self.name, self[:])
+        return self.__class__(self.name, self[:])
     def random (self):
         """
         Returns a random element from the Database.
@@ -39,6 +39,57 @@ class Database (list):
         if len(self) == 0:
             return None
         item = random.randint(0, len(self))-1
+        return self.pop(item)
+
+class WeightedString (str):
+    """
+    A simple collation of a string and a weight.
+
+    The default weight of ``50`` means that the string has no higher or lesser
+    chance of being chosen from a WeightedStringDatabase than any other string.
+    A weight of ``100`` means that it has double the chance, a weight of ``25``
+    meaning that has half the chance, etc.
+    """
+    def __init__ (self, string, weight=50):
+        """
+        Create a new weighted string.
+
+        :``string``: The actual string contents.
+        :``weight``: The weight of the string. *Default 50*.
+        """
+        self.weight = weight
+        str.__init__(self, string)
+
+class WeightedStringDatabase (Database):
+    def _total_weight (self):
+        weight = 0
+        for item in self:
+            weight += item.weight
+        return weight
+
+    def _random_pick (self):
+        tweight = self._total_weight()
+        n = random.uniform(0, tweight)
+        for num, item in enumerate(self):
+            if item.weight < n:
+                return num, item
+            n = n - item.weight
+
+    def random (self):
+        """
+        Returns a random element from the Database.
+        """
+        if len(self) == 0:
+            return None
+        return _random_pick(self)[1]
+    def random_pop (self):
+        """
+        Removes a random element from the Database and then returns it. This is
+        an in-place activity.
+        """
+        if len(self) == 0:
+            return None
+        index = self._random_pick()[0]
         return self.pop(item)
 
 def databases ():
