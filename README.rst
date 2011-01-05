@@ -57,7 +57,7 @@ License
 Where relevant, MurderRL is licensed under the terms of the following MIT
 license:
 
-Copyright (c) 2010 Jon McManus
+Copyright (c) 2010 Jon McManus, Johanna Ploog
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
