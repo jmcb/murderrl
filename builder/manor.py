@@ -78,10 +78,10 @@ def builder (style=ONE_CORRIDOR):
 
         row2.append(entrance_hall)
 
-        while len(row2) >= 10:
+        while len(row2) <= 10:
             # If we have six rooms, one in three chance of not adding any more
             # rooms.
-            if len(row2) < 6 and random.randint(1, 3) == 1:
+            if len(row2) > 6 and random.randint(1, 3) == 1:
                 break
 
 
