@@ -1,52 +1,36 @@
 %
 name=drawing room
-section=domestic
 weight=100
 %
 name=dining room
-section=domestic
 %
 name=library
-section=domestic
 %
 name=morning room
-section=domestic
 %
 name=breakfast room
-section=domestic
 %
 name=inglenook
-section=domestic
 %
 name=boudoir
-section=domestic
 %
 name=business room
-section=domestic
 %
 name=smoking room
-section=domestic
 %
 name=billiard room
-section=domestic
 %
 name=conservatory
-section=domestic
 %
 name=picture gallery
-section=domestic
 %
 name=hall
-section=domestic
 %
 name=cloak room
-section=domestic
 %
 name=lavatory
-section=domestic
 %
 name=porch
-section=domestic
 %
 name=kitchen
 section=utility

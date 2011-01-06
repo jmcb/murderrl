@@ -1,4 +1,4 @@
 %id room_spec
 $name
-$section
+$section domestic
 $weight 10
