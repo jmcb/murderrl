@@ -893,6 +893,7 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1
+            collection[0].normalise(width=new_canvas.width(), height=new_canvas.height())
         else:
             collection = ShapeCollection()
             collection.append(new_canvas)
@@ -942,6 +943,7 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1
+            collection[0].normalise(width=new_canvas.width(), height=new_canvas.height())
         else:
             collection = ShapeCollection()
             collection.append(new_canvas)
