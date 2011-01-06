@@ -852,9 +852,12 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     new_canvas = Shape(width=new_size.width-overlap, height=new_size.height, fill=fill)
 
     if collection:
-        collection = ShapeCollection()
-        collection.append(new_canvas)
-        collection.append(shape1)
+        if isinstance(shape1, ShapeCollection):
+            collection = shape1
+        else:
+            collection = ShapeCollection()
+            collection.append(new_canvas)
+            collection.append(shape1)
         collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
         return collection
     else:
@@ -898,9 +901,12 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     if offset_second:
         shape2_offset.x = left_offset
     if collection:
-        collection = ShapeCollection()
-        collection.append(new_canvas)
-        collection.append(ShapeCoord(shape1, shape1_offset))
+        if isinstance(shape1, ShapeCollection):
+            collection = shape1
+        else:
+            collection = ShapeCollection()
+            collection.append(new_canvas)
+            collection.append(ShapeCoord(shape1, shape1_offset))
         collection.append(ShapeCoord(shape2, shape2_offset))
         return collection
     else:
