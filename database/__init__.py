@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, random
+import sys, os, random, collections, re
 
 _dbobjects = []
 
@@ -136,6 +136,146 @@ def num_databases ():
     """
     return len(_dbobjects)
 
+def split_escaped_delim (delimiter, string, count=0):
+    """
+    Returns the result of splitting ``string`` with ``delimiter``. It is an
+    extension of ``string.split(delimiter, count)`` in that it ignores instances
+    of the delimiter being escaped or contained within a string.
+
+    :``delimiter``: The delimiter to split the string with. *Required*.
+    :``string``: The string to be split. *Required*.
+    :``count``: How many strings to limit the match to. *Default 0*.
+    """
+    assert len(delimiter) == 1
+
+    split_expression = re.compile(r"""(?<!\\)%s""" % (delimiter))
+
+    result = split_expression.split(string, count)
+
+    return result
+
+def parse_spec (spec_file):
+    """
+    Parses a specification into either a list or a namedtuple constructor.
+
+    **Example specifications**::
+
+        $0
+
+    *Would return a single-element list creator that could be applied to all
+    incoming data.*::
+
+        %delim ,
+        $0
+        $1
+        $2
+
+    *Would return a three-element list creator using "," as the delimiter.*::
+
+        $name
+        $weight
+
+    *Would return a two-element namedtuple called "(filename)_spec" with a name
+    and weight property.*::
+
+        %id room_spec
+        $name
+        $weight
+
+    *Would return a two-element namedtuple called "room_spec" with a name and
+    weight property.*
+
+    **Example specification usage**::
+
+        (using the "room_spec" above)
+        %
+        name=dining room
+        weight=10
+        %
+        name=kitchen
+        weight=20
+
+    In this instance, the order doesn't matter, as they are passed by
+    parameter::
+
+        (using the first unnamed list example)
+        %
+        dining room
+        %
+        kitchen
+        %
+
+    As there is just a single set of data, the block is parsed and stripped of
+    whitespace and then stored in a single element::
+
+        (using the second unnamed list example)
+        %
+        dining room,10,domestic
+        %
+        kitchen, 50, utility
+        %
+
+    Here, the provided delimiter of a commas used to convert the incoming block
+    into a three-element list.
+    """
+    spec_object = None
+    spec_name = spec_file.replace(".", "_")
+    params = []
+    namedtuple = False
+    delimiter = "\n"
+
+    spec_file = open(spec_file, "r")
+    spec = spec_file.readlines()
+    spec_file.close()
+
+    for line in spec:
+        line = line.strip()
+        if line.startswith("%id"):
+            spec_name = line.split(" ", 1)[1]
+        elif line.startswith("%delim"):
+            delimiter = line.split(" ", 1)[1].strip()
+        elif line.startswith("$"):
+            param_name = line.strip("$")
+            if not param_name.isdigit():
+                namedtuple = True
+            params.append(param_name)
+
+    if namedtuple:
+        parent = collections.namedtuple(spec_name, " ".join(params))
+    else:
+        parent = list
+
+    class spec_object (parent):
+        def __init__ (self, block):
+            self.__name__ = spec_name
+            if isinstance(block, str):
+                block = split_escaped_delim(delimiter, block.strip())
+                assert len(block) == len(params)
+                if not namedtuple:
+                    parent.__init__(self, block)
+                else:
+                    new_data = {}
+                    for item in block:
+                        item = split_escaped_delim("=", item, 1)
+                        assert len(item) == 2
+                        new_data[item[0]] = item[1]
+                    parent.__init__(self, **new_data)
+            elif isinstance(block, list):
+                if not namedtuple:
+                    parent.__init__(self, block)
+                else:
+                    parent.__init__(self, *block)
+            elif isinstance(block, dict):
+                assert namedtuple
+                parent.__init__(self, **block)
+        def __repr__ (self):
+            if namedtuple:
+                return "<%s>" % parent.__repr__(self)
+            else:
+                return "<%s %s>" % (self.__name__, parent.__repr__(self))
+
+    return spec_object
+
 def _do_build ():
     """
     Convert the contents of the local directory, or a data directory relevant to
@@ -154,8 +294,13 @@ def _do_build ():
     for database in databases:
         # chop the extension off
         name = database[:-3]
+        spec = name + ".spec"
+        if os.path.exists(os.path.join(data_path, spec)):
+            spec_obj = parse_spec(os.path.join(data_path, spec))
+        else:
+            spec_obj = str
         dbfile = open(os.path.join(data_path, database), "r")
-        dbdata = [item.strip() for item in dbfile.read().strip().strip("%").split("%")]
+        dbdata = [spec_obj(item.strip()) for item in dbfile.read().strip().strip("%").split("%")]
         globals()[name] = Database(name, dbdata)
         dbfile.close()
         _dbobjects.append(globals()[name])
