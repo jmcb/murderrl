@@ -24,25 +24,49 @@ class Database (list):
         Returns a copy of the database that allows for modification.
         """
         return self.__class__(self.name, self[:])
-    def random (self):
+    def random (self, checkfn=None):
         """
         Returns a random element from the Database.
+
+        :``checkfn``: A function to be applied to results. If this function
+                      returns ``true``, the result is allowed; if it returns
+                      ``false``, another item is picked. *Default None*.
         """
         if len(self) == 0:
             return None
-        return random.choice(self)
-    def random_pop (self):
+        if checkfn is None:
+            return random.choice(self)
+        else:
+            item = random.choice(self)
+            tries = len(self) * 5
+            while not checkfn(item):
+                item = random.choice(self)
+                tries = tries - 1
+                if tries <= 0:
+                    return None
+            return item
+    def random_pop (self, checkfn=None):
         """
         Removes a random element from the Database and then returns it. This is
         an in-place activity.
+
+        :``checkfn``: A function to be applied to results. If this function
+                      returns ``true``, the result is allowed; if it returns
+                      ``false``, another item is picked. *Default None*.
         """
         if len(self) == 0:
             return None
-        item = random.randint(0, len(self))-1
+        item = random.randint(0, len(self)-1)
+        if checkfn is not None:
+            tries = len(self) * 5
+            while not checkfn(self[item]):
+                item = random.randint(0, len(self)-1)
+                tries = tries - 1
+                if tries <= 0:
+                    return None
         return self.pop(item)
     def __repr__ (self):
         return "Database[%s]" % (list.__repr__(self))
-
 
 class WeightedString (str):
     """
@@ -69,45 +93,73 @@ class WeightedDatabase (Database):
     "default" weight of the databse is ``10``. Random choices pick things by
     weight as well as randomness, etc.
     """
-    def total_weight (self):
+    def total_weight (self, checkfn=None):
         """
         Return the total weight of the database.
+
+        :``checkfn``: A function to be applied to each item. If the function
+                      returns ``false``, the weight of the item is ignored (and the
+                      item is discarded). *Default None*.
         """
         weight = 0
         for item in self:
+            if checkfn is not None and not checkfn(item):
+                continue
             assert hasattr(item, "weight")
             weight += item.weight
         return weight
 
-    def random_pick (self):
+    def random_pick (self, checkfn=None):
         """
         Randomly pick an item from the database based on its weight in
         comparison to the total weight of the database. Returns a tuple of
         (``index``, ``item``).
+
+        :``checkfn``: A function to be applied to the items in the database: if
+                      it returns ``false``, the item is not considered. *Default
+                      None*.
         """
-        tweight = self.total_weight()
+        tweight = self.total_weight(checkfn=checkfn)
+        if tweight == 0:
+            return None, None
         n = random.uniform(0, tweight)
         for num, item in enumerate(self):
+            if checkfn is not None and not checkfn(item):
+                continue
+
             if item.weight < n:
                 return num, item
             n = n - item.weight
 
-    def random (self):
+    def random (self, checkfn=None):
         """
         Returns a random element from the Database, picked by weight.
+
+        :``checkfn``: A function to be applied to the items in the database: if
+                      it returns ``false``, the item is not considered. *Default
+                      None*.
         """
         if len(self) == 0:
             return None
-        return self.random_pick()[1]
+        return self.random_pick(checkfn=checkfn)[1]
 
-    def random_pop (self):
+    def random_pop (self, checkfn=None):
         """
         Removes a random element from the Database and then returns it. This is
         an in-place activity.
+
+        :``checkfn``: A function to be applied to the items in the database: if
+                      it returns ``false``, the item is not considered. *Default
+                      None*.
         """
         if len(self) == 0:
             return None
-        index = self.random_pick()[0]
+
+        index = self.random_pick(checkfn=checkfn)[0]
+
+        if index == None:
+            return None
+
         return self.pop(item)
 
     def __repr__ (self):
