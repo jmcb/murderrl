@@ -160,7 +160,7 @@ class WeightedDatabase (Database):
         if index == None:
             return None
 
-        return self.pop(item)
+        return self.pop(index)
 
     def __repr__ (self):
         return "WeightedDatabase[%s]" % (list.__repr__(self))
