@@ -122,7 +122,9 @@ class WeightedDatabase (Database):
         tweight = self.total_weight(checkfn=checkfn)
         if tweight == 0:
             return None, None
+
         n = random.uniform(0, tweight)
+
         for num, item in enumerate(self):
             if checkfn is not None and not checkfn(item):
                 continue
@@ -130,6 +132,8 @@ class WeightedDatabase (Database):
             if item.weight < n:
                 return num, item
             n = n - item.weight
+
+        return None, None
 
     def random (self, checkfn=None):
         """
