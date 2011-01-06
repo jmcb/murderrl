@@ -1,6 +1,7 @@
 %
 name=drawing room
 section=domestic
+weight=100
 %
 name=dining room
 section=domestic

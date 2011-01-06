@@ -40,6 +40,9 @@ class Database (list):
             return None
         item = random.randint(0, len(self))-1
         return self.pop(item)
+    def __repr__ (self):
+        return "Database[%s]" % (list.__repr__(self))
+
 
 class WeightedString (str):
     """
@@ -107,6 +110,9 @@ class WeightedDatabase (Database):
         index = self.random_pick()[0]
         return self.pop(item)
 
+    def __repr__ (self):
+        return "WeightedDatabase[%s]" % (list.__repr__(self))
+
 def databases ():
     """
     Returns a list of all Database objects stored.
@@ -173,10 +179,10 @@ def parse_spec (spec_file):
     *Would return a three-element list creator using "," as the delimiter.*::
 
         $name
-        $weight
+        $weight 10
 
     *Would return a two-element namedtuple called "(filename)_spec" with a name
-    and weight property.*::
+    and weight property. The weight would default to 10 if not supplied.*::
 
         %id room_spec
         $name
@@ -190,7 +196,6 @@ def parse_spec (spec_file):
         (using the "room_spec" above)
         %
         name=dining room
-        weight=10
         %
         name=kitchen
         weight=20
@@ -221,6 +226,7 @@ def parse_spec (spec_file):
     spec_object = None
     spec_name = spec_file.replace(".", "_")
     params = []
+    default_params = {}
     namedtuple = False
     delimiter = "\n"
 
@@ -230,18 +236,44 @@ def parse_spec (spec_file):
 
     for line in spec:
         line = line.strip()
+        param_name = None
+        default_param = None
         if line.startswith("%id"):
             spec_name = line.split(" ", 1)[1]
         elif line.startswith("%delim"):
             delimiter = line.split(" ", 1)[1].strip()
         elif line.startswith("$"):
-            param_name = line.strip("$")
-            if not param_name.isdigit():
+            line = line.split(" ", 1)
+            if len(line) >= 1:
+                param_name = line[0].strip("$")
+            if len(line) == 2:
+                default_param = line[1].strip()
+            if param_name and not param_name.isdigit():
                 namedtuple = True
+            if default_param and param_name.isdigit():
+                assert param_name != "0"
             params.append(param_name)
+            if default_param:
+                default_params[param_name]=default_param
 
     if namedtuple:
-        parent = collections.namedtuple(spec_name, " ".join(params))
+        class parent (object):
+            def __init__ (self, *args, **kwargs):
+                self.__name__ = spec_name
+                if len(args) == len(params):
+                    # arg for arg
+                    for key, value in zip(params, args):
+                        self.__dict__[key] = value
+                elif len(kwargs) == len(params):
+                    for key, value in kwargs.iteritems():
+                        self.__dict__[key] = value
+                else:
+                    assert not "Didn't get the right number of arguments!"
+            def __repr__ (self):
+                values = ""
+                for key in params:
+                    values += "%s=%s," % (key, repr(self.__dict__[key]))
+                return "<%s %s>" % (self.__name__, values)
     else:
         parent = list
 
@@ -250,7 +282,15 @@ def parse_spec (spec_file):
             self.__name__ = spec_name
             if isinstance(block, str):
                 block = split_escaped_delim(delimiter, block.strip())
-                assert len(block) == len(params)
+                assert len(block) + len(default_params) >= len(params)
+                if len(block) < len(params):
+                    for key, default in default_params.iteritems():
+                        if key.isdigit():
+                            assert int(key) >= len(block)
+                            block.insert(int(key), default)
+                        else:
+                            block.append("%s=%s" % (key, default))
+
                 if not namedtuple:
                     parent.__init__(self, block)
                 else:
@@ -259,6 +299,7 @@ def parse_spec (spec_file):
                         item = split_escaped_delim("=", item, 1)
                         assert len(item) == 2
                         new_data[item[0]] = item[1]
+
                     parent.__init__(self, **new_data)
             elif isinstance(block, list):
                 if not namedtuple:
@@ -270,7 +311,7 @@ def parse_spec (spec_file):
                 parent.__init__(self, **block)
         def __repr__ (self):
             if namedtuple:
-                return "<%s>" % parent.__repr__(self)
+                return parent.__repr__(self)
             else:
                 return "<%s %s>" % (self.__name__, parent.__repr__(self))
 
@@ -301,7 +342,10 @@ def _do_build ():
             spec_obj = str
         dbfile = open(os.path.join(data_path, database), "r")
         dbdata = [spec_obj(item.strip()) for item in dbfile.read().strip().strip("%").split("%")]
-        globals()[name] = Database(name, dbdata)
+        db = Database
+        if hasattr(dbdata[0], 'weight'):
+            db = WeightedDatabase
+        globals()[name] = db(name, dbdata)
         dbfile.close()
         _dbobjects.append(globals()[name])
 
