@@ -228,6 +228,13 @@ class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
         Wrapper over self.shape.height.
         """
         return self.shape.height()
+    def __getattribute__ (self, attr):
+        if attr == "shape":
+            return tuple.__getitem__(self, 0)
+        if hasattr(self.shape, attr):
+            return self.shape.__getattribute__(attr)
+        else:
+            return tuple.__getattribute__(self, attr)
 
 class ShapeCollection (object):
     """
