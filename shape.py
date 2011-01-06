@@ -290,14 +290,16 @@ class ShapeCollection (object):
         converted into ShapeCoords, using Coord(0, 0) as their offset. All other
         instances are not allowed.
         """
-        if coord is not None:
-            item = ShapeCoord(item, coord)
-        if isinstance(item, Shape):
-            self._shapes.append(ShapeCoord(item, Coord(0, 0)))
-        elif isinstance(item, ShapeCoord):
+        if isinstance(item, ShapeCoord):
             self._shapes.append(item)
         else:
-            assert isinstance(item, ShapeCoord)
+            if coord is not None:
+                item = ShapeCoord(item, coord)
+            elif isinstance(item, Shape):
+                item = ShapeCoord(item, Coord(0, 0))
+            else:
+                assert isinstance(item, ShapeCoord)
+            self._shapes.append(item)
         self.sort()
 
     def pop (self, index=-1):
