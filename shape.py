@@ -213,7 +213,21 @@ class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
     A named tuple pair providing ``shape`` and ``coord`` members. This is primarily
     used by the ShapeCollection class.
     """
-    pass
+    def size (self):
+        """
+        Wrapper over self.shape.size.
+        """
+        return self.shape.size()
+    def width (self):
+        """
+        Wraper over self.shape.width.
+        """
+        return self.shape.width()
+    def height (self):
+        """
+        Wrapper over self.shape.height.
+        """
+        return self.shape.height()
 
 class ShapeCollection (object):
     """
@@ -312,7 +326,7 @@ class ShapeCollection (object):
         :``item``: The item to be fetched.
         """
         self.sort()
-        return self._shapes.__getitem__(self, item)
+        return self._shapes.__getitem__(item)
 
     def __setitem__ (self, item, value):
         """
@@ -328,7 +342,7 @@ class ShapeCollection (object):
         if isinstance(value, Shape):
             value = ShapeCoord(shape, Coord(0, 0))
         assert isinstance(value, ShapeCoord)
-        result = self._shapes.__setitem__(self, item, value)
+        result = self._shapes.__setitem__(item, value)
         self.sort()
         return result
 
