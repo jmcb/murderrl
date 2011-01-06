@@ -749,8 +749,8 @@ Methods
 
 .. _adjoin:
 
-function *adjoin* (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *adjoin* (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False, collection=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one. This method places shapes
 side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -769,13 +769,15 @@ left by ``overlap``. Finally, the resultant shape will be padded using
                 *Default False*.
 :``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
                      ``shape2`` where they overlap with the parts of ``shape1``.
+:``collection``: If true, returns a ShapeCollection instead of a canvas.
+                 *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _underneath:
 
-function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one by drawing ``shape1`` and then
 drawing ``shape2`` directly beneath it.
@@ -794,13 +796,15 @@ drawing ``shape2`` directly beneath it.
                      ``shape1``'s glyphs. *Default False*
 :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
 :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
+:``collection``: If true, returns a ShapeCollection instead of a canvas.
+                 *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _atop:
 
-function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one by drawing ``shape1`` and then
 drawing ``shape2`` directly above it. This is an alias for ``underneath``
@@ -820,6 +824,8 @@ with the ``join_top`` flag set to True.
                      ``shape1``'s glyphs. *Default False*
 :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
 :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
+:``collection``: If true, returns a ShapeCollection instead of a canvas.
+                 *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

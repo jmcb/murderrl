@@ -85,18 +85,26 @@ Returns a copy of the database that allows for modification.
 
 .. _Database::random:
 
-**Database::random** (self)
+**Database::random** (self, checkfn=None)
 
 Returns a random element from the Database.
+
+:``checkfn``: A function to be applied to results. If this function
+              returns ``true``, the result is allowed; if it returns
+              ``false``, another item is picked. *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _Database::random_pop:
 
-**Database::random_pop** (self)
+**Database::random_pop** (self, checkfn=None)
 
 Removes a random element from the Database and then returns it. This is
 an in-place activity.
+
+:``checkfn``: A function to be applied to results. If this function
+              returns ``true``, the result is allowed; if it returns
+              ``false``, another item is picked. *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -202,36 +210,52 @@ Methods
 
 .. _WeightedDatabase::random:
 
-**WeightedDatabase::random** (self)
+**WeightedDatabase::random** (self, checkfn=None)
 
 Returns a random element from the Database, picked by weight.
+
+:``checkfn``: A function to be applied to the items in the database: if
+              it returns ``false``, the item is not considered. *Default
+              None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _WeightedDatabase::random_pick:
 
-**WeightedDatabase::random_pick** (self)
+**WeightedDatabase::random_pick** (self, checkfn=None)
 
 Randomly pick an item from the database based on its weight in
 comparison to the total weight of the database. Returns a tuple of
 (``index``, ``item``).
 
+:``checkfn``: A function to be applied to the items in the database: if
+              it returns ``false``, the item is not considered. *Default
+              None*.
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _WeightedDatabase::random_pop:
 
-**WeightedDatabase::random_pop** (self)
+**WeightedDatabase::random_pop** (self, checkfn=None)
 
 Removes a random element from the Database and then returns it. This is
 an in-place activity.
+
+:``checkfn``: A function to be applied to the items in the database: if
+              it returns ``false``, the item is not considered. *Default
+              None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _WeightedDatabase::total_weight:
 
-**WeightedDatabase::total_weight** (self)
+**WeightedDatabase::total_weight** (self, checkfn=None)
 
 Return the total weight of the database.
+
+:``checkfn``: A function to be applied to each item. If the function
+              returns ``false``, the weight of the item is ignored (and the
+              item is discarded). *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -280,10 +304,10 @@ incoming data.*::
 *Would return a three-element list creator using "," as the delimiter.*::
 
     $name
-    $weight
+    $weight 10
 
 *Would return a two-element namedtuple called "(filename)_spec" with a name
-and weight property.*::
+and weight property. The weight would default to 10 if not supplied.*::
 
     %id room_spec
     $name
@@ -297,7 +321,6 @@ weight property.*
     (using the "room_spec" above)
     %
     name=dining room
-    weight=10
     %
     name=kitchen
     weight=20
