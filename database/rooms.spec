@@ -2,3 +2,4 @@
 $name
 $section domestic
 $weight 10
+%int weight

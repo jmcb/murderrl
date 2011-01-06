@@ -279,6 +279,7 @@ def parse_spec (spec_file):
     spec_name = spec_file.replace(".", "_")
     params = []
     default_params = {}
+    int_conversion = []
     namedtuple = False
     delimiter = "\n"
 
@@ -307,6 +308,9 @@ def parse_spec (spec_file):
             params.append(param_name)
             if default_param:
                 default_params[param_name]=default_param
+        elif line.startswith("%int"):
+            var = line.split(" ", 1)[1].strip()
+            int_conversion.append(var)
 
     if namedtuple:
         class parent (object):
@@ -325,7 +329,7 @@ def parse_spec (spec_file):
                 values = ""
                 for key in params:
                     values += "%s=%s," % (key, repr(self.__dict__[key]))
-                return "<%s %s>" % (self.__name__, values)
+                return "<%s %s>" % (self.__name__, values.strip(", "))
     else:
         parent = list
 
@@ -344,11 +348,16 @@ def parse_spec (spec_file):
                             block.append("%s=%s" % (key, default))
 
                 if not namedtuple:
+                    if int_conversion:
+                        for conv in int_conversion:
+                            block[conv] = int(block[conv])
                     parent.__init__(self, block)
                 else:
                     new_data = {}
                     for item in block:
                         item = split_escaped_delim("=", item, 1)
+                        if int_conversion and item[0] in int_conversion:
+                            item[1] = int(item[1])
                         assert len(item) == 2
                         new_data[item[0]] = item[1]
 
