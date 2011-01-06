@@ -286,6 +286,24 @@ class ShapeCollection (object):
         self.sort()
         return item
 
+    def width (self):
+        """
+        Returns the width of the widest member.
+        """
+        return self[0].width()
+
+    def height (self):
+        """
+        Returns the height of the highest member.
+        """
+        return self[0].height()
+
+    def size (self):
+        """
+        Returns the size of the largest member.
+        """
+        return self[0].size()
+
     def __getitem__ (self, item):
         """
         Fetch item index ``item`` from the collection of ShapeCoords after
