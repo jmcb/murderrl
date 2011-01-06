@@ -325,6 +325,12 @@ class ShapeCollection (object):
         """
         return self[0].size()
 
+    def copy (self):
+        """
+        Returns a copy of this collection.
+        """
+        return ShapeCollection(self._shapes[:])
+
     def __getitem__ (self, item):
         """
         Fetch item index ``item`` from the collection of ShapeCoords after
