@@ -62,7 +62,7 @@ def builder (style=ONE_CORRIDOR):
                 Currently on ``ONE_CORRIDOR`` is supported. *Default
                 ONE_CORRIDOR*.
     """
-    room_names = data.rooms.copy()
+    room_names = database.rooms.copy()
 
     rooms = []
 
