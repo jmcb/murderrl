@@ -72,6 +72,7 @@ class WeightedDatabase (Database):
         """
         weight = 0
         for item in self:
+            assert hasattr(item, "weight")
             weight += item.weight
         return weight
 
@@ -140,12 +141,12 @@ def _do_build ():
     Convert the contents of the local directory, or a data directory relevant to
     the local directory, into a series of Database objects.
     """
-    if os.path.exists("./data"):
-        data_path = "./data"
-    elif os.path.exists("../data"):
-        data_path = "../data"
-    elif os.path.exists("../../data"):
-        data_path = "../../data"
+    if os.path.exists("./database"):
+        data_path = "./database"
+    elif os.path.exists("../database"):
+        data_path = "../database"
+    elif os.path.exists("../../database"):
+        data_path = "../../database"
     else:
         data_path = "."
 
