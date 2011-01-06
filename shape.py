@@ -231,6 +231,8 @@ class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
     def __getattribute__ (self, attr):
         if attr == "shape":
             return tuple.__getitem__(self, 0)
+        elif attr == "coord":
+            return tuple.__getitem__(self, 1)
         if hasattr(self.shape, attr):
             return self.shape.__getattribute__(attr)
         else:
@@ -250,12 +252,13 @@ class ShapeCollection (object):
         self._shapes = []
 
         if shapes is not None:
-            for shape in shapes:
-                if isinstance(shape, Shape):
-                    shape = ShapeCoord(item, Coord(0, 0))
-
-                assert isinstance(shape, ShapeCoord)
-                self._shapes.append(shape)
+            for s in shapes:
+                if not isinstance(s, ShapeCoord):
+                    if isinstance(s, Shape):
+                        s = ShapeCoord(s, Coord(0, 0))
+                    else:
+                        assert isinstance(shape, ShapeCoord)
+                self._shapes.append(s)
 
         self.sort()
 
@@ -590,10 +593,10 @@ class Shape (object):
         assert width is None or isinstance(width, int)
         assert height is None or isinstance(height, int)
 
-        if width is not None and width > self.width():
+        if width is not None and width < self.width():
             raise ShapeError, "can't normalise to less than maximum width."
 
-        if height is not None and height > self.height():
+        if height is not None and height < self.height():
             raise ShapeError, "can't normalise to less than maximum height."
 
         if fill is not None and len(fill) != 1:
@@ -899,7 +902,10 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1.copy()
-            collection[0].normalise(width=new_canvas.width(), height=new_canvas.height())
+            if collection[0].width() < new_canvas.width():
+                collection[0].normalise(width=new_canvas.width())
+            if collection[0].height() < new_canvas.height():
+                collection[0].normalise(height=new_canvas.height())
         else:
             collection = ShapeCollection()
             collection.append(new_canvas)
@@ -949,7 +955,10 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1.copy()
-            collection[0].normalise(width=new_canvas.width(), height=new_canvas.height())
+            if collection[0].width() < new_canvas.width():
+                collection[0].normalise(width=new_canvas.width())
+            if collection[0].height() < new_canvas.height():
+                collection[0].normalise(height=new_canvas.height())
         else:
             collection = ShapeCollection()
             collection.append(new_canvas)
