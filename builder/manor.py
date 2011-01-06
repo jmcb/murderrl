@@ -83,10 +83,10 @@ def builder (style=ONE_CORRIDOR):
 
         row2.append(entrance_hall)
 
-        while len(row2) <= 10:
+        while len(row2) <= 8:
             # If we have six rooms, one in three chance of not adding any more
             # rooms.
-            if len(row2) > 6 and random.randint(1, 3) == 1:
+            if len(row2) > 5 and random.randint(1, 3) == 1:
                 break
 
             name = room_names.random_pop()
@@ -158,14 +158,12 @@ def builder (style=ONE_CORRIDOR):
 
         # Now, start drawing it! YAY!
         first_room = row1[0].as_shape()
-        print first_room
         second_room = row1[1].as_shape()
-        print second_room
-        collection = shape.adjoin(first_room, second_room, overlap=1)
+        collection = shape.adjoin(first_room, second_room, overlap=1, collection=True)
         for room in row1[1:]:
-            collection = shape.adjoin(collection, room.as_shape(), overlap=1)
+            collection = shape.adjoin(collection, room.as_shape(), overlap=1, collection=True)
 
-        print collection
+        return collection
 
     else:
         return shape.ShapeCollection(), rooms

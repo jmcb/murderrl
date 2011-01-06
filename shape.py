@@ -260,8 +260,6 @@ class ShapeCollection (object):
                         assert isinstance(shape, ShapeCoord)
                 self._shapes.append(s)
 
-        self.sort()
-
     def combine (self):
         """
         Converts a collection into a single Shape by taking the largest contained
@@ -271,6 +269,8 @@ class ShapeCollection (object):
         Doesn't currently provide error checking. Should.
         """
         # We take the largest and work on that, ignoring its coord.
+        self.sort()
+
         base = self._shapes[0].shape
 
         for sc in self._shapes[1:]:
@@ -300,7 +300,6 @@ class ShapeCollection (object):
             else:
                 assert isinstance(item, ShapeCoord)
             self._shapes.append(item)
-        self.sort()
 
     def pop (self, index=-1):
         """
@@ -309,7 +308,6 @@ class ShapeCollection (object):
         :``index``: The index in question. *Default -1*.
         """
         item = self._shapes.pop(index)
-        self.sort()
         return item
 
     def width (self):
@@ -343,7 +341,6 @@ class ShapeCollection (object):
 
         :``item``: The item to be fetched.
         """
-        self.sort()
         return self._shapes.__getitem__(item)
 
     def __setitem__ (self, item, value):
@@ -361,7 +358,6 @@ class ShapeCollection (object):
             value = ShapeCoord(shape, Coord(0, 0))
         assert isinstance(value, ShapeCoord)
         result = self._shapes.__setitem__(item, value)
-        self.sort()
         return result
 
     def __iter__ (self):
@@ -678,7 +674,7 @@ class Shape (object):
                              accidental overwriting. *Default False*.
         """
         assert isinstance(shape, Shape)
-        assert Size(offset)+shape.size() < self.size()
+        assert Size(offset)+shape.size() <= self.size()
         for xy, char in shape:
             nxy = xy+offset
             if check_conflict and self[nxy] != None:
@@ -686,11 +682,7 @@ class Shape (object):
                     raise ShapeError, "Tried to blit foreign '%s' onto '%s' at %s!" % (char, self[nxy], nxy)
                 else:
                     continue
-            try:
-                self[nxy] = char
-            except:
-                print self
-                raise
+            self[nxy] = char
 
     def section (self, section_start, section_stop=None):
         """
@@ -908,14 +900,10 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1.copy()
-            if collection[0].width() < new_canvas.width():
-                collection[0].normalise(width=new_canvas.width()+10)
-            if collection[0].height() < new_canvas.height():
-                collection[0].normalise(height=new_canvas.height())
         else:
             collection = ShapeCollection()
-            collection.append(new_canvas)
             collection.append(shape1)
+        collection.append(ShapeCoord(new_canvas, Coord(0, 0)))
         collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
         return collection
     else:
