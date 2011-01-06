@@ -678,7 +678,7 @@ class Shape (object):
                              accidental overwriting. *Default False*.
         """
         assert isinstance(shape, Shape)
-        assert Size(offset)+shape.size() <= self.size()
+        assert Size(offset)+shape.size() < self.size()
         for xy, char in shape:
             nxy = xy+offset
             if check_conflict and self[nxy] != None:
@@ -686,7 +686,11 @@ class Shape (object):
                     raise ShapeError, "Tried to blit foreign '%s' onto '%s' at %s!" % (char, self[nxy], nxy)
                 else:
                     continue
-            self[nxy] = char
+            try:
+                self[nxy] = char
+            except:
+                print self
+                raise
 
     def section (self, section_start, section_stop=None):
         """
@@ -905,7 +909,7 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
         if isinstance(shape1, ShapeCollection):
             collection = shape1.copy()
             if collection[0].width() < new_canvas.width():
-                collection[0].normalise(width=new_canvas.width())
+                collection[0].normalise(width=new_canvas.width()+10)
             if collection[0].height() < new_canvas.height():
                 collection[0].normalise(height=new_canvas.height())
         else:

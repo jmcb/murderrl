@@ -3,13 +3,13 @@
 Attempt to create a "manor" akin to:
 
   ###############################################
-  #.........#......#........#.........#.........#
-  #.........#......#........#.........#.........#
-  #.........#......#........#.........#.........#
-  #.........#......#........#.........#.........#
-  #########+####+######+###########+###+#########
+  #.........#......#........#...........#.......#
+  #.........#......#........#...........#.......#
+  #.........#......#........#...........#.......#
+  #.........#......#........#...........#.......#
+  #########+####+######+###########+#####.......#
   #.......+......+......................+.......#
-  #.......######+######+#.......#######+#.......#
+  #.......######+######+#.......#######+#########
   #.......#......#......#<<#....#.......#.......#
   #.......#......#......#<<#....#.......#.......#
   #.......#......#......####....+.......#.......#
@@ -52,6 +52,8 @@ class Room (object):
         Converts the room into a Shape object, by way of a Box.
         """
         return shape.Box(width=self.width, height=self.height, border=1, fill=".", border_fill="#")
+    def __repr__ (self):
+        return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
 def builder (style=ONE_CORRIDOR):
     """
@@ -76,6 +78,9 @@ def builder (style=ONE_CORRIDOR):
         # until we have a minimum of six and a maximum of ten
         entrance_hall = Room()
 
+        left = 0
+        right = 0
+
         row2.append(entrance_hall)
 
         while len(row2) <= 10:
@@ -84,6 +89,86 @@ def builder (style=ONE_CORRIDOR):
             if len(row2) > 6 and random.randint(1, 3) == 1:
                 break
 
+            name = room_names.random_pop()
+            if not name:
+                name = "UNKNOWN"
+
+            new_room = Room(name=name)
+
+            if left > right:
+                row2.append(new_room)
+                right += 1
+            elif left < right:
+                row2.insert(0, new_room)
+                left += 1
+            else:
+                side = random.randint(-1, 0)
+                if side == -1:
+                    right += 1
+                else:
+                    left += 1
+                row2.insert(side, new_room)
+
+        while len(row1) < len(row2):
+            name = room_names.random_pop()
+            if not name:
+                name = "UNKNOWN"
+            new_room = Room(name=name)
+            row1.append(new_room)
+
+        # Now, adjust the rooms at either end to compensate for the corridor:
+        # 1. We can adjust two rooms on the bottom level for height, 2 on the
+        #    top for width.
+        # 2. We can adjust one on the bottom and one on the top for height, and
+        #    the opposites for width.
+        # 3. We can adjust two rooms on the top level for height, 2 on the
+        #    bottom for width.
+        adjust_bottom = random.randint(0, 2)
+        if adjust_bottom == 2:
+            row2[0].height += 2
+            row2[-1].height += 2
+            row1[0].width += 1
+            row1[1].width -= 1
+            row1[-1].width += 1
+            row1[-2].width -= 1
+        elif adjust_bottom == 1:
+            side_adjusted = random.randint(-1, 0)
+            side_not_adjusted = -side_adjusted-1
+            row2[side_adjusted].height += 2
+            row1[side_not_adjusted].height += 2
+
+            row2[side_not_adjusted].width += 1
+            if side_not_adjusted == -1:
+                row2[-2].width -= 1
+            else:
+                row2[1].width -= 1
+
+            row1[side_adjusted].width += 1
+            if side_adjusted == -1:
+                row2[-2].width -= 1
+            else:
+                row2[1].width -= 1
+        elif adjust_bottom == 0:
+            row1[0].height += 2
+            row1[-1].height += 2
+            row2[0].width += 1
+            row2[1].width -= 1
+            row2[-1].width += 1
+            row2[-2].width -= 1
+
+        # Now, start drawing it! YAY!
+        first_room = row1[0].as_shape()
+        print first_room
+        second_room = row1[1].as_shape()
+        print second_room
+        collection = shape.adjoin(first_room, second_room, overlap=1)
+        for room in row1[1:]:
+            collection = shape.adjoin(collection, room.as_shape(), overlap=1)
+
+        print collection
 
     else:
         return shape.ShapeCollection(), rooms
+
+if __name__=="__main__":
+    builder()
