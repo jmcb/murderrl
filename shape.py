@@ -898,7 +898,7 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
 
     if collection:
         if isinstance(shape1, ShapeCollection):
-            collection = shape1
+            collection = shape1.copy()
             collection[0].normalise(width=new_canvas.width(), height=new_canvas.height())
         else:
             collection = ShapeCollection()
@@ -948,7 +948,7 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
         shape2_offset.x = left_offset
     if collection:
         if isinstance(shape1, ShapeCollection):
-            collection = shape1
+            collection = shape1.copy()
             collection[0].normalise(width=new_canvas.width(), height=new_canvas.height())
         else:
             collection = ShapeCollection()
