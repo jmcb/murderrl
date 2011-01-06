@@ -1,39 +1,58 @@
 %
-drawing room
+name=drawing room
+section=domestic
 %
-dining room
+name=dining room
+section=domestic
 %
-library
+name=library
+section=domestic
 %
-morning room
+name=morning room
+section=domestic
 %
-breakfast room
+name=breakfast room
+section=domestic
 %
-inglenook
+name=inglenook
+section=domestic
 %
-boudoir
+name=boudoir
+section=domestic
 %
-business room
+name=business room
+section=domestic
 %
-smoking room
+name=smoking room
+section=domestic
 %
-billiard room
+name=billiard room
+section=domestic
 %
-conservatory
+name=conservatory
+section=domestic
 %
-picture gallery
+name=picture gallery
+section=domestic
 %
-hall
+name=hall
+section=domestic
 %
-cloak room
+name=cloak room
+section=domestic
 %
-lavatory
+name=lavatory
+section=domestic
 %
-porch
+name=porch
+section=domestic
 %
-kitchen
+name=kitchen
+section=utility
 %
-scullery
+name=scullery
+section=utility
 %
-servant's hall
+name=servant's hall
+section=utility
 %
