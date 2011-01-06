@@ -821,7 +821,7 @@ class Column (Shape):
                 nshape.append([column])
             Shape.__init__(self, nshape, height=height, fill=fill)
 
-def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False):
+def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False, collection=False):
     """
     Take two shapes and combine them into one. This method places shapes
     side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -840,6 +840,8 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
                     *Default False*.
     :``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
                          ``shape2`` where they overlap with the parts of ``shape1``.
+    :``collection``: If true, returns a ShapeCollection instead of a canvas.
+                     *Default False*.
     """
     if join_left:
         s1 = shape2
@@ -848,11 +850,19 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
 
     new_size = Size(width=shape1.width()+shape2.width(), height=max(shape1.height(), shape2.height()))
     new_canvas = Shape(width=new_size.width-overlap, height=new_size.height, fill=fill)
-    new_canvas.draw_on(shape1, check_conflict=skip_conflicts)
-    new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, 0), check_conflict=skip_conflicts)
-    return new_canvas
 
-def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True):
+    if collection:
+        collection = ShapeCollection()
+        collection.append(new_canvas)
+        collection.append(shape1)
+        collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
+        return collection
+    else:
+        new_canvas.draw_on(shape1, check_conflict=skip_conflicts)
+        new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, 0), check_conflict=skip_conflicts)
+        return new_canvas
+
+def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False):
     """
     Take two shapes and combine them into one by drawing ``shape1`` and then
     drawing ``shape2`` directly beneath it.
@@ -871,6 +881,8 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
                          ``shape1``'s glyphs. *Default False*
     :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
     :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
+    :``collection``: If true, returns a ShapeCollection instead of a canvas.
+                     *Default False*.
     """
     if join_top:
         s1 = shape2
@@ -885,11 +897,18 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
         shape1_offset = Coord(left_offset, 0)
     if offset_second:
         shape2_offset.x = left_offset
-    new_canvas.draw_on(shape1, shape1_offset)
-    new_canvas.draw_on(shape2, shape2_offset, skip_conflicts)
-    return new_canvas
+    if collection:
+        collection = ShapeCollection()
+        collection.append(new_canvas)
+        collection.append(ShapeCoord(shape1, shape1_offset))
+        collection.append(ShapeCoord(shape2, shape2_offset))
+        return collection
+    else:
+        new_canvas.draw_on(shape1, shape1_offset)
+        new_canvas.draw_on(shape2, shape2_offset, skip_conflicts)
+        return new_canvas
 
-def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True):
+def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False):
     """
     Take two shapes and combine them into one by drawing ``shape1`` and then
     drawing ``shape2`` directly above it. This is an alias for ``underneath``
@@ -909,5 +928,7 @@ def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False
                          ``shape1``'s glyphs. *Default False*
     :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
     :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
+    :``collection``: If true, returns a ShapeCollection instead of a canvas.
+                     *Default False*.
     """
-    return underneath(shape1, shape2, left_offset, overlap, fill, not join_bottom, skip_conflicts, offset_first, offset_second)
+    return underneath(shape1, shape2, left_offset, overlap, fill, not join_bottom, skip_conflicts, offset_first, offset_second, collection)
