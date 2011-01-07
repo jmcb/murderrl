@@ -841,6 +841,35 @@ class AutoShape (Shape):
         """
         return Shape.size(self)
 
+    def _actual_wrapper (function):
+        """
+        Performs hot-swapping of actual_width, actual_height and actual_size
+        into the relevant width, height and size functions before executing
+        the function. Once performed, hot-swaps the functions back again.
+
+        :``function``: The function to be wrapped.
+        """
+        def _wrapper (self, *args, **kwargs):
+            oh = self.height
+            self.height = self.actual_height
+            ow = self.width
+            self.width = self.actual_width
+            os = self.size
+            self.size = self.actual_size
+            ah = self.actual_height
+            try:
+                function(self, *args, **kwargs)
+            finally:
+                self.height = oh
+                self.width = ow
+                self.size = os
+        _wrapper.__name__ = function.__name__
+        _wrapper.__doc__ =  function.__doc__
+        _wrapper.__wraps__ = function
+        return _wrapper
+
+    normalise = _actual_wrapper(Shape.normalise)
+
     def __getitem__ (self, item):
         """
         Attempt to access ``item``. If ``item`` is outside of the bounds of the
@@ -849,12 +878,12 @@ class AutoShape (Shape):
         :``item``: The item to be accessed.
         """
         if isinstance(item, Coord):
-            if item.x > self.actual_width():
+            if item.x >= self.actual_width():
                 self.normalise(width=item.x, fill=self.fill)
-            if item.y > self.actual_height():
+            if item.y >= self.actual_height():
                 self.normalise(height=item.y, fill=self.fill)
         elif isinstance(item, int):
-            if item > self.actual_width():
+            if item >= self.actual_width():
                 self.normalise(width=item, fill=self.fill)
         return Shape.__getitem__(self, item)
 
@@ -867,9 +896,9 @@ class AutoShape (Shape):
         :``value``: The value to be set.
         """
         if isinstance(item, Coord):
-            if item.x > self.actual_width():
+            if item.x >= self.actual_width():
                 self.normalise(width=item.x, fill=self.fill)
-            if item.y > self.actual_height():
+            if item.y >= self.actual_height():
                 self.normalise(height=item.y, fill=self.fill)
         return Shape.__setitem__(self, item, value)
 
