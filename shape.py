@@ -256,8 +256,10 @@ class ShapeCollection (object):
                 if not isinstance(s, ShapeCoord):
                     if isinstance(s, Shape):
                         s = ShapeCoord(s, Coord(0, 0))
+                    elif isinstance(s, tuple) or isinstance(s, list) and len(s) == 2:
+                        s = ShapeCoord(s[0], s[1])
                     else:
-                        assert isinstance(shape, ShapeCoord)
+                        assert isinstance(s, ShapeCoord)
                 self._shapes.append(s)
 
     def combine (self):
@@ -1033,7 +1035,7 @@ class Column (Shape):
                 nshape.append([column])
             Shape.__init__(self, nshape, height=height, fill=fill)
 
-def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False, collection=False):
+def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False):
     """
     Take two shapes and combine them into one. This method places shapes
     side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -1045,6 +1047,9 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     :``shape2``: The second shape. *Required*.
     :``overlap``: How much to overlap ``shape1`` with ``shape2``. *Default*
                   *0*.
+    :``top_offset``: If specified, once the overlap has been calculated, the
+                     second shape will be vertically offset by ``top_offset``
+                     from the "top" of the canvas. *Default 0*.
     :``fill``: The character to pad out the rest of the canvas if
                ``shape1.height() < shape2.height()`` or vice versa.
     :``join_left``: If true, will instead join ``shape2`` to the left of
@@ -1073,14 +1078,14 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
             collection = ShapeCollection()
             collection.append(ShapeCoord(shape1, Coord(max(collection.width(), 0), 0)))
         if isinstance(shape2, ShapeCollection):
-            shape2.offset(Coord(shape1.width()-overlap, 0))
+            shape2.offset(Coord(shape1.width()-overlap, top_offset))
             collection.extend(shape2)
         else:
-            collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
+            collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, top_offset)))
         return collection
     else:
         new_canvas.draw_on(shape1, check_conflict=skip_conflicts)
-        new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, 0), check_conflict=skip_conflicts)
+        new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, top_offset), check_conflict=skip_conflicts)
         return new_canvas
 
 def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False):
