@@ -179,3 +179,72 @@ class Size (Coord):
         Coord.__init__(self, width, height)
     def __repr__ (self):
         return "<Size width=%s height=%s>" % (self.width, self.height)
+
+class AutoDimension (int):
+    """
+    An automatically sized integer. As a string, it is represented by infinity.
+    It is always larger than other integers, never less than nor equal to.
+    """
+    def __lt__ (self, other):
+        return False
+    def __le__ (self, other):
+        return False
+    def __eq__ (self, other):
+        return False
+    def __ne__ (self, other):
+        return True
+    def __gt__ (self, other):
+        return True
+    def __ge__ (self, other):
+        return True
+    def __repr__ (self):
+        return str(self)
+    def __str__ (self):
+        return u"\u221e".encode("utf-8")
+    __add__ = property(lambda self, other: self)
+    __iadd__ = property(lambda self, other: self)
+    __sub__ = property(lambda self, other: self)
+    __isub__ = property(lambda self, other: self)
+    __mul__ = property(lambda self, other: self)
+    __imul__ = property(lambda self, other: self)
+    __div__ = property(lambda self, other: self)
+    __floordiv__ = property(lambda self, other: self)
+    __idiv__ = property(lambda self, other: self)
+    __ifloordiv__ = property(lambda self, other: self)
+
+class AutoSize (Size):
+    """
+    An automatic size. For comparative purposes, it is always larger than
+    something else--never equal and never smaller.
+    """
+    def __init__ (self):
+        Size.__init__(self, AutoDimension(), AutoDimension())
+    def valid (self):
+        return True
+    def __repr__ (self):
+        return "<AutoSize width=%s,height=%s>" % (self.width, self.height)
+    def __lt__ (self, other):
+        return False
+    def __le__ (self, other):
+        return False
+    def __eq__ (self, other):
+        return False
+    def __ne__ (self, other):
+        return True
+    def __gt__ (self, other):
+        return True
+    def __ge__ (self, other):
+        return True
+
+    # These functions are stubbed out, as an automatic size cannot be
+    # manipulated, but always returns itself.
+    __add__ = property(lambda self, other: self)
+    __iadd__ = property(lambda self, other: self)
+    __sub__ = property(lambda self, other: self)
+    __isub__ = property(lambda self, other: self)
+    __mul__ = property(lambda self, other: self)
+    __imul__ = property(lambda self, other: self)
+    __div__ = property(lambda self, other: self)
+    __floordiv__ = property(lambda self, other: self)
+    __idiv__ = property(lambda self, other: self)
+    __ifloordiv__ = property(lambda self, other: self)
