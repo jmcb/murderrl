@@ -785,10 +785,100 @@ class Shape (object):
                 result += "\n"
         return result
 
+class AutoShape (Shape):
+    """
+    An unsized Shape that expands to suit needs.
+    """
+    def __init__ (self, fill=None):
+        """
+        Initiate the automatic shape.
+
+        :``fill``: What character should be used when normalising the shape.
+        """
+        self.fill = fill
+        Shape.__init__(self, 0, 0, fill=fill)
+
+    def size (self):
+        """
+        To compensate for the automatic sizing of the shape, size returns an
+        "infinite" size. To get the actual size of the shape, use
+        ``AutoShape::actual_size.``
+        """
+        return AutoSize()
+
+    def width (self):
+        """
+        To compensate for the automatic sizing of the shape, width returns an
+        "inifinite" width. To get the actual width of the shape, use
+        ``AutoShape::actual_width``.
+        """
+        return AutoDimension()
+
+    def height (self):
+        """
+        To compensate for the automatic sizing of the shape, height returns an
+        "infinite" height. To get the actual height of the shape, use
+        ``AutoShape::actual_width``.
+        """
+        return AutoDimension()
+
+    def actual_width (self):
+        """
+        To compensate for automatic sizing, actual widths of the AutoShape are
+        accessed via suffixing "actual" to the function name.
+        """
+        return Shape.width(self)
+
+    def actual_height (self):
+        """
+        To compensate for automatic sizing, actual heights of the AutoShape are
+        accessed via suffixing "actual" to the function name.
+        """
+        return Shape.height(self)
+
+    def actual_size (self):
+        """
+        To compensate for automatic sizing, actual sizes of the AutoShape are
+        accessed via suffixing "actual" to the function name.
+        """
+        return Shape.size(self)
+
+    def __getitem__ (self, item):
+        """
+        Attempt to access ``item``. If ``item`` is outside of the bounds of the
+        current shape, it is sized accordingly.
+
+        :``item``: The item to be accessed.
+        """
+        if isinstance(item, Coord):
+            if item.x > self.actual_width():
+                self.normalise(width=item.x, fill=self.fill)
+            if item.y > self.actual_height():
+                self.normalise(height=item.y, fill=self.fill)
+        elif isinstance(item, int):
+            if item > self.actual_width():
+                self.normalise(width=item, fill=self.fill)
+        return Shape.__getitem__(self, item)
+
+    def __setitem__ (self, item, value):
+        """
+        Attempt to set ``item`` to ``value``. If ``item`` if outside of the
+        bounds of the current shape, it is sized accordingly.
+
+        :``item``: The item to be set.
+        :``value``: The value to be set.
+        """
+        if isinstance(item, Coord):
+            if item.x > self.actual_width():
+                self.normalise(width=item.x, fill=self.fill)
+            if item.y > self.actual_height():
+                self.normalise(height=item.y, fill=self.fill)
+        return Shape.__setitem__(self, item, value)
+
+
 class Box (Shape):
     """
     A rectangular Shape that provides borders and perimeter access.
-
     """
     def __init__ (self, width, height, border=1, fill=None, border_fill=None):
         """
