@@ -1055,6 +1055,9 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
     :``collection``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
     """
+    if (isinstance(shape1, ShapeCollection) or isinstance(shape2, ShapeCollection)) and not collection:
+        raise ShapeError, "Passed a collection but ``collection=False``!"
+
     if join_left:
         s1 = shape2
         shape2 = shape1
@@ -1069,7 +1072,11 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
         else:
             collection = ShapeCollection()
             collection.append(ShapeCoord(shape1, Coord(max(collection.width(), 0), 0)))
-        collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
+        if isinstance(shape2, ShapeCollection):
+            shape2.offset(Coord(shape1.width()-overlap, 0))
+            collection.extend(shape2)
+        else:
+            collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
         return collection
     else:
         new_canvas.draw_on(shape1, check_conflict=skip_conflicts)
@@ -1098,6 +1105,9 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     :``collection``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
     """
+    if (isinstance(shape1, ShapeCollection) or isinstance(shape2, ShapeCollection)) and not collection:
+        raise ShapeError, "Passed a collection but ``collection=False``!"
+
     if join_top:
         s1 = shape2
         shape2 = shape1
@@ -1114,15 +1124,17 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1.copy()
-            if collection[0].width() < new_canvas.width():
-                collection[0].normalise(width=new_canvas.width())
-            if collection[0].height() < new_canvas.height():
-                collection[0].normalise(height=new_canvas.height())
         else:
             collection = ShapeCollection()
-            collection.append(new_canvas)
+            shape1_offset.height += collection.height()
+            shape2_offset.height += collection.height()
             collection.append(ShapeCoord(shape1, shape1_offset))
-        collection.append(ShapeCoord(shape2, shape2_offset))
+
+        if isinstance(shape2, ShapeCollection):
+            shape2.offset(shape2_offset)
+            collection.extend(shape2)
+        else:
+            collection.append(ShapeCoord(shape2, shape2_offset))
         return collection
     else:
         new_canvas.draw_on(shape1, shape1_offset)
