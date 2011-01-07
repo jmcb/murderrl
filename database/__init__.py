@@ -3,6 +3,12 @@ import sys, os, random, collections, re
 
 _dbobjects = []
 
+class DatabaseError (Exception):
+    """
+    An error class for any and all errors relating to databases.
+    """
+    pass
+
 class Database (list):
     """
     An extremely simplistic type that is nothing more than a wrapper on top of
@@ -359,7 +365,12 @@ def parse_spec (spec_file):
                 else:
                     new_data = {}
                     for item in block:
-                        item = split_escaped_delim("=", item, 1)
+                        new_item = split_escaped_delim("=", item, 1)
+                        if len(new_item) == 1:
+                            new_item = split_escaped_delim(":", item, 1)
+                            if len(new_item) == 1:
+                                raise DatabaseError, "Corrupted line? %s" % item
+                        item = new_item
                         if int_conversion and item[0] in int_conversion:
                             item[1] = int(item[1])
                         assert len(item) == 2
@@ -406,7 +417,8 @@ def _do_build ():
         else:
             spec_obj = str
         dbfile = open(os.path.join(data_path, database), "r")
-        dbdata = [spec_obj(item.strip()) for item in dbfile.read().strip().strip("%").split("%")]
+        dbfile_contents = [item.strip() for item in dbfile.read().strip().strip("%").split("%")]
+        dbdata = [spec_obj(item) for item in dbfile_contents if not item.startswith("#")]
         db = Database
         if hasattr(dbdata[0], 'weight'):
             db = WeightedDatabase
