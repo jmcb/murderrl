@@ -31,20 +31,18 @@ class Room (object):
     """
     Currently a builder-only representation of a room.
     """
-    def __init__ (self, width=10, height=6, name="", start=None, stop=None):
+    def __init__ (self, width=12, height=7, start=None, stop=None):
         """
         Create a room.
 
         :``width``: The width of the room. *Default 10*.
         :``height``: The height of the room. *Default 6*.
-        :``name``: The descriptive name of the room. ie, "Library". *Default ""*.
         :``start``: A coord denoting the top-left point of the room. *Default None*.
         :``stop``: A coord denoting the bottom-right point of the room. *Default None*.
 
         """
         self.width = width
         self.height = height
-        self.name = name
         self.start = start
         self.stop = stop
     def as_shape (self):
@@ -83,17 +81,13 @@ def builder (style=ONE_CORRIDOR):
 
         row2.append(entrance_hall)
 
-        while len(row2) <= 8:
+        while len(row2) <= 5:
             # If we have six rooms, one in three chance of not adding any more
             # rooms.
-            if len(row2) > 5 and random.randint(1, 3) == 1:
+            if len(row2) > 4 and random.randint(1, 4) == 1:
                 break
 
-            name = room_names.random_pop()
-            if not name:
-                name = "UNKNOWN"
-
-            new_room = Room(name=name)
+            new_room = Room()
 
             if left > right:
                 row2.append(new_room)
@@ -110,10 +104,7 @@ def builder (style=ONE_CORRIDOR):
                 row2.insert(side, new_room)
 
         while len(row1) < len(row2):
-            name = room_names.random_pop()
-            if not name:
-                name = "UNKNOWN"
-            new_room = Room(name=name)
+            new_room = Room()
             row1.append(new_room)
 
         # Now, adjust the rooms at either end to compensate for the corridor:
@@ -124,37 +115,31 @@ def builder (style=ONE_CORRIDOR):
         # 3. We can adjust two rooms on the top level for height, 2 on the
         #    bottom for width.
         adjust_bottom = random.randint(0, 2)
+        top_offset = 2
+        overlap = 3
         if adjust_bottom == 2:
-            row2[0].height += 1
-            row2[-1].height += 1
-            row1[0].width += 1
-            row1[1].width -= 1
-            row1[-1].width += 1
-            row1[-2].width -= 1
+            overlap = 1
+            row2[0].height += 2
+            row2[-1].height += 2
+            row1[0].width += 2
+            row1[-1].width += 2
+            row2[1].width += 2
+            row2[-2].width += 2
         elif adjust_bottom == 1:
             side_adjusted = random.randint(-1, 0)
             side_not_adjusted = -side_adjusted-1
-            row2[side_adjusted].height += 1
-            row1[side_not_adjusted].height += 1
-
-            row2[side_not_adjusted].width += 1
-            if side_not_adjusted == -1:
-                row2[-2].width -= 1
-            else:
-                row2[1].width -= 1
-
-            row1[side_adjusted].width += 1
-            if side_adjusted == -1:
-                row2[-2].width -= 1
-            else:
-                row2[1].width -= 1
+            row2[side_adjusted].height += 2
+            row1[side_not_adjusted].height += 2
+            row2[side_not_adjusted].width += 2
+            row1[side_adjusted].width += 2
         elif adjust_bottom == 0:
-            row1[0].height += 1
-            row1[-1].height += 1
-            row2[0].width += 1
-            row2[1].width -= 1
-            row2[-1].width += 1
-            row2[-2].width -= 1
+            overlap = 3
+            row1[0].height += 2
+            row1[-1].height += 2
+            row2[0].width += 2
+            row2[-1].width += 2
+            row1[1].width += 2
+            row1[-2].width += 2
 
         # Now, start drawing it! YAY!
 
@@ -165,14 +150,35 @@ def builder (style=ONE_CORRIDOR):
         for room in row1[2:]:
             row1_collection = shape.adjoin(row1_collection, room.as_shape(), overlap=1, collection=True)
 
-        # secondrow
+        # second row
         first_room = row2[0].as_shape()
         second_room = row2[1].as_shape()
-        row2_collection = shape.adjoin(first_room, second_room, overlap=1, collection=True)
-        for room in row2[2:]:
-            row2_collection = shape.adjoin(row2_collection, room.as_shape(), overlap=1, collection=True)
 
-        return shape.atop(row1_collection, row2_collection, collection=True)
+        # Does some weird stuff to offset everything
+        offset_both = False
+        if first_room.height() == second_room.height():
+            offset_both = True
+
+        row2_collection = shape.adjoin(first_room, second_room, top_offset=top_offset, overlap=1, collection=True, offset_both=offset_both)
+        for room in row2[2:]:
+            to = top_offset
+            room_shape = room.as_shape()
+            if room_shape.height() == first_room.height() and not offset_both or room_shape.height() > first_room.height():
+                to = 0
+            row2_collection = shape.adjoin(row2_collection, room_shape, top_offset=to, overlap=1, collection=True)
+
+        # Finally, make a corridor!
+        room_width = Room().width
+        room_height = Room().height
+
+        collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collection=True)
+
+        corridor_length = collection.width() - room_width * 2
+        corridor = shape.Shape(height=1, width=corridor_length, fill=".")
+
+        collection.append(shape.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
+
+        return collection
     else:
         return shape.ShapeCollection(), rooms
 
