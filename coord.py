@@ -166,8 +166,8 @@ class Size (Coord):
     """
     A specific representation of size using width and height.
     """
-    width = property(lambda self: self.x, lambda self, width: self.__setattr__(x, width))
-    height = property(lambda self: self.y, lambda self, width: self.__setattr__(y, width))
+    width = property(lambda self: self.x, lambda self, width: self.__setattr__("x", width))
+    height = property(lambda self: self.y, lambda self, width: self.__setattr__("y", width))
     def __init__ (self, width=-1, height=-1):
         if isinstance(width, tuple):
             height = width[1]
