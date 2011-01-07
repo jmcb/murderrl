@@ -129,18 +129,19 @@ def main (args):
                 s.contents += "\nClasses\n#######\n"
                 tree = inspect.getclasstree(section.classes)
                 this_toc = "\n"
-                for tier in tree[1]:
-                    if isinstance(tier, list):
-                        if len(tier) == 0:
-                            continue
-                        this_toc += "\n"
-                        for subclass in tier:
-                            this_toc += " - `%s`_.\n" % subclass[0].__name__
-                        this_toc += "\n"
-                    elif isinstance(tier, tuple):
-                        if len(tier) == 0:
-                            continue
-                        this_toc += "- `%s`_.\n" % tier[0].__name__
+                for subtree in tree[1::2]:
+                    for tier in subtree:
+                        if isinstance(tier, list):
+                            if len(tier) == 0:
+                                continue
+                            this_toc += "\n"
+                            for subclass in tier:
+                                this_toc += " - `%s`_.\n" % subclass[0].__name__
+                            this_toc += "\n"
+                        elif isinstance(tier, tuple):
+                            if len(tier) == 0:
+                                continue
+                            this_toc += "- `%s`_.\n" % tier[0].__name__
                 s.contents += this_toc
             if len(section.methods) != 0:
                 s.contents += "\nMethods\n#######\n"
