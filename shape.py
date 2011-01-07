@@ -1035,7 +1035,7 @@ class Column (Shape):
                 nshape.append([column])
             Shape.__init__(self, nshape, height=height, fill=fill)
 
-def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False):
+def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False):
     """
     Take two shapes and combine them into one. This method places shapes
     side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -1059,6 +1059,8 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
                          ``shape2`` where they overlap with the parts of ``shape1``.
     :``collection``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
+    :``offset_both``: If true, the ``top_offset`` will be applied to both
+                      shapes. *Default False*.
     """
     if (isinstance(shape1, ShapeCollection) or isinstance(shape2, ShapeCollection)) and not collection:
         raise ShapeError, "Passed a collection but ``collection=False``!"
@@ -1071,12 +1073,18 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
     new_size = Size(width=shape1.width()+shape2.width(), height=max(shape1.height(), shape2.height()))
     new_canvas = Shape(width=new_size.width-overlap, height=new_size.height, fill=fill)
 
+    if offset_both:
+        first_offset = Coord(0, top_offset)
+
     if collection:
         if isinstance(shape1, ShapeCollection):
             collection = shape1.copy()
         else:
             collection = ShapeCollection()
-            collection.append(ShapeCoord(shape1, Coord(max(collection.width(), 0), 0)))
+            y = 0
+            if offset_both:
+                y = top_offset
+            collection.append(ShapeCoord(shape1, Coord(max(collection.width(), 0), y)))
         if isinstance(shape2, ShapeCollection):
             shape2.offset(Coord(shape1.width()-overlap, top_offset))
             collection.extend(shape2)
@@ -1084,7 +1092,7 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
             collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, top_offset)))
         return collection
     else:
-        new_canvas.draw_on(shape1, check_conflict=skip_conflicts)
+        new_canvas.draw_on(shape1, offset=first_offset, check_conflict=skip_conflicts)
         new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, top_offset), check_conflict=skip_conflicts)
         return new_canvas
 
