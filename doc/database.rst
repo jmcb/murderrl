@@ -7,8 +7,8 @@ Table of Contents
   A. `Flat-text database`_
 
     a. `Database`_
-    b. `databases`_
-    c. `database`_
+    b. `get_databases`_
+    c. `get_database`_
     d. `database_exists`_
     e. `num_databases`_
 
@@ -108,19 +108,19 @@ an in-place activity.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _databases:
+.. _get_databases:
 
-function *databases* ()
-^^^^^^^^^^^^^^^^^^^^^^^
+function *get_databases* ()
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Returns a list of all Database objects stored.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _database:
+.. _get_database:
 
-function *database* (name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *get_database* (name)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Returns a specific Database object. If the Database doesn't exist, will
 instead return ``None``.
@@ -356,13 +356,13 @@ Index
 =====
 
 +-------------------------------------+-------------------------------------+
-|`Database`_                          |`database`_                          |
+|`Database`_                          |`Database::__init__`_                |
 +-------------------------------------+-------------------------------------+
-|`Database::__init__`_                |`Database::copy`_                    |
+|`Database::copy`_                    |`Database::random`_                  |
 +-------------------------------------+-------------------------------------+
-|`Database::random`_                  |`Database::random_pop`_              |
+|`Database::random_pop`_              |`database_exists`_                   |
 +-------------------------------------+-------------------------------------+
-|`databases`_                         |`database_exists`_                   |
+|`get_database`_                      |`get_databases`_                     |
 +-------------------------------------+-------------------------------------+
 |`num_databases`_                     |`parse_spec`_                        |
 +-------------------------------------+-------------------------------------+

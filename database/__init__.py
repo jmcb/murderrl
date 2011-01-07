@@ -169,13 +169,13 @@ class WeightedDatabase (Database):
     def __repr__ (self):
         return "WeightedDatabase[%s]" % (list.__repr__(self))
 
-def databases ():
+def get_databases ():
     """
     Returns a list of all Database objects stored.
     """
     return _dbobjects[:]
 
-def database (name):
+def get_database (name):
     """
     Returns a specific Database object. If the Database doesn't exist, will
     instead return ``None``.
