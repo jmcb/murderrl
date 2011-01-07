@@ -312,19 +312,28 @@ class ShapeCollection (object):
         """
         Returns the width required to contain each member.
         """
-        pass
+        return self.size().width
 
     def height (self):
         """
         Returns the height required to contain each member.
         """
-        pass
+        return self.size().height
 
     def size (self):
         """
         Returns the size required to contain each member.
         """
-        pass
+        size = Size()
+
+        for shape in self:
+            shape, coord = shape
+            if shape.width() + coord.x > size.width:
+                size.width = shape.width() + coord.x
+            if shape.height() + coord.y > size.height:
+                size.height = shape.height() + coord.y
+
+        return size
 
     def copy (self):
         """
