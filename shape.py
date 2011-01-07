@@ -604,6 +604,9 @@ class Shape (object):
         if fill is not None and len(fill) != 1:
             raise ShapeError, "can't normalise with character '%s'." % fill
 
+        if width == None and height == None:
+            return
+
         if self._canvas == []:
             self._canvas = [[]]
 
@@ -612,11 +615,12 @@ class Shape (object):
                 while len(self._canvas[i]) < width:
                     self._canvas[i].append(fill)
         if height:
+            if not width:
+                width = self.width()
             while len(self._canvas) < height:
                 new_row = []
-                if width:
-                    while len(new_row) < width:
-                        new_row.append(fill)
+                while len(new_row) < width:
+                    new_row.append(fill)
                 self._canvas.append(new_row)
 
     def trim (self, width=None, height=None, trim_left=False, trim_top=False):
@@ -829,27 +833,6 @@ class AutoShape (Shape):
         """
         return AutoDimension()
 
-    def actual_width (self):
-        """
-        To compensate for automatic sizing, actual widths of the AutoShape are
-        accessed via suffixing "actual" to the function name.
-        """
-        return Shape.width(self)
-
-    def actual_height (self):
-        """
-        To compensate for automatic sizing, actual heights of the AutoShape are
-        accessed via suffixing "actual" to the function name.
-        """
-        return Shape.height(self)
-
-    def actual_size (self):
-        """
-        To compensate for automatic sizing, actual sizes of the AutoShape are
-        accessed via suffixing "actual" to the function name.
-        """
-        return Shape.size(self)
-
     def _actual_wrapper (function):
         """
         Performs hot-swapping of actual_width, actual_height and actual_size
@@ -866,16 +849,41 @@ class AutoShape (Shape):
             os = self.size
             self.size = self.actual_size
             ah = self.actual_height
-            try:
-                function(self, *args, **kwargs)
-            finally:
+            def cleanup():
                 self.height = oh
                 self.width = ow
                 self.size = os
+            try:
+                result = function(self, *args, **kwargs)
+            except:
+                cleanup()
+                raise
+
+            cleanup()
+            return result
+
         _wrapper.__name__ = function.__name__
         _wrapper.__doc__ =  function.__doc__
         _wrapper.__wraps__ = function
         return _wrapper
+
+    actual_width = _actual_wrapper(Shape.width)
+    actual_width.__doc__ = """
+        To compensate for automatic sizing, actual widths of the AutoShape are
+        accessed via suffixing "actual" to the function name.
+        """
+
+    actual_height = _actual_wrapper(Shape.height)
+    actual_height.__doc__ = """
+        To compensate for automatic sizing, actual heights of the AutoShape are
+        accessed via suffixing "actual" to the function name.
+        """
+
+    actual_size = _actual_wrapper(Shape.size)
+    actual_size.__doc__ = """
+        To compensate for automatic sizing, actual sizes of the AutoShape are
+        accessed via suffixing "actual" to the function name.
+        """
 
     normalise = _actual_wrapper(Shape.normalise)
 
@@ -888,12 +896,12 @@ class AutoShape (Shape):
         """
         if isinstance(item, Coord):
             if item.x >= self.actual_width():
-                self.normalise(width=item.x, fill=self.fill)
+                self.normalise(width=item.x+1, fill=self.fill)
             if item.y >= self.actual_height():
-                self.normalise(height=item.y, fill=self.fill)
+                self.normalise(height=item.y+1, fill=self.fill)
         elif isinstance(item, int):
             if item >= self.actual_width():
-                self.normalise(width=item, fill=self.fill)
+                self.normalise(width=item+1, fill=self.fill)
         return Shape.__getitem__(self, item)
 
     def __setitem__ (self, item, value):
@@ -906,9 +914,9 @@ class AutoShape (Shape):
         """
         if isinstance(item, Coord):
             if item.x >= self.actual_width():
-                self.normalise(width=item.x, fill=self.fill)
+                self.normalise(width=item.x+1, fill=self.fill)
             if item.y >= self.actual_height():
-                self.normalise(height=item.y, fill=self.fill)
+                self.normalise(height=item.y+1, fill=self.fill)
         return Shape.__setitem__(self, item, value)
 
 
