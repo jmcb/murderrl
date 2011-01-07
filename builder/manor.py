@@ -157,14 +157,22 @@ def builder (style=ONE_CORRIDOR):
             row2[-2].width -= 1
 
         # Now, start drawing it! YAY!
+
+        # First row
         first_room = row1[0].as_shape()
         second_room = row1[1].as_shape()
-        collection = shape.adjoin(first_room, second_room, overlap=1, collection=True)
-        for room in row1[1:]:
-            collection = shape.adjoin(collection, room.as_shape(), overlap=1, collection=True)
+        row1_collection = shape.adjoin(first_room, second_room, overlap=1, collection=True)
+        for room in row1[2:]:
+            row1_collection = shape.adjoin(row1_collection, room.as_shape(), overlap=1, collection=True)
 
-        return collection
+        # secondrow
+        first_room = row2[0].as_shape()
+        second_room = row2[1].as_shape()
+        row2_collection = shape.adjoin(first_room, second_room, overlap=1, collection=True)
+        for room in row2[2:]:
+            row2_collection = shape.adjoin(row2_collection, room.as_shape(), overlap=1, collection=True)
 
+        return shape.atop(row1_collection, row2_collection, collection=True)
     else:
         return shape.ShapeCollection(), rooms
 
