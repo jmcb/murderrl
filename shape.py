@@ -299,6 +299,16 @@ class ShapeCollection (object):
                 assert isinstance(item, ShapeCoord)
             self._shapes.append(item)
 
+    def extend (self, items):
+        """
+        Extends the current collection of ShapeCoords by the passed list of
+        items.
+
+        :``items``: An instance of ShapeCollection. *Required*.
+        """
+        assert isinstance(items, ShapeCollection)
+        self._shapes.extend(items)
+
     def pop (self, index=-1):
         """
         Pop index ``index`` item from the collection of ShapeCoords.
@@ -340,6 +350,28 @@ class ShapeCollection (object):
         Returns a copy of this collection.
         """
         return ShapeCollection(self._shapes[:])
+
+    def offset (self, offset):
+        """
+        Offsets each member of the ShapeCollection by the passed offset.
+
+        :``offset``: A Coord or Size with which to offset each Shape. If this is
+                     a negative value, the offsetting will be subtractive;
+                     however, if this results in any ShapeCoord being negatively
+                     offset, an error will be raised, and the offsetting will be
+                     abandoned. *Required*.
+        """
+        new_self = []
+
+        for index, sc in enumerate(self):
+            if sc.coord < Coord(0, 0):
+                raise ShapeError, "Shape indexed %s already had a negative offset!" % index
+            if sc.coord+offset < Coord(0, 0):
+                raise ShapeError, "Adding %s to %s results in %s! Cannot perform negative offsetting." % (offset, sc.coord, sc.coorrd+offset)
+
+            new_self.append(ShapeCoord(sc.shape, Coord(sc.coord + offset)))
+
+        self._shapes = new_self
 
     def __getitem__ (self, item):
         """
