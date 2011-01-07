@@ -240,7 +240,7 @@ class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
 
 class ShapeCollection (object):
     """
-    A sorted collection of Shapes and co-ordinates. Can be initiliased from a list
+    A sortable collection of Shapes and co-ordinates. Can be initiliased from a list
     of ShapeCoords or Shapes. For the latter, these will be wrapped in a ShapeCoord
     using Coord(0, 0) as their co-ordinate.
 
@@ -262,18 +262,16 @@ class ShapeCollection (object):
 
     def combine (self):
         """
-        Converts a collection into a single Shape by taking the largest contained
-        ShapeCoord (or the top-most ShapeCoord determined by sort) and then drawing
-        all other ShapeCoords onto it, using their defined Coords as the offset.
+        Converts a collection into a single Shape by taking drawing all ShapeCoords
+        onto an automatically shaped canvas.
 
         Doesn't currently provide error checking. Should.
         """
         # We take the largest and work on that, ignoring its coord.
-        self.sort()
 
-        base = self._shapes[0].shape
+        base = AutoShape()
 
-        for sc in self._shapes[1:]:
+        for sc in self._shapes:
             base.draw_on(sc.shape, sc.coord, False)
 
         return base
@@ -312,21 +310,21 @@ class ShapeCollection (object):
 
     def width (self):
         """
-        Returns the width of the widest member.
+        Returns the width required to contain each member.
         """
-        return self[0].width()
+        pass
 
     def height (self):
         """
-        Returns the height of the highest member.
+        Returns the height required to contain each member.
         """
-        return self[0].height()
+        pass
 
     def size (self):
         """
-        Returns the size of the largest member.
+        Returns the size required to contain each member.
         """
-        return self[0].size()
+        pass
 
     def copy (self):
         """
@@ -336,8 +334,7 @@ class ShapeCollection (object):
 
     def __getitem__ (self, item):
         """
-        Fetch item index ``item`` from the collection of ShapeCoords after
-        performing an in-place sort based on Shape size.
+        Fetch item index ``item`` from the collection of ShapeCoords.
 
         :``item``: The item to be fetched.
         """
@@ -346,7 +343,7 @@ class ShapeCollection (object):
     def __setitem__ (self, item, value):
         """
         Insert ``value`` at ``item``, replacing whatever ShapeCoord is existent
-        there. Afterwards, an in-place sort is performed.
+        there.
 
         :``item``: The index the value is to be inserted at.
         :``value``: The value to be inserted. This is automatically cased
@@ -362,10 +359,8 @@ class ShapeCollection (object):
 
     def __iter__ (self):
         """
-        Creates an iterator for the ShapeCoords contained within, first
-        performing an in-place sort.
+        Creates an iterator for the ShapeCoords contained within.
         """
-        self.sort()
         return iter(self._shapes)
 
     def __len__ (self):
@@ -599,6 +594,9 @@ class Shape (object):
 
         if fill is not None and len(fill) != 1:
             raise ShapeError, "can't normalise with character '%s'." % fill
+
+        if self._canvas == []:
+            self._canvas = [[]]
 
         if width:
             for i in xrange(len(self._canvas)):
