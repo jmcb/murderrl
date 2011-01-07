@@ -125,8 +125,8 @@ def builder (style=ONE_CORRIDOR):
         #    bottom for width.
         adjust_bottom = random.randint(0, 2)
         if adjust_bottom == 2:
-            row2[0].height += 2
-            row2[-1].height += 2
+            row2[0].height += 1
+            row2[-1].height += 1
             row1[0].width += 1
             row1[1].width -= 1
             row1[-1].width += 1
@@ -134,8 +134,8 @@ def builder (style=ONE_CORRIDOR):
         elif adjust_bottom == 1:
             side_adjusted = random.randint(-1, 0)
             side_not_adjusted = -side_adjusted-1
-            row2[side_adjusted].height += 2
-            row1[side_not_adjusted].height += 2
+            row2[side_adjusted].height += 1
+            row1[side_not_adjusted].height += 1
 
             row2[side_not_adjusted].width += 1
             if side_not_adjusted == -1:
@@ -149,8 +149,8 @@ def builder (style=ONE_CORRIDOR):
             else:
                 row2[1].width -= 1
         elif adjust_bottom == 0:
-            row1[0].height += 2
-            row1[-1].height += 2
+            row1[0].height += 1
+            row1[-1].height += 1
             row2[0].width += 1
             row2[1].width -= 1
             row2[-1].width += 1
