@@ -12,6 +12,15 @@ Table of Contents
 
     a. `RectangleIterator`_
 
+  C. `Sizes`_
+
+    a. `Size`_
+
+  D. `Automatic sizes and dimensions`_
+
+    a. `AutoSize`_
+    b. `AutoDimension`_
+
 2. `Index`_
 
 .. _Coord module:
@@ -110,15 +119,110 @@ at ``stop_point``.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Sizes:
+
+Sizes
+-----
+
+Classes
+#######
+
+- `Size`_.
+
+.. _Size:
+
+class *Size*
+^^^^^^^^^^^^
+
+A specific representation of size using width and height.
+
+Methods
+#######
+
+1. `Size::__init__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Size::__init__:
+
+**Size::__init__** (self, width=-1, height=-1)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Automatic sizes and dimensions:
+
+Automatic sizes and dimensions
+------------------------------
+
+Classes
+#######
+
+- `AutoDimension`_.
+- `AutoSize`_.
+
+.. _AutoSize:
+
+class *AutoSize*
+^^^^^^^^^^^^^^^^
+
+An automatic size. For comparative purposes, it is always larger than
+something else--never equal and never smaller.
+
+Methods
+#######
+
+1. `AutoSize::__init__`_.
+2. `AutoSize::valid`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoSize::__init__:
+
+**AutoSize::__init__** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoSize::valid:
+
+**AutoSize::valid** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoDimension:
+
+class *AutoDimension*
+^^^^^^^^^^^^^^^^^^^^^
+
+An automatically sized integer. As a string, it is represented by infinity.
+It is always larger than other integers, never less than nor equal to.
+
+Methods
+#######
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Index:
 
 Index
 =====
 
 +------------------------------+------------------------------+
+|`AutoDimension`_              |`AutoSize`_                   |
++------------------------------+------------------------------+
+|`AutoSize::__init__`_         |`AutoSize::valid`_            |
++------------------------------+------------------------------+
 |`Coord`_                      |`Coord::__init__`_            |
 +------------------------------+------------------------------+
 |`Coord::as_tuple`_            |`Coord::valid`_               |
 +------------------------------+------------------------------+
 |`RectangleIterator`_          |`RectangleIterator::__init__`_|
++------------------------------+------------------------------+
+|`Size`_                       |`Size::__init__`_             |
 +------------------------------+------------------------------+

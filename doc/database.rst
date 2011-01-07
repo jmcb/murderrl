@@ -158,6 +158,7 @@ Classes
 #######
 
 - `WeightedString`_.
+- `WeightedDatabase`_.
 
 .. _WeightedString:
 

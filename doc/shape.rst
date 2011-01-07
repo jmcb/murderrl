@@ -17,15 +17,19 @@ Table of Contents
     a. `ShapeCollection`_
     b. `ShapeCoord`_
 
-  C. `Miscellaneous`_
-
-    a. `ShapeError`_
-
-  D. `Shape Manipulation`_
+  C. `Shape Manipulation`_
 
     a. `adjoin`_
     b. `underneath`_
     c. `atop`_
+
+  D. `Automatic shapes`_
+
+    a. `AutoShape`_
+
+  E. `Miscellaneous`_
+
+    a. `ShapeError`_
 
 2. `Index`_
 
@@ -591,13 +595,14 @@ Classes
 #######
 
 - `ShapeCollection`_.
+- `ShapeCoord`_.
 
 .. _ShapeCollection:
 
 class *ShapeCollection*
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-A sorted collection of Shapes and co-ordinates. Can be initiliased from a list
+A sortable collection of Shapes and co-ordinates. Can be initiliased from a list
 of ShapeCoords or Shapes. For the latter, these will be wrapped in a ShapeCoord
 using Coord(0, 0) as their co-ordinate.
 
@@ -610,12 +615,16 @@ Methods
 1. `ShapeCollection::__init__`_.
 2. `ShapeCollection::append`_.
 3. `ShapeCollection::combine`_.
-4. `ShapeCollection::pop`_.
-5. `ShapeCollection::sort`_.
-6. `ShapeCollection::__getitem__`_.
-7. `ShapeCollection::__iter__`_.
-8. `ShapeCollection::__len__`_.
-9. `ShapeCollection::__setitem__`_.
+4. `ShapeCollection::copy`_.
+5. `ShapeCollection::height`_.
+6. `ShapeCollection::pop`_.
+7. `ShapeCollection::size`_.
+8. `ShapeCollection::sort`_.
+9. `ShapeCollection::width`_.
+10. `ShapeCollection::__getitem__`_.
+11. `ShapeCollection::__iter__`_.
+12. `ShapeCollection::__len__`_.
+13. `ShapeCollection::__setitem__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -641,11 +650,26 @@ instances are not allowed.
 
 **ShapeCollection::combine** (self)
 
-Converts a collection into a single Shape by taking the largest contained
-ShapeCoord (or the top-most ShapeCoord determined by sort) and then drawing
-all other ShapeCoords onto it, using their defined Coords as the offset.
+Converts a collection into a single Shape by taking drawing all ShapeCoords
+onto an automatically shaped canvas.
 
 Doesn't currently provide error checking. Should.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::copy:
+
+**ShapeCollection::copy** (self)
+
+Returns a copy of this collection.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::height:
+
+**ShapeCollection::height** (self)
+
+Returns the height required to contain each member.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -659,6 +683,14 @@ Pop index ``index`` item from the collection of ShapeCoords.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::size:
+
+**ShapeCollection::size** (self)
+
+Returns the size required to contain each member.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::sort:
 
 **ShapeCollection::sort** (self)
@@ -667,12 +699,19 @@ In-place sorting by size!
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::width:
+
+**ShapeCollection::width** (self)
+
+Returns the width required to contain each member.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::__getitem__:
 
 **ShapeCollection::__getitem__** (self, item)
 
-Fetch item index ``item`` from the collection of ShapeCoords after
-performing an in-place sort based on Shape size.
+Fetch item index ``item`` from the collection of ShapeCoords.
 
 :``item``: The item to be fetched.
 
@@ -682,8 +721,7 @@ performing an in-place sort based on Shape size.
 
 **ShapeCollection::__iter__** (self)
 
-Creates an iterator for the ShapeCoords contained within, first
-performing an in-place sort.
+Creates an iterator for the ShapeCoords contained within.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -700,7 +738,7 @@ Returns the number of ShapeCoords contained within.
 **ShapeCollection::__setitem__** (self, item, value)
 
 Insert ``value`` at ``item``, replacing whatever ShapeCoord is existent
-there. Afterwards, an in-place sort is performed.
+there.
 
 :``item``: The index the value is to be inserted at.
 :``value``: The value to be inserted. This is automatically cased
@@ -718,24 +756,45 @@ class *ShapeCoord*
 A named tuple pair providing ``shape`` and ``coord`` members. This is primarily
 used by the ShapeCollection class.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _Miscellaneous:
-
-Miscellaneous
--------------
-
-Classes
+Methods
 #######
 
-- `ShapeError`_.
+1. `ShapeCoord::height`_.
+2. `ShapeCoord::size`_.
+3. `ShapeCoord::width`_.
+4. `ShapeCoord::__getattribute__`_.
 
-.. _ShapeError:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class *ShapeError*
-^^^^^^^^^^^^^^^^^^
+.. _ShapeCoord::height:
 
-A generic Shape-related error.
+**ShapeCoord::height** (self)
+
+Wrapper over self.shape.height.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCoord::size:
+
+**ShapeCoord::size** (self)
+
+Wrapper over self.shape.size.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCoord::width:
+
+**ShapeCoord::width** (self)
+
+Wraper over self.shape.width.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCoord::__getattribute__:
+
+**ShapeCoord::__getattribute__** (self, attr)
+
+*Method undocumented*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -829,6 +888,179 @@ with the ``join_top`` flag set to True.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Automatic shapes:
+
+Automatic shapes
+----------------
+
+Classes
+#######
+
+- `AutoShape`_.
+
+.. _AutoShape:
+
+class *AutoShape*
+^^^^^^^^^^^^^^^^^
+
+An unsized Shape that expands to suit needs.
+
+Methods
+#######
+
+1. `AutoShape::__init__`_.
+2. `AutoShape::actual_height`_.
+3. `AutoShape::actual_size`_.
+4. `AutoShape::actual_width`_.
+5. `AutoShape::height`_.
+6. `AutoShape::normalise`_.
+7. `AutoShape::size`_.
+8. `AutoShape::width`_.
+9. `AutoShape::_actual_wrapper`_.
+10. `AutoShape::__getitem__`_.
+11. `AutoShape::__setitem__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::__init__:
+
+**AutoShape::__init__** (self, fill=None)
+
+Initiate the automatic shape.
+
+:``fill``: What character should be used when normalising the shape.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::actual_height:
+
+**AutoShape::actual_height** (self)
+
+To compensate for automatic sizing, actual heights of the AutoShape are
+accessed via suffixing "actual" to the function name.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::actual_size:
+
+**AutoShape::actual_size** (self)
+
+To compensate for automatic sizing, actual sizes of the AutoShape are
+accessed via suffixing "actual" to the function name.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::actual_width:
+
+**AutoShape::actual_width** (self)
+
+To compensate for automatic sizing, actual widths of the AutoShape are
+accessed via suffixing "actual" to the function name.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::height:
+
+**AutoShape::height** (self)
+
+To compensate for the automatic sizing of the shape, height returns an
+"infinite" height. To get the actual height of the shape, use
+``AutoShape::actual_width``.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::normalise:
+
+**AutoShape::normalise** (self, \*args, \*\*kwargs)
+
+Extend either the width, the height, or both, of a Shape to the relevant
+value, using the provided fill value.
+
+:``width``: The width to which the Shape should be extended. This
+            integer value should be greater than the current width
+            of the Shape, or None to perform no width normalisation.
+            *Default None*.
+:``height``: The height to which the Shape should be extended. As per
+             ``width`` above. *Default None*.
+:``fill``: The fill character which should be used when extending
+           rows and columns. *Default None*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::size:
+
+**AutoShape::size** (self)
+
+To compensate for the automatic sizing of the shape, size returns an
+"infinite" size. To get the actual size of the shape, use
+``AutoShape::actual_size.``
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::width:
+
+**AutoShape::width** (self)
+
+To compensate for the automatic sizing of the shape, width returns an
+"inifinite" width. To get the actual width of the shape, use
+``AutoShape::actual_width``.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::_actual_wrapper:
+
+**AutoShape::_actual_wrapper** (function)
+
+Performs hot-swapping of actual_width, actual_height and actual_size
+into the relevant width, height and size functions before executing
+the function. Once performed, hot-swaps the functions back again.
+
+:``function``: The function to be wrapped.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::__getitem__:
+
+**AutoShape::__getitem__** (self, item)
+
+Attempt to access ``item``. If ``item`` is outside of the bounds of the
+current shape, it is sized accordingly.
+
+:``item``: The item to be accessed.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::__setitem__:
+
+**AutoShape::__setitem__** (self, item, value)
+
+Attempt to set ``item`` to ``value``. If ``item`` if outside of the
+bounds of the current shape, it is sized accordingly.
+
+:``item``: The item to be set.
+:``value``: The value to be set.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Miscellaneous:
+
+Miscellaneous
+-------------
+
+Classes
+#######
+
+- `ShapeError`_.
+
+.. _ShapeError:
+
+class *ShapeError*
+^^^^^^^^^^^^^^^^^^
+
+A generic Shape-related error.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Index:
 
 Index
@@ -836,6 +1068,18 @@ Index
 
 +------------------------------------+------------------------------------+
 |`adjoin`_                           |`atop`_                             |
++------------------------------------+------------------------------------+
+|`AutoShape`_                        |`AutoShape::__init__`_              |
++------------------------------------+------------------------------------+
+|`AutoShape::actual_height`_         |`AutoShape::actual_size`_           |
++------------------------------------+------------------------------------+
+|`AutoShape::actual_width`_          |`AutoShape::height`_                |
++------------------------------------+------------------------------------+
+|`AutoShape::normalise`_             |`AutoShape::size`_                  |
++------------------------------------+------------------------------------+
+|`AutoShape::width`_                 |`AutoShape::_actual_wrapper`_       |
++------------------------------------+------------------------------------+
+|`AutoShape::__getitem__`_           |`AutoShape::__setitem__`_           |
 +------------------------------------+------------------------------------+
 |`Box`_                              |`Box::__init__`_                    |
 +------------------------------------+------------------------------------+
@@ -861,7 +1105,11 @@ Index
 +------------------------------------+------------------------------------+
 |`ShapeCollection::append`_          |`ShapeCollection::combine`_         |
 +------------------------------------+------------------------------------+
-|`ShapeCollection::pop`_             |`ShapeCollection::sort`_            |
+|`ShapeCollection::copy`_            |`ShapeCollection::height`_          |
++------------------------------------+------------------------------------+
+|`ShapeCollection::pop`_             |`ShapeCollection::size`_            |
++------------------------------------+------------------------------------+
+|`ShapeCollection::sort`_            |`ShapeCollection::width`_           |
 +------------------------------------+------------------------------------+
 |`ShapeCollection::__getitem__`_     |`ShapeCollection::__iter__`_        |
 +------------------------------------+------------------------------------+
@@ -876,6 +1124,10 @@ Index
 |`ShapeColumn::__repr__`_            |`ShapeColumn::__setitem__`_         |
 +------------------------------------+------------------------------------+
 |`ShapeColumn::__str__`_             |`ShapeCoord`_                       |
++------------------------------------+------------------------------------+
+|`ShapeCoord::height`_               |`ShapeCoord::size`_                 |
++------------------------------------+------------------------------------+
+|`ShapeCoord::width`_                |`ShapeCoord::__getattribute__`_     |
 +------------------------------------+------------------------------------+
 |`ShapeError`_                       |`ShapeRow`_                         |
 +------------------------------------+------------------------------------+
