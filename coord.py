@@ -40,7 +40,7 @@ class Coord (object):
         if isinstance(x, tuple):
             self.x, self.y = x
         elif isinstance(x, Coord):
-            self.x = x.as_tuple()
+            self.x, self.y = x.as_tuple()
         else:
             self.x = x
             self.y = y
