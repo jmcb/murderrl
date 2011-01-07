@@ -1036,8 +1036,7 @@ def adjoin (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflict
             collection = shape1.copy()
         else:
             collection = ShapeCollection()
-            collection.append(shape1)
-        collection.append(ShapeCoord(new_canvas, Coord(0, 0)))
+            collection.append(ShapeCoord(shape1, Coord(max(collection.width(), 0), 0)))
         collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, 0)))
         return collection
     else:
