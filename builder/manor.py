@@ -183,4 +183,4 @@ def builder (style=ONE_CORRIDOR):
         return shape.ShapeCollection(), rooms
 
 if __name__=="__main__":
-    builder()
+    print builder().combine()
