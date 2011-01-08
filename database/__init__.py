@@ -196,7 +196,7 @@ def database_exists (name):
 
     :``name``: The name of the Database.
     """
-    return database(name) is not None
+    return get_database(name) is not None
 
 def num_databases ():
     """
