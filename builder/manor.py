@@ -18,8 +18,10 @@ Attempt to create a "manor" akin to:
                            ##++##
 
 """
+
 import sys
-sys.path.append("../")
+sys.path.extend(["../", "./"])
+
 import shape, coord, random, database
 
 # Specific build styles:
