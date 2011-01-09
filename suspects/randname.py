@@ -5,8 +5,10 @@ Generate random first, last and full names from various building blocks.
 
 import random, sys
 
-import __init__
-db = __init__
+sys.path.append("../")
+
+import database
+db = database
 
 ##################################################
 # Utility methods
