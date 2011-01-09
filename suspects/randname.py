@@ -5,7 +5,7 @@ Generate random first, last and full names from various building blocks.
 
 import random, sys
 
-sys.path.append("../")
+sys.path.extend(["../", "./"])
 
 import database
 db = database
