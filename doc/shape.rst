@@ -616,15 +616,17 @@ Methods
 2. `ShapeCollection::append`_.
 3. `ShapeCollection::combine`_.
 4. `ShapeCollection::copy`_.
-5. `ShapeCollection::height`_.
-6. `ShapeCollection::pop`_.
-7. `ShapeCollection::size`_.
-8. `ShapeCollection::sort`_.
-9. `ShapeCollection::width`_.
-10. `ShapeCollection::__getitem__`_.
-11. `ShapeCollection::__iter__`_.
-12. `ShapeCollection::__len__`_.
-13. `ShapeCollection::__setitem__`_.
+5. `ShapeCollection::extend`_.
+6. `ShapeCollection::height`_.
+7. `ShapeCollection::offset`_.
+8. `ShapeCollection::pop`_.
+9. `ShapeCollection::size`_.
+10. `ShapeCollection::sort`_.
+11. `ShapeCollection::width`_.
+12. `ShapeCollection::__getitem__`_.
+13. `ShapeCollection::__iter__`_.
+14. `ShapeCollection::__len__`_.
+15. `ShapeCollection::__setitem__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -665,11 +667,36 @@ Returns a copy of this collection.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::extend:
+
+**ShapeCollection::extend** (self, items)
+
+Extends the current collection of ShapeCoords by the passed list of
+items.
+
+:``items``: An instance of ShapeCollection. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::height:
 
 **ShapeCollection::height** (self)
 
 Returns the height required to contain each member.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::offset:
+
+**ShapeCollection::offset** (self, offset)
+
+Offsets each member of the ShapeCollection by the passed offset.
+
+:``offset``: A Coord or Size with which to offset each Shape. If this is
+             a negative value, the offsetting will be subtractive;
+             however, if this results in any ShapeCoord being negatively
+             offset, an error will be raised, and the offsetting will be
+             abandoned. *Required*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -808,8 +835,8 @@ Methods
 
 .. _adjoin:
 
-function *adjoin* (shape1, shape2, overlap=0, fill=None, join_left=False, skip_conflicts=False, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one. This method places shapes
 side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -821,6 +848,9 @@ left by ``overlap``. Finally, the resultant shape will be padded using
 :``shape2``: The second shape. *Required*.
 :``overlap``: How much to overlap ``shape1`` with ``shape2``. *Default*
               *0*.
+:``top_offset``: If specified, once the overlap has been calculated, the
+                 second shape will be vertically offset by ``top_offset``
+                 from the "top" of the canvas. *Default 0*.
 :``fill``: The character to pad out the rest of the canvas if
            ``shape1.height() < shape2.height()`` or vice versa.
 :``join_left``: If true, will instead join ``shape2`` to the left of
@@ -830,6 +860,8 @@ left by ``overlap``. Finally, the resultant shape will be padded using
                      ``shape2`` where they overlap with the parts of ``shape1``.
 :``collection``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
+:``offset_both``: If true, the ``top_offset`` will be applied to both
+                  shapes. *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -934,7 +966,7 @@ Initiate the automatic shape.
 
 .. _AutoShape::actual_height:
 
-**AutoShape::actual_height** (self)
+**AutoShape::actual_height** (self, \*args, \*\*kwargs)
 
 To compensate for automatic sizing, actual heights of the AutoShape are
 accessed via suffixing "actual" to the function name.
@@ -943,7 +975,7 @@ accessed via suffixing "actual" to the function name.
 
 .. _AutoShape::actual_size:
 
-**AutoShape::actual_size** (self)
+**AutoShape::actual_size** (self, \*args, \*\*kwargs)
 
 To compensate for automatic sizing, actual sizes of the AutoShape are
 accessed via suffixing "actual" to the function name.
@@ -952,7 +984,7 @@ accessed via suffixing "actual" to the function name.
 
 .. _AutoShape::actual_width:
 
-**AutoShape::actual_width** (self)
+**AutoShape::actual_width** (self, \*args, \*\*kwargs)
 
 To compensate for automatic sizing, actual widths of the AutoShape are
 accessed via suffixing "actual" to the function name.
@@ -1105,7 +1137,9 @@ Index
 +------------------------------------+------------------------------------+
 |`ShapeCollection::append`_          |`ShapeCollection::combine`_         |
 +------------------------------------+------------------------------------+
-|`ShapeCollection::copy`_            |`ShapeCollection::height`_          |
+|`ShapeCollection::copy`_            |`ShapeCollection::extend`_          |
++------------------------------------+------------------------------------+
+|`ShapeCollection::height`_          |`ShapeCollection::offset`_          |
 +------------------------------------+------------------------------------+
 |`ShapeCollection::pop`_             |`ShapeCollection::size`_            |
 +------------------------------------+------------------------------------+
