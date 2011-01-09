@@ -56,8 +56,6 @@ def check_name_db ():
     Check whether all needed databases actually exist.
     If not, throws an exception.
     """
-    # First build the database.
-    db._do_build()
     db_checks = [DB_FIRST_MALE, DB_FIRST_FEMALE,
                  DB_LAST_SIMPLE, DB_LAST_NAMESON,
                  DB_LAST_GAELIC1, DB_LAST_GAELIC2,
