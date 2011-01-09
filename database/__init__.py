@@ -253,22 +253,38 @@ def get_databases ():
     """
     return _dbobjects[:]
 
-def get_database (name):
+def get_database (name, parent=None):
     """
     Returns a specific Database object. If the Database doesn't exist, will
     instead return ``None``.
 
     :``name``: The name of the Database object being requested.
+    :``parent``: A possible DatabaseFolder instance or name to be searched
+                 instead of the global scope. *Default None*
     """
+    if "." in name:
+        parent, name = name.split(".")
+
+    if parent is not None:
+        if not isinstance(parent, DatabaseFolder):
+            parent = globals().get(parent, None)
+
+        if parent is None or not isinstance(parent, DatabaseFolder):
+            return None
+
+        return parent.get(name, None)
+
     return globals().get(name, None)
 
-def database_exists (name):
+def database_exists (name, parent=None):
     """
     Checks for the existance of a specific database object.
 
     :``name``: The name of the Database.
+    :``parent``: A possible DatabaseFolder instance or name to be searched
+                 instead of the global scope. *Default None*.
     """
-    return get_database(name) is not None
+    return get_database(name, parent) is not None
 
 def num_databases ():
     """
