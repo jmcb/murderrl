@@ -9,6 +9,57 @@ class DatabaseError (Exception):
     """
     pass
 
+class DatabaseFolder (object):
+    """
+    A basic representation of a folder structure. This container does not
+    actually contain any database information, but instead stores copies of the
+    databases equivalent to the database that are found in the specified folder.
+    """
+    _databases = None
+    spec = None
+
+    def __init__ (self, folder, spec=None):
+        """
+        Create a new database folder.
+
+        :``folder``: The folder path. Example: *names.db/*. This path should
+                     contain databases within itself.
+        :``spec``: The default spec for this folder. *Default None*
+        """
+        self.folder = folder
+        if spec is not None:
+            self.spec = spec
+
+        self._databases = []
+
+    def append (self, db):
+        """
+        Add a database representation to the folder representation.
+
+        :``db``: The Database instance. This will be accessible by
+                 ``DatabaseFolder.database_name``.
+        """
+        assert isinstance(db, Database)
+        assert not hasattr(self, db.name)
+
+        self._databases.append(db)
+        setattr(self, db.name, db)
+
+    def extend (self, db_list):
+        """
+        Append the contents of a list to the DatabaseFolder representation.
+
+        :``db_list``: The iterable list of databases to store.
+        """
+        for db in db_list:
+            self.append(db)
+
+    def __repr__ (self):
+        r = "<DatabaseFolder %s [" % self.folder
+        for d in self._databases:
+            r += d.name + ", "
+        return r.rstrip(", ") + "]>"
+
 class Database (list):
     """
     An extremely simplistic type that is nothing more than a wrapper on top of
@@ -72,7 +123,7 @@ class Database (list):
                     return None
         return self.pop(item)
     def __repr__ (self):
-        return "Database[%s]" % (list.__repr__(self))
+        return "Database%s" % (list.__repr__(self))
 
 class WeightedString (str):
     """
@@ -173,7 +224,7 @@ class WeightedDatabase (Database):
         return self.pop(index)
 
     def __repr__ (self):
-        return "WeightedDatabase[%s]" % (list.__repr__(self))
+        return "WeightedDatabase%s" % (list.__repr__(self))
 
 def get_databases ():
     """
@@ -399,32 +450,142 @@ def _do_build ():
     the local directory, into a series of Database objects.
     """
     if os.path.exists("./database"):
-        data_path = "./database"
+        data_path = "./database/"
     elif os.path.exists("../database"):
-        data_path = "../database"
+        data_path = "../database/"
     elif os.path.exists("../../database"):
-        data_path = "../../database"
+        data_path = "../../database/"
     else:
         data_path = "."
 
-    databases = [db for db in os.listdir(data_path) if db.endswith(".db")]
-    for database in databases:
-        # chop the extension off
-        name = database[:-3]
-        spec = name + ".spec"
-        if os.path.exists(os.path.join(data_path, spec)):
-            spec_obj = parse_spec(os.path.join(data_path, spec))
-        else:
-            spec_obj = str
-        dbfile = open(os.path.join(data_path, database), "r")
-        dbfile_contents = [item.strip() for item in dbfile.read().strip().strip("%").split("%")]
-        dbdata = [spec_obj(item) for item in dbfile_contents if not item.startswith("#")]
-        db = Database
-        if hasattr(dbdata[0], 'weight'):
-            db = WeightedDatabase
-        globals()[name] = db(name, dbdata)
-        dbfile.close()
-        _dbobjects.append(globals()[name])
+    dir_specs = {}
+    databases = []
 
-if __name__!="__main__":
-    _do_build()
+    # first pass over the databases to create complete tree:
+    for dirpath, dirnames, filenames in os.walk(data_path):
+        # all databases are stored
+        for name in filenames:
+            if name.endswith(".db"):
+                databases.append(os.path.join(dirpath, name).replace(data_path, ""))
+            # but we need to store specs here otherwise things could get a bit confusing
+            elif name.endswith(".spec"):
+                possible_dir = os.path.join(dirpath, name[:-5]+".db")
+                if os.path.exists(possible_dir) and os.path.isdir(possible_dir):
+                    spec_name = possible_dir.replace(data_path, "")
+                    dir_specs[spec_name] = parse_spec(os.path.join(dirpath, name))
+
+        # and we create DatabaseFolders for each subfolder
+        for name in dirnames:
+            if name.endswith(".db"):
+                # dump the extension here too
+                obj_name = name[:-3]
+                this_folder = DatabaseFolder(obj_name)
+
+                if dir_specs.has_key(name):
+                    this_folder.spec = dir_specs.pop(name)
+
+                if dirpath != data_path:
+                    search = dirpath.replace(data_path, "").split("/")
+                    try:
+                        top_folder = globals()[search[0]]
+                    except KeyError:
+                        raise DatabaseError, "Subdirectory of a db folder without a DatabaseFolder?"
+                    for p in search[1:]:
+                        if p == name:
+                            break
+                        try:
+                            top_folder = getattr(top_folder, p)
+                        except AttributeError:
+                            raise DatabaseError, "Subdirectory of a db subfolder without a DatabaseFolder subfolder!"
+                    top_folder.append(this_folder)
+                else:
+                    globals()[obj_name] = this_folder
+
+    for database in databases:
+        build_from_file_name(database, data_path)
+
+def build_from_file_name (database, data_path, folder=None, spec=None):
+    """
+    Converts a database file via a specification into a Database instance.
+
+    :``database``: The filename to be opened. If this is in a subfolder, the
+                   subfolder name will be removed from the final name and the
+                   database will be available globally, unless ``folder`` has
+                   been specified, or ``folder`` is already a globally available
+                   folder. *Required*.
+    :``data_path``: This will be appended to the beginning of all I/O operations
+                    but will not be treated as a ``folder``. *Required*.
+    :``folder``: The folder this database will be appended to. If None and the
+                 database contains a folder name, the folder will be looked for
+                 globally and if found, the database will be appended to this;
+                 if there is no folder available, the database will be inserted
+                 into the global scope. *Default None*.
+    :``spec``: A specification object that matches the contents of this
+               database. If not provided, and a specification exists, this
+               specification will be used instead. If not provided and ``folder``
+               is not none, and the ``folder`` contains a specification, this
+               will be used instead. *Default None*.
+    """
+    # chop the extension off
+    temp = database.split("/")
+    name = database[:-3]
+    folder_name = None
+    store_point = None
+
+    if len(temp) != 1:
+        folder_name = "/".join(temp[:-1])
+        name = temp[-1][:-3]
+
+    if folder_name is not None and not folder:
+        search = folder_name
+        if "/" in folder_name:
+            # we need to look recursively, but not yet
+            search = folder_name.split("/")[0]
+
+        try:
+            store_point = globals()[search.replace(".db", "")]
+        except KeyError:
+            pass
+
+        if "/" in folder_name:
+            # now recurse
+            searches = folder_name.split("/")[1:]
+            for search in searches:
+                try:
+                    store_point = getattr(store_point, search.replace(".db", ""))
+                except AttributeError:
+                    break
+
+    elif folder:
+        store_point = folder
+
+    if spec is None:
+        if store_point is not None and store_point.spec is not None:
+            spec_obj = store_point.spec
+        else:
+            spec = name + ".spec"
+            if os.path.exists(os.path.join(data_path, spec)):
+                spec_obj = parse_spec(os.path.join(data_path, spec))
+            else:
+                spec_obj = str
+    else:
+        spec_obj = spec
+
+    dbfile = open(os.path.join(data_path, database), "r")
+    dbfile_contents = [item.strip() for item in dbfile.read().strip().strip("%").split("%")]
+    dbdata = [spec_obj(item) for item in dbfile_contents if not item.startswith("#")]
+    db = Database
+    if hasattr(dbdata[0], 'weight'):
+        db = WeightedDatabase
+
+    this_db = db(name, dbdata)
+    dbfile.close()
+
+    if store_point:
+        store_point.append(this_db)
+    else:
+        globals()[name] = this_db
+
+    _dbobjects.append(this_db)
+
+_do_build()
