@@ -3,8 +3,6 @@ import sys, os
 import inspect
 from docparser import *
 
-sys.path.append('../')
-
 # Actual documentation generation happens here.
 # TODO: Clean-up!
 #       ... document

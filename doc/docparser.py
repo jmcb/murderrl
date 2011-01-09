@@ -8,6 +8,7 @@ document. The file format for \*.conf files allows combinations of the following
 signifiers:
 
 :`$ignore`_: ``qualified name``
+:`$search`_: ``path1``, ``path2``, ...
 :`$module`_: ``module identifier``, ``module description``
 :`$suppress`_: ``suppression target`` [1]_
 :`$section`_: ``section description`` [2]_
@@ -52,6 +53,22 @@ documented.
 All ``$ignore`` signifiers must be followed by a single string. To denote
 multiple functions or methods to be ignored, use multiple ``$ignore``
 signifiers, each with its own line.
+
+.. _$search:
+
+``$search``:
+------------
+
+Arguments: 
+
+:[``path1``, ``path2``, ...]: A string of comma-separated search paths.
+
+``$search`` allows you to specify additional paths that should be searched when
+importing modules. These can be absolute paths of relative directories, but they
+must each exist.
+
+If ``$search`` is provided, it should be the first line of the document,
+otherwise the actual parser will fail to properly import modules.
 
 .. _$module:
 
@@ -130,6 +147,7 @@ class Document:
     """
     modules = []
     ignore = []
+    search_paths = []
     def __iter__ (self):
         """
         Yields a tuple of three values: ``module``, ``section`` and ``object``.
@@ -302,6 +320,14 @@ def docparser (filename, verbose=False):
             if verbose:
                 print "<Ignore %s>" % line.split()[1]
             doc.ignore.append(line.split()[1])
+        elif line.startswith("$search"):
+            paths = line.split(" ", 1)[1].split(", ")
+            for path in paths:
+                if verbose:
+                    print "<SearchPath %s>" % path
+                assert os.path.exists(path)
+                doc.search_paths.append(path)
+                sys.path.append(path)
         else:
             if verbose:
                 print "Unknown symbol: " + line
