@@ -26,6 +26,9 @@ def main (args):
 
     parsed = docparser("doc.conf")
 
+    for path in parsed.search_paths:
+        sys.path.append(path)
+
     modules = []
     previous_module = None
 
