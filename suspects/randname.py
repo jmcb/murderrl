@@ -40,16 +40,16 @@ class DatabaseException (Exception):
 ##################################################
 # Database files: ../database/names.db/<file>.db
 
-DB_FIRST_MALE   = 'first_male'
-DB_FIRST_FEMALE = 'first_female'
-DB_LAST_SIMPLE  = 'last_simple'
-DB_LAST_NAMESON = 'last_nameson'
-DB_LAST_GAELIC1 = 'last_gaelic1'
-DB_LAST_GAELIC2 = 'last_gaelic2'
-DB_LAST_COMBO1  = 'last_combo1'
-DB_LAST_COMBO2  = 'last_combo2'
-DB_LAST_UPPER1  = 'last_upperclass1'
-DB_LAST_UPPER2  = 'last_upperclass2'
+DB_FIRST_MALE   = 'names.first_male'
+DB_FIRST_FEMALE = 'names.first_female'
+DB_LAST_SIMPLE  = 'names.last_simple'
+DB_LAST_NAMESON = 'names.last_nameson'
+DB_LAST_GAELIC1 = 'names.last_gaelic1'
+DB_LAST_GAELIC2 = 'names.last_gaelic2'
+DB_LAST_COMBO1  = 'names.last_combo1'
+DB_LAST_COMBO2  = 'names.last_combo2'
+DB_LAST_UPPER1  = 'names.last_upperclass1'
+DB_LAST_UPPER2  = 'names.last_upperclass2'
 
 def check_name_db ():
     """
