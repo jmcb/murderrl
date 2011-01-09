@@ -17,10 +17,11 @@ Table of Contents
     a. `WeightedString`_
     b. `WeightedDatabase`_
 
-  C. `Database specifications`_
+  C. `Database specifications and related`_
 
     a. `split_escaped_delim`_
     b. `parse_spec`_
+    c. `build_from_file_name`_
 
 2. `Index`_
 
@@ -119,24 +120,28 @@ Returns a list of all Database objects stored.
 
 .. _get_database:
 
-function *get_database* (name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *get_database* (name, parent=None)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Returns a specific Database object. If the Database doesn't exist, will
 instead return ``None``.
 
 :``name``: The name of the Database object being requested.
+:``parent``: A possible DatabaseFolder instance or name to be searched
+             instead of the global scope. *Default None*
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _database_exists:
 
-function *database_exists* (name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *database_exists* (name, parent=None)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Checks for the existance of a specific database object.
 
 :``name``: The name of the Database.
+:``parent``: A possible DatabaseFolder instance or name to be searched
+             instead of the global scope. *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -260,10 +265,10 @@ Return the total weight of the database.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Database specifications:
+.. _Database specifications and related:
 
-Database specifications
------------------------
+Database specifications and related
+-----------------------------------
 
 Methods
 #######
@@ -351,27 +356,56 @@ into a three-element list.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _build_from_file_name:
+
+function *build_from_file_name* (database, data_path, folder=None, spec=None)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Converts a database file via a specification into a Database instance and
+then inserts into into the global scope or a specific parent based on
+provided information.
+
+:``database``: The filename to be opened. If this is in a subfolder, the
+               subfolder name will be removed from the final name and the
+               database will be available globally, unless ``folder`` has
+               been specified, or ``folder`` is already a globally available
+               folder. *Required*.
+:``data_path``: This will be appended to the beginning of all I/O operations
+                but will not be treated as a ``folder``. *Required*.
+:``folder``: The folder this database will be appended to. If None and the
+             database contains a folder name, the folder will be looked for
+             globally and if found, the database will be appended to this;
+             if there is no folder available, the database will be inserted
+             into the global scope. *Default None*.
+:``spec``: A specification object that matches the contents of this
+           database. If not provided, and a specification exists, this
+           specification will be used instead. If not provided and ``folder``
+           is not none, and the ``folder`` contains a specification, this
+           will be used instead. *Default None*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Index:
 
 Index
 =====
 
 +-------------------------------------+-------------------------------------+
-|`Database`_                          |`Database::__init__`_                |
+|`build_from_file_name`_              |`Database`_                          |
 +-------------------------------------+-------------------------------------+
-|`Database::copy`_                    |`Database::random`_                  |
+|`Database::__init__`_                |`Database::copy`_                    |
 +-------------------------------------+-------------------------------------+
-|`Database::random_pop`_              |`database_exists`_                   |
+|`Database::random`_                  |`Database::random_pop`_              |
 +-------------------------------------+-------------------------------------+
-|`get_database`_                      |`get_databases`_                     |
+|`database_exists`_                   |`get_database`_                      |
 +-------------------------------------+-------------------------------------+
-|`num_databases`_                     |`parse_spec`_                        |
+|`get_databases`_                     |`num_databases`_                     |
 +-------------------------------------+-------------------------------------+
-|`split_escaped_delim`_               |`WeightedDatabase`_                  |
+|`parse_spec`_                        |`split_escaped_delim`_               |
 +-------------------------------------+-------------------------------------+
-|`WeightedDatabase::random`_          |`WeightedDatabase::random_pick`_     |
+|`WeightedDatabase`_                  |`WeightedDatabase::random`_          |
 +-------------------------------------+-------------------------------------+
-|`WeightedDatabase::random_pop`_      |`WeightedDatabase::total_weight`_    |
+|`WeightedDatabase::random_pick`_     |`WeightedDatabase::random_pop`_      |
 +-------------------------------------+-------------------------------------+
-|`WeightedString`_                    |`WeightedString::__init__`_          |
+|`WeightedDatabase::total_weight`_    |`WeightedString`_                    |
 +-------------------------------------+-------------------------------------+

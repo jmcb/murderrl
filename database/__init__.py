@@ -543,7 +543,9 @@ def _do_build ():
 
 def build_from_file_name (database, data_path, folder=None, spec=None):
     """
-    Converts a database file via a specification into a Database instance.
+    Converts a database file via a specification into a Database instance and
+    then inserts into into the global scope or a specific parent based on
+    provided information.
 
     :``database``: The filename to be opened. If this is in a subfolder, the
                    subfolder name will be removed from the final name and the

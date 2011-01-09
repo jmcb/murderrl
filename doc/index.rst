@@ -65,10 +65,11 @@ Table of Contents
     a. `WeightedString`_
     b. `WeightedDatabase`_
 
-  C. `Database specifications`_
+  C. `Database specifications and related`_
 
     a. `split_escaped_delim`_
     b. `parse_spec`_
+    c. `build_from_file_name`_
 
 4. `Random name generation`_
 
@@ -1452,24 +1453,28 @@ Returns a list of all Database objects stored.
 
 .. _get_database:
 
-function *get_database* (name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *get_database* (name, parent=None)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Returns a specific Database object. If the Database doesn't exist, will
 instead return ``None``.
 
 :``name``: The name of the Database object being requested.
+:``parent``: A possible DatabaseFolder instance or name to be searched
+             instead of the global scope. *Default None*
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _database_exists:
 
-function *database_exists* (name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *database_exists* (name, parent=None)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Checks for the existance of a specific database object.
 
 :``name``: The name of the Database.
+:``parent``: A possible DatabaseFolder instance or name to be searched
+             instead of the global scope. *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1593,10 +1598,10 @@ Return the total weight of the database.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Database specifications:
+.. _Database specifications and related:
 
-Database specifications
------------------------
+Database specifications and related
+-----------------------------------
 
 Methods
 #######
@@ -1681,6 +1686,35 @@ whitespace and then stored in a single element::
 
 Here, the provided delimiter of a commas used to convert the incoming block
 into a three-element list.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _build_from_file_name:
+
+function *build_from_file_name* (database, data_path, folder=None, spec=None)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Converts a database file via a specification into a Database instance and
+then inserts into into the global scope or a specific parent based on
+provided information.
+
+:``database``: The filename to be opened. If this is in a subfolder, the
+               subfolder name will be removed from the final name and the
+               database will be available globally, unless ``folder`` has
+               been specified, or ``folder`` is already a globally available
+               folder. *Required*.
+:``data_path``: This will be appended to the beginning of all I/O operations
+                but will not be treated as a ``folder``. *Required*.
+:``folder``: The folder this database will be appended to. If None and the
+             database contains a folder name, the folder will be looked for
+             globally and if found, the database will be appended to this;
+             if there is no folder available, the database will be inserted
+             into the global scope. *Default None*.
+:``spec``: A specification object that matches the contents of this
+           database. If not provided, and a specification exists, this
+           specification will be used instead. If not provided and ``folder``
+           is not none, and the ``folder`` contains a specification, this
+           will be used instead. *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2249,117 +2283,117 @@ Index
 +--------------------------------------+--------------------------------------+
 |`Box`_                                |`Box::__init__`_                      |
 +--------------------------------------+--------------------------------------+
-|`Box::perimeter`_                     |`check_name_db`_                      |
+|`Box::perimeter`_                     |`build_from_file_name`_               |
 +--------------------------------------+--------------------------------------+
-|`coinflip`_                           |`Column`_                             |
+|`check_name_db`_                      |`coinflip`_                           |
 +--------------------------------------+--------------------------------------+
-|`Column::__init__`_                   |`Coord`_                              |
+|`Column`_                             |`Column::__init__`_                   |
 +--------------------------------------+--------------------------------------+
-|`Coord::__init__`_                    |`Coord::as_tuple`_                    |
+|`Coord`_                              |`Coord::__init__`_                    |
 +--------------------------------------+--------------------------------------+
-|`Coord::valid`_                       |`Database`_                           |
+|`Coord::as_tuple`_                    |`Coord::valid`_                       |
 +--------------------------------------+--------------------------------------+
-|`Database::__init__`_                 |`Database::copy`_                     |
+|`Database`_                           |`Database::__init__`_                 |
 +--------------------------------------+--------------------------------------+
-|`Database::random`_                   |`Database::random_pop`_               |
+|`Database::copy`_                     |`Database::random`_                   |
 +--------------------------------------+--------------------------------------+
-|`DatabaseException`_                  |`DatabaseException::__init__`_        |
+|`Database::random_pop`_               |`DatabaseException`_                  |
 +--------------------------------------+--------------------------------------+
-|`database_exists`_                    |`db_random_pop_default`_              |
+|`DatabaseException::__init__`_        |`database_exists`_                    |
 +--------------------------------------+--------------------------------------+
-|`docparser`_                          |`Document`_                           |
+|`db_random_pop_default`_              |`docparser`_                          |
 +--------------------------------------+--------------------------------------+
-|`Document::__iter__`_                 |`Document::__str__`_                  |
+|`Document`_                           |`Document::__iter__`_                 |
 +--------------------------------------+--------------------------------------+
-|`generate_names`_                     |`get_database`_                       |
+|`Document::__str__`_                  |`generate_names`_                     |
 +--------------------------------------+--------------------------------------+
-|`get_databases`_                      |`get_random_female_name`_             |
+|`get_database`_                       |`get_databases`_                      |
 +--------------------------------------+--------------------------------------+
-|`get_random_first_name`_              |`get_random_fullname`_                |
+|`get_random_female_name`_             |`get_random_first_name`_              |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_combo`_          |`get_random_lastname_family`_         |
+|`get_random_fullname`_                |`get_random_lastname_combo`_          |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_irish`_          |`get_random_lastname_lowerclass`_     |
+|`get_random_lastname_family`_         |`get_random_lastname_irish`_          |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_middleclass`_    |`get_random_lastname_nameson`_        |
+|`get_random_lastname_lowerclass`_     |`get_random_lastname_middleclass`_    |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_scottish`_       |`get_random_lastname_simple`_         |
+|`get_random_lastname_nameson`_        |`get_random_lastname_scottish`_       |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_upperclass`_     |`get_random_last_name`_               |
+|`get_random_lastname_simple`_         |`get_random_lastname_upperclass`_     |
 +--------------------------------------+--------------------------------------+
-|`get_random_male_name`_               |`Module`_                             |
+|`get_random_last_name`_               |`get_random_male_name`_               |
 +--------------------------------------+--------------------------------------+
-|`Module::__init__`_                   |`num_databases`_                      |
+|`Module`_                             |`Module::__init__`_                   |
 +--------------------------------------+--------------------------------------+
-|`one_chance_in`_                      |`parse_spec`_                         |
+|`num_databases`_                      |`one_chance_in`_                      |
 +--------------------------------------+--------------------------------------+
-|`RectangleIterator`_                  |`RectangleIterator::__init__`_        |
+|`parse_spec`_                         |`RectangleIterator`_                  |
 +--------------------------------------+--------------------------------------+
-|`Section`_                            |`Section::__init__`_                  |
+|`RectangleIterator::__init__`_        |`Section`_                            |
 +--------------------------------------+--------------------------------------+
-|`Shape`_                              |`Shape::__init__`_                    |
+|`Section::__init__`_                  |`Shape`_                              |
 +--------------------------------------+--------------------------------------+
-|`Shape::column`_                      |`Shape::draw_on`_                     |
+|`Shape::__init__`_                    |`Shape::column`_                      |
 +--------------------------------------+--------------------------------------+
-|`Shape::height`_                      |`Shape::normalise`_                   |
+|`Shape::draw_on`_                     |`Shape::height`_                      |
 +--------------------------------------+--------------------------------------+
-|`Shape::row`_                         |`Shape::section`_                     |
+|`Shape::normalise`_                   |`Shape::row`_                         |
 +--------------------------------------+--------------------------------------+
-|`Shape::size`_                        |`Shape::trim`_                        |
+|`Shape::section`_                     |`Shape::size`_                        |
 +--------------------------------------+--------------------------------------+
-|`Shape::width`_                       |`Shape::__getitem__`_                 |
+|`Shape::trim`_                        |`Shape::width`_                       |
 +--------------------------------------+--------------------------------------+
-|`Shape::__iter__`_                    |`Shape::__setitem__`_                 |
+|`Shape::__getitem__`_                 |`Shape::__iter__`_                    |
 +--------------------------------------+--------------------------------------+
-|`Shape::__str__`_                     |`ShapeCollection`_                    |
+|`Shape::__setitem__`_                 |`Shape::__str__`_                     |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::__init__`_          |`ShapeCollection::append`_            |
+|`ShapeCollection`_                    |`ShapeCollection::__init__`_          |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::combine`_           |`ShapeCollection::copy`_              |
+|`ShapeCollection::append`_            |`ShapeCollection::combine`_           |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::extend`_            |`ShapeCollection::height`_            |
+|`ShapeCollection::copy`_              |`ShapeCollection::extend`_            |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::offset`_            |`ShapeCollection::pop`_               |
+|`ShapeCollection::height`_            |`ShapeCollection::offset`_            |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::size`_              |`ShapeCollection::sort`_              |
+|`ShapeCollection::pop`_               |`ShapeCollection::size`_              |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::width`_             |`ShapeCollection::__getitem__`_       |
+|`ShapeCollection::sort`_              |`ShapeCollection::width`_             |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::__iter__`_          |`ShapeCollection::__len__`_           |
+|`ShapeCollection::__getitem__`_       |`ShapeCollection::__iter__`_          |
 +--------------------------------------+--------------------------------------+
-|`ShapeCollection::__setitem__`_       |`ShapeColumn`_                        |
+|`ShapeCollection::__len__`_           |`ShapeCollection::__setitem__`_       |
 +--------------------------------------+--------------------------------------+
-|`ShapeColumn::col`_                   |`ShapeColumn::copy`_                  |
+|`ShapeColumn`_                        |`ShapeColumn::col`_                   |
 +--------------------------------------+--------------------------------------+
-|`ShapeColumn::parent`_                |`ShapeColumn::__getitem__`_           |
+|`ShapeColumn::copy`_                  |`ShapeColumn::parent`_                |
 +--------------------------------------+--------------------------------------+
-|`ShapeColumn::__iter__`_              |`ShapeColumn::__repr__`_              |
+|`ShapeColumn::__getitem__`_           |`ShapeColumn::__iter__`_              |
 +--------------------------------------+--------------------------------------+
-|`ShapeColumn::__setitem__`_           |`ShapeColumn::__str__`_               |
+|`ShapeColumn::__repr__`_              |`ShapeColumn::__setitem__`_           |
 +--------------------------------------+--------------------------------------+
-|`ShapeCoord`_                         |`ShapeCoord::height`_                 |
+|`ShapeColumn::__str__`_               |`ShapeCoord`_                         |
 +--------------------------------------+--------------------------------------+
-|`ShapeCoord::size`_                   |`ShapeCoord::width`_                  |
+|`ShapeCoord::height`_                 |`ShapeCoord::size`_                   |
 +--------------------------------------+--------------------------------------+
-|`ShapeCoord::__getattribute__`_       |`ShapeError`_                         |
+|`ShapeCoord::width`_                  |`ShapeCoord::__getattribute__`_       |
 +--------------------------------------+--------------------------------------+
-|`ShapeRow`_                           |`ShapeRow::copy`_                     |
+|`ShapeError`_                         |`ShapeRow`_                           |
 +--------------------------------------+--------------------------------------+
-|`ShapeRow::parent`_                   |`ShapeRow::row`_                      |
+|`ShapeRow::copy`_                     |`ShapeRow::parent`_                   |
 +--------------------------------------+--------------------------------------+
-|`ShapeRow::__getitem__`_              |`ShapeRow::__iter__`_                 |
+|`ShapeRow::row`_                      |`ShapeRow::__getitem__`_              |
 +--------------------------------------+--------------------------------------+
-|`ShapeRow::__repr__`_                 |`ShapeRow::__setitem__`_              |
+|`ShapeRow::__iter__`_                 |`ShapeRow::__repr__`_                 |
 +--------------------------------------+--------------------------------------+
-|`ShapeRow::__str__`_                  |`Size`_                               |
+|`ShapeRow::__setitem__`_              |`ShapeRow::__str__`_                  |
 +--------------------------------------+--------------------------------------+
-|`Size::__init__`_                     |`split_escaped_delim`_                |
+|`Size`_                               |`Size::__init__`_                     |
 +--------------------------------------+--------------------------------------+
-|`underneath`_                         |`WeightedDatabase`_                   |
+|`split_escaped_delim`_                |`underneath`_                         |
 +--------------------------------------+--------------------------------------+
-|`WeightedDatabase::random`_           |`WeightedDatabase::random_pick`_      |
+|`WeightedDatabase`_                   |`WeightedDatabase::random`_           |
 +--------------------------------------+--------------------------------------+
-|`WeightedDatabase::random_pop`_       |`WeightedDatabase::total_weight`_     |
+|`WeightedDatabase::random_pick`_      |`WeightedDatabase::random_pop`_       |
 +--------------------------------------+--------------------------------------+
-|`WeightedString`_                     |`WeightedString::__init__`_           |
+|`WeightedDatabase::total_weight`_     |`WeightedString`_                     |
 +--------------------------------------+--------------------------------------+
