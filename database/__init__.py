@@ -45,6 +45,14 @@ class DatabaseFolder (object):
         self._databases.append(db)
         setattr(self, db.name, db)
 
+    def exists (self, db):
+        """
+        Boolean function for determining if a database is contained within.
+
+        :``db``: The database name to search for.
+        """
+        return hasattr(self, db) and isinstance(getattr(self, db), Database)
+
     def extend (self, db_list):
         """
         Append the contents of a list to the DatabaseFolder representation.
@@ -53,6 +61,19 @@ class DatabaseFolder (object):
         """
         for db in db_list:
             self.append(db)
+
+    def get (self, database, default=None):
+        """
+        Fetch databases from the folder.
+
+        :``database``: The database name to search for.
+        :``default``: The default value to return if this folder does not
+                      contain ``database``. *Default None*.
+        """
+        if hasattr(self, database):
+            return getattr(self, database)
+        else:
+            return default
 
     def __repr__ (self):
         r = "<DatabaseFolder %s [" % self.folder
