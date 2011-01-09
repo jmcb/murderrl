@@ -3,6 +3,8 @@ import sys, os, random, collections, re
 
 _dbobjects = []
 
+PATH_DELIM = "\\"
+
 class DatabaseError (Exception):
     """
     An error class for any and all errors relating to databases.
@@ -522,7 +524,7 @@ def _do_build ():
                     this_folder.spec = dir_specs.pop(name)
 
                 if dirpath != data_path:
-                    search = dirpath.replace(data_path, "").split("/")
+                    search = dirpath.replace(data_path, "").split(PATH_DELIM)
                     try:
                         top_folder = globals()[search[0]]
                     except KeyError:
@@ -566,29 +568,29 @@ def build_from_file_name (database, data_path, folder=None, spec=None):
                will be used instead. *Default None*.
     """
     # chop the extension off
-    temp = database.split("/")
+    temp = database.split(PATH_DELIM)
     name = database[:-3]
     folder_name = None
     store_point = None
 
     if len(temp) != 1:
-        folder_name = "/".join(temp[:-1])
+        folder_name = PATH_DELIM.join(temp[:-1])
         name = temp[-1][:-3]
 
     if folder_name is not None and not folder:
         search = folder_name
-        if "/" in folder_name:
+        if PATH_DELIM in folder_name:
             # we need to look recursively, but not yet
-            search = folder_name.split("/")[0]
+            search = folder_name.split(PATH_DELIM)[0]
 
         try:
             store_point = globals()[search.replace(".db", "")]
         except KeyError:
             pass
 
-        if "/" in folder_name:
+        if PATH_DELIM in folder_name:
             # now recurse
-            searches = folder_name.split("/")[1:]
+            searches = folder_name.split(PATH_DELIM)[1:]
             for search in searches:
                 try:
                     store_point = getattr(store_point, search.replace(".db", ""))
