@@ -247,7 +247,8 @@ def get_random_last_name (style = None):
     Returns a random previously unused last name.
 
     :``style``: One of ``'upper'``, ``'middle'`` or ``'lower'`` for
-    upper-, middle- and lowerclass names, respectively. *Default random*.
+                upper-, middle- and lowerclass names, respectively.
+                *Default random*.
     """
     styles = ['upper', 'middle', 'lower']
     if not style:
@@ -272,7 +273,8 @@ def get_random_fullname(gender = None, style = None):
 
     :``gender``: Gender: ``'m'`` or ``'f'``. *Default random*.
     :``style``: One of ``'upper'``, ``'middle'`` or ``'lower'`` for
-    upper-, middle- and lowerclass names, respectively. *Default random*.
+                upper-, middle- and lowerclass names, respectively.
+                *Default random*.
     """
     firstname = get_random_first_name(gender)
     lastname  = get_random_last_name(style)
@@ -284,7 +286,8 @@ def generate_names (num = 10, style = None, gender = None):
 
     :``num``: The number of repeats. *Default 10*.
     :``style``: One of ``'upper'``, ``'middle'``, ``'lower'`` for
-    upper-, middle- and lowerclass names, respectively. *Default random*.
+                upper-, middle- and lowerclass names, respectively.
+                *Default random*.
     :``gender``: Gender: ``'m'`` or ``'f'``. *Default random*.
     """
 
@@ -299,7 +302,8 @@ if __name__ == "__main__":
 
     :``num``: The number of repeats. *Default 10*.
     :``style``: One of ``'upper'``, ``'middle'`` or ``'lower'`` for
-    upper-, middle- and lowerclass names, respectively. *Default random*.
+                upper-, middle- and lowerclass names, respectively.
+                *Default random*.
     :``gender``: Gender: ``'m'`` or ``'f'``. *Default random*.
     """
     num    = 10
