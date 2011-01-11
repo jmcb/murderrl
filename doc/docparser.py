@@ -14,6 +14,8 @@ signifiers:
 :`$section`_: ``section description`` [2]_
 :`$classes`_: ``class1``, ``class2``, ... [3]_
 :`$methods`_:  ``method1``, ``method2``, ... [3]_
+:`$package`_: ``package identifier``
+:`$contains`_: ``module identifier``, ``module_identifier``, ...
 :``#``: ``comment text`` [4]_
 
 .. [1] Suppression targets are defined per-module, thus must be included in a
@@ -132,10 +134,39 @@ Arguments:
 :[``method1``, ``method2``, ``...``]: A list of comma separated methods to be
                                       documented. [3]_
 
+.. _$package:
+
+``$package``
+------------
+
+Arguments:
+
+:``package name``: The Python pacakge name.
+
+For modules that are contained within packages but are not specifically
+documented as part of that package (ie, the disparate collection of Shape and
+Coord modules), you can define a package that contains modules, and this package
+will be searched for those modules when documenting.
+
+See `$contains`_ for more information.
+
+.. _$contains:
+
+``$contains``
+-------------
+
+Arguments
+
+:[``module1``, ``module2``, ``...``]: A list of comma separated modules
+                                      contained within this class.
+
+This signifier can only be contained within a $package block, and denotes the
+classes are included as part of that package.
+
 """
 import sys, os, inspect
 
-class Document:
+class Document (object):
     """
     Defines an iterable list of modules and ignore targets.
 
@@ -145,9 +176,12 @@ class Document:
     :``modules``: A list of ``Module`` relevant to this document.
     :``ignore``: A list of ignore targets relevant to this document.
     """
-    modules = []
-    ignore = []
-    search_paths = []
+    def __init__ (self):
+        self.modules = []
+        self.ignore = []
+        self.search_paths = []
+        self.packages = []
+
     def __iter__ (self):
         """
         Yields a tuple of three values: ``module``, ``section`` and ``object``.
@@ -192,7 +226,18 @@ class Document:
                 result += "   -%s\n" % obj.__name__
         return result
 
-class Module:
+    def lookup_module (self, mname, package=None):
+        if package is None:
+            packages = self.packages
+        else:
+            packages = self.packages
+            packages.append(package)
+
+        for package_name, contents in packages:
+            if mname in contents:
+                return package_name
+
+class Module (object):
     """
     Stores information about a Python module to be documented.
 
@@ -218,7 +263,7 @@ class Module:
     def __ne__ (self, other):
         return isinstance(other, Module) and self.module != other.module
 
-class Section:
+class Section (object):
     """
     Stores information about a section of a Python module to be documented.
 
@@ -268,12 +313,24 @@ def docparser (filename, verbose=False):
     doc = Document()
     cur_module = None
     cur_section = None
+    cur_package = None
+
     for line in filename:
         line = line.strip()
         if line.startswith("#"):
             continue
 
-        if line.startswith("$module"):
+        if line.startswith("$package"):
+            if cur_package is not None:
+                doc.packages.append(cur_package)
+            package_name = line.split(" ", 1)[1]
+            cur_package = [package_name, []]
+        elif line.startswith("$contains"):
+            assert cur_package is not None
+            module_list = line.split(" ", 1)[1].split(", ")
+            for m in module_list:
+                cur_package[1].append(m)
+        elif line.startswith("$module"):
             if cur_section is not None and cur_section not in cur_module.sections:
                 cur_module.sections.append(cur_section)
                 cur_section = None
@@ -282,7 +339,11 @@ def docparser (filename, verbose=False):
                 cur_module = None
             cur_module = Module()
             identifier, name = line.split(" ", 1)[1].split(", ")
-            cur_module.module = __import__(identifier)
+
+            if doc.lookup_module(identifier, cur_package):
+                cur_module.module = getattr(__import__(doc.lookup_module(identifier)), identifier)
+            else:
+                cur_module.module = __import__(identifier)
             cur_module.name = name
             cur_module.identifier = identifier
             if verbose:
@@ -325,7 +386,6 @@ def docparser (filename, verbose=False):
             for path in paths:
                 if verbose:
                     print "<SearchPath %s>" % path
-                assert os.path.exists(path)
                 doc.search_paths.append(path)
                 sys.path.append(path)
         else:
@@ -337,6 +397,9 @@ def docparser (filename, verbose=False):
 
     if cur_module is not None and cur_module not in doc.modules:
         doc.modules.append(cur_module)
+
+    if cur_package is not None and cur_package not in doc.packages:
+        doc.packages.append(cur_package)
 
     return doc
 

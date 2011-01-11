@@ -24,7 +24,13 @@ def main (args):
     else:
         build_index = False
 
-    parsed = docparser("doc.conf")
+    if "doc" not in os.getcwd():
+        output = "doc/" + output
+        conf = "doc/doc.conf"
+    else:
+        conf = "doc.conf"
+
+    parsed = docparser(conf)
 
     for path in parsed.search_paths:
         sys.path.append(path)
