@@ -3,7 +3,7 @@ import sys, os, random, collections, re
 
 _dbobjects = []
 
-PATH_DELIM = "\\"
+PATH_DELIM = os.path.sep
 
 class DatabaseError (Exception):
     """
