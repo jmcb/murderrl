@@ -28,7 +28,6 @@ Table of Contents
     l. `get_random_lastname_upperclass`_
     m. `get_random_last_name`_
     n. `get_random_fullname`_
-    o. `generate_names`_
 
 2. `Index`_
 
@@ -284,21 +283,6 @@ first and last names.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _generate_names:
-
-function *generate_names* (num=10, style=None, gender=None)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Generates and outputs a given number of random names.
-
-:``num``: The number of repeats. *Default 10*.
-:``style``: One of ``'upper'``, ``'middle'``, ``'lower'`` for
-            upper-, middle- and lowerclass names, respectively.
-            *Default random*.
-:``gender``: Gender: ``'m'`` or ``'f'``. *Default random*.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. _Index:
 
 Index
@@ -309,19 +293,19 @@ Index
 +--------------------------------------+--------------------------------------+
 |`DatabaseException`_                  |`DatabaseException::__init__`_        |
 +--------------------------------------+--------------------------------------+
-|`db_random_pop_default`_              |`generate_names`_                     |
+|`db_random_pop_default`_              |`get_random_female_name`_             |
 +--------------------------------------+--------------------------------------+
-|`get_random_female_name`_             |`get_random_first_name`_              |
+|`get_random_first_name`_              |`get_random_fullname`_                |
 +--------------------------------------+--------------------------------------+
-|`get_random_fullname`_                |`get_random_lastname_combo`_          |
+|`get_random_lastname_combo`_          |`get_random_lastname_family`_         |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_family`_         |`get_random_lastname_irish`_          |
+|`get_random_lastname_irish`_          |`get_random_lastname_lowerclass`_     |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_lowerclass`_     |`get_random_lastname_middleclass`_    |
+|`get_random_lastname_middleclass`_    |`get_random_lastname_nameson`_        |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_nameson`_        |`get_random_lastname_scottish`_       |
+|`get_random_lastname_scottish`_       |`get_random_lastname_simple`_         |
 +--------------------------------------+--------------------------------------+
-|`get_random_lastname_simple`_         |`get_random_lastname_upperclass`_     |
+|`get_random_lastname_upperclass`_     |`get_random_last_name`_               |
 +--------------------------------------+--------------------------------------+
-|`get_random_last_name`_               |`get_random_male_name`_               |
+|`get_random_male_name`_               |`one_chance_in`_                      |
 +--------------------------------------+--------------------------------------+

@@ -29,12 +29,13 @@ document. The file format for \*.conf files allows combinations of the following
 signifiers:
 
 :`$ignore`_: ``qualified name``
-:`$search`_: ``path1``, ``path2``, ...
 :`$module`_: ``module identifier``, ``module description``
 :`$suppress`_: ``suppression target`` [1]_
 :`$section`_: ``section description`` [2]_
 :`$classes`_: ``class1``, ``class2``, ... [3]_
 :`$methods`_:  ``method1``, ``method2``, ... [3]_
+:`$package`_: ``package identifier``
+:`$contains`_: ``module identifier``, ``module_identifier``, ...
 :``#``: ``comment text`` [4]_
 
 .. [1] Suppression targets are defined per-module, thus must be included in a
@@ -74,22 +75,6 @@ documented.
 All ``$ignore`` signifiers must be followed by a single string. To denote
 multiple functions or methods to be ignored, use multiple ``$ignore``
 signifiers, each with its own line.
-
-.. _$search:
-
-``$search``:
-------------
-
-Arguments: 
-
-:[``path1``, ``path2``, ...]: A string of comma-separated search paths.
-
-``$search`` allows you to specify additional paths that should be searched when
-importing modules. These can be absolute paths of relative directories, but they
-must each exist.
-
-If ``$search`` is provided, it should be the first line of the document,
-otherwise the actual parser will fail to properly import modules.
 
 .. _$module:
 
@@ -153,6 +138,35 @@ Arguments:
 :[``method1``, ``method2``, ``...``]: A list of comma separated methods to be
                                       documented. [3]_
 
+.. _$package:
+
+``$package``
+------------
+
+Arguments:
+
+:``package name``: The Python pacakge name.
+
+For modules that are contained within packages but are not specifically
+documented as part of that package (ie, the disparate collection of Shape and
+Coord modules), you can define a package that contains modules, and this package
+will be searched for those modules when documenting.
+
+See `$contains`_ for more information.
+
+.. _$contains:
+
+``$contains``
+-------------
+
+Arguments
+
+:[``module1``, ``module2``, ``...``]: A list of comma separated modules
+                                      contained within this class.
+
+This signifier can only be contained within a $package block, and denotes the
+classes are included as part of that package.
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _Classes:
@@ -163,6 +177,9 @@ Classes
 Classes
 #######
 
+- `Document`_.
+- `Module`_.
+- `Section`_.
 
 .. _Document:
 
@@ -180,8 +197,26 @@ Members
 Methods
 #######
 
-1. `Document::__iter__`_.
-2. `Document::__str__`_.
+1. `Document::__init__`_.
+2. `Document::lookup_module`_.
+3. `Document::__iter__`_.
+4. `Document::__str__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Document::__init__:
+
+**Document::__init__** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Document::lookup_module:
+
+**Document::lookup_module** (self, mname, package=None)
+
+*Method undocumented*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -293,12 +328,14 @@ Iterators over the provided filename, parses it, and returns a ``Document``.
 Index
 =====
 
-+-------------------------+-------------------------+
-|`docparser`_             |`Document`_              |
-+-------------------------+-------------------------+
-|`Document::__iter__`_    |`Document::__str__`_     |
-+-------------------------+-------------------------+
-|`Module`_                |`Module::__init__`_      |
-+-------------------------+-------------------------+
-|`Section`_               |`Section::__init__`_     |
-+-------------------------+-------------------------+
++----------------------------+----------------------------+
+|`docparser`_                |`Document`_                 |
++----------------------------+----------------------------+
+|`Document::__init__`_       |`Document::lookup_module`_  |
++----------------------------+----------------------------+
+|`Document::__iter__`_       |`Document::__str__`_        |
++----------------------------+----------------------------+
+|`Module`_                   |`Module::__init__`_         |
++----------------------------+----------------------------+
+|`Section`_                  |`Section::__init__`_        |
++----------------------------+----------------------------+
