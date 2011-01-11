@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-import randname
+import randname, person
