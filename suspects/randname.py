@@ -5,7 +5,7 @@ Generate random first, last and full names from various building blocks.
 
 import random, sys
 
-from .database import database as db
+import database.database as db
 
 ##################################################
 # Utility methods

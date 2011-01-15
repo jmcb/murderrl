@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from .suspects.randname import *
+from suspects.randname import *
 
 def generate_names (num = 10, style = None, gender = None):
     """

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from .suspects.person import *
+from suspects.person import *
 
 def main (num = 10):
     """

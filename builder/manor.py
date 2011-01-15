@@ -20,8 +20,8 @@ Attempt to create a "manor" akin to:
 """
 
 import sys, random
-from .library import shape, coord
-from .database import database
+from library import shape, coord
+from database import database
 
 # Specific build styles:
 ONE_CORRIDOR = "one-corridor"
