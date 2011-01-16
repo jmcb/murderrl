@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+"""
+unit test for manor building.
+"""
+
+import sys
+from builder import manor
+
+if __name__=="__main__":
+    if sys.argv[0] == "python":
+        del sys.argv[0]
+
+    del sys.argv[0]
+
+    if len(sys.argv) == 0:
+        sys.argv.append(2)
+
+
+    print manor.build_L(rooms=int(sys.argv[0])).combine()

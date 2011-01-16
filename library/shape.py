@@ -846,6 +846,40 @@ class Column (Shape):
                 nshape.append([column])
             Shape.__init__(self, nshape, height=height, fill=fill)
 
+class Row (Shape):
+    """
+    A single-character row of characters.
+    """
+    def __init__ (self, shape=None, width=None, fill=None):
+        """
+        Create a row.
+
+        :``shape``: List of characters (or Shape or ShapeColumn) to fill our
+                    row with.
+        :``width``: Width to pad the row to. *Default None*.
+        :``fill``: Padding character to use when padding the row. *Default
+                   None*.
+        """
+        if isinstance(shape, ShapeColumn):
+            shape = shape.copy()
+        if isinstance(shape, Shape):
+            assert shape.height() == 1
+            Shape.__init__(self, shape, width=width, fill=fill)
+        elif isinstance(shape, int):
+            if width is not None:
+                fill = width
+            Shape.__init__(self, width=shape, height=1, fill=fill)
+        elif shape is None:
+            if width is None:
+                width = 1
+            Shape.__init__(self, width=width, height=1, fill=fill)
+        else:
+            nshape = []
+            for row in shape:
+                nshape.append([row])
+            Shape.__init__(self, nshape, height=height, fill=fill)
+
+
 def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False):
     """
     Take two shapes and combine them into one. This method places shapes

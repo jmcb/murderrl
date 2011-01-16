@@ -5,11 +5,26 @@ from collections import namedtuple
 import copy
 
 class CollectionCoord (coord.Coord):
-    def __init__ (self, coord, collection):
+    """
+    A Coord that references a specific ShapeCollection.
+
+    This allows for iteration over areas of a ShapeCollection and also directly
+    accessing them.
+    """
+    def __init__ (self, collection, c):
+        """
+        Create a new CollectionCoord.
+
+        :``collection``: Which collection this references.
+        :``coord``: The coordinates of that Collection.
+        """
         self.collection = collection
-        coord.Coord.__init__(self, coord)
+        coord.Coord.__init__(self, c)
 
     def get (self):
+        """
+        Fetch the glyphs contained with these points, otherwise return None.
+        """
         result = self.collection[self]
         if result == []:
             return None
@@ -17,6 +32,11 @@ class CollectionCoord (coord.Coord):
             return result
 
     def set (self, value):
+        """
+        Set the glyph connected with this Coord to ``value``.
+
+        :``value``: The value to set. See ``ShapeCollection:__setitem__``.
+        """
         self.collection[self] = value
 
     def __str__ (self):
@@ -206,7 +226,7 @@ class ShapeCollection (object):
             if sc.coord < coord.Coord(0, 0):
                 raise shape.ShapeError, "Shape indexed %s already had a negative offset!" % index
             if sc.coord+offset < coord.Coord(0, 0):
-                raise shape.ShapeError, "Adding %s to %s results in %s! Cannot perform negative offsetting." % (offset, sc.coord, sc.coorrd+offset)
+                raise shape.ShapeError, "Adding %s to %s results in %s! Cannot perform negative offsetting." % (offset, sc.coord, sc.coord+offset)
 
             new_self.append(ShapeCoord(sc.shape, coord.Coord(sc.coord + offset)))
 

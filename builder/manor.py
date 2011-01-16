@@ -19,8 +19,8 @@ Attempt to create a "manor" akin to:
 
 """
 
-import sys, random
-from library import shape, coord
+import random
+from library import shape, coord, collection
 from database import database
 
 # Specific build styles:
@@ -177,7 +177,7 @@ def base_builder ():
     collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collection=True)
 
     corridor_length = collection.width() - room_width * 2
-    corridor = shape.Shape(height=1, width=corridor_length, fill=".")
+    corridor = shape.Row(width=corridor_length, fill=".")
 
     collection.append(shape.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
 
@@ -190,11 +190,85 @@ N_LAYOUT = "N-corridors"
 H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
 
-def build_L (base=None):
+def build_L (base=None, rooms=2):
+    """
+    Modifies the results of base_builder() to result in an L shape in any
+    orientation.
+
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    :``rooms``: How many rooms to build along the sides of the new axis.
+    """
     if base is None:
         base = base_builder()
 
+    # Draw the new rooms.
+    new_rooms = collection.ShapeCollection()
 
+    for row in xrange(rooms):
+        room1 = Room().as_shape()
+        room2 = Room().as_shape()
+        this_row = shape.adjoin(room1, room2, overlap=-1, collection=True)
+        new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collection=True)
+
+    # Find the corridor
+    corridor = None
+
+    for s in base:
+        if s.height() == 1:
+            corridor = s
+            break
+
+    assert corridor is not None
+    corridor, start = corridor
+
+    stop = coord.Coord(start)
+    stop.x = corridor.width()
+
+    side = random.choice(["left", "right"])
+
+    y_offset = 0
+
+    # Pick either the right or left end of the corridor.
+
+    if side == "right":
+        new_rooms.offset(coord.Coord(stop.x-1, 0))
+        y_offset = stop.x + (Room().width - 1)
+    else:
+        y_offset = start.x
+
+    new_corridor = shape.Column(height=Room().height * (rooms + 1) - (rooms - 1), fill=".")
+
+    corridor_offset = None
+
+    vert = None
+
+    if random.randint(1, 2) == 1:
+        base = shape.underneath(base, new_rooms, overlap=1, collection=True)
+        new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
+        corridor_offset = coord.Coord(y_offset, Room().height)
+        base.append(new_corridor, corridor_offset)
+        vert = "bottom"
+    else:
+        base = shape.underneath(new_rooms, base, overlap=1, collection=True)
+        new_corridor[coord.Coord(0, 0)] = "#"
+        corridor_offset = coord.Coord(y_offset, 0)
+        base.append(new_corridor, corridor_offset)
+        vert = "top"
+
+    # Finally, fixup the broken wall.
+    start = None
+
+    if vert == "top":
+        start = coord.Coord(corridor_offset.x - 1, Room().height * rooms - rooms)
+    else:
+        start = coord.Coord(corridor_offset.x - 1, Room().height + 1)
+
+    new_shape = shape.Shape(width=3, height=Room().height, fill="#")
+    new_shape.draw_on(shape.Shape(width=1, height=Room().height, fill="."), offset=coord.Coord(1, 0), check_conflict=False)
+
+    base.append(new_shape, start)
+    return base
 
 def build_Z (base=None):
     if base is None:
