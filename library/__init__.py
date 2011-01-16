@@ -1,2 +1,2 @@
 #!/usr/bin/env python
-import shape, coord
+import shape, coord, collection
