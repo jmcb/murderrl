@@ -11,8 +11,9 @@ See the `Shapes`_ section for ``Shape``, ``Box``, ``Column`` and related
 classes.
 
 """
-from coord import *
-from collections import namedtuple
+
+from library.coord import *
+from library.collection import *
 
 def iterable (obj):
     """

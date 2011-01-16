@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+
 from library.shape import *
 from library.coord import *
+from collections import namedtuple
 
 class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
     """

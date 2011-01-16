@@ -12,26 +12,28 @@ Table of Contents
     d. `ShapeColumn`_
     e. `ShapeRow`_
 
-  B. `Collections`_
-
-    a. `ShapeCollection`_
-    b. `ShapeCoord`_
-
-  C. `Shape Manipulation`_
+  B. `Shape Manipulation`_
 
     a. `adjoin`_
     b. `underneath`_
     c. `atop`_
 
-  D. `Automatic shapes`_
+  C. `Automatic shapes`_
 
     a. `AutoShape`_
 
-  E. `Miscellaneous`_
+  D. `Miscellaneous`_
 
     a. `ShapeError`_
 
-2. `Coord module`_
+2. `ShapeCollection module`_
+
+  A. `Collections`_
+
+    a. `ShapeCollection`_
+    b. `ShapeCoord`_
+
+3. `Coord module`_
 
   A. `Co-ordinates`_
 
@@ -50,7 +52,14 @@ Table of Contents
     a. `AutoSize`_
     b. `AutoDimension`_
 
-3. `Database module`_
+4. `Peeople and suspect module`_
+
+  A. `People`_
+
+    a. `Person`_
+    b. `SuspectList`_
+
+5. `Database module`_
 
   A. `Flat-text database`_
 
@@ -71,7 +80,7 @@ Table of Contents
     b. `parse_spec`_
     c. `build_from_file_name`_
 
-4. `Random name generation`_
+6. `Random name generation`_
 
   A. `Utility functions`_
 
@@ -98,7 +107,7 @@ Table of Contents
     m. `get_random_last_name`_
     n. `get_random_fullname`_
 
-5. `Documentation parser`_
+7. `Documentation parser`_
 
   A. `Classes`_
 
@@ -110,7 +119,7 @@ Table of Contents
 
     a. `docparser`_
 
-6. `Index`_
+8. `Index`_
 
 .. _Shape module:
 
@@ -126,8 +135,6 @@ into a single canvas, collected, split, sectioned, and iterated over.
 
 See the `Shapes`_ section for ``Shape``, ``Box``, ``Column`` and related
 classes.
-
-See the `Collections`_ section for ``ShapeCollection`` and ``ShapeCoord``.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -665,6 +672,291 @@ Returns a string representation of the row.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Shape Manipulation:
+
+Shape Manipulation
+------------------
+
+Methods
+#######
+
+.. _adjoin:
+
+function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Take two shapes and combine them into one. This method places shapes
+side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
+``overlap`` is greater than zero, ``shape2`` will overlap ``shape1`` on the
+left by ``overlap``. Finally, the resultant shape will be padded using
+``fill``.
+
+:``shape1``: The first shape. *Required*.
+:``shape2``: The second shape. *Required*.
+:``overlap``: How much to overlap ``shape1`` with ``shape2``. *Default*
+              *0*.
+:``top_offset``: If specified, once the overlap has been calculated, the
+                 second shape will be vertically offset by ``top_offset``
+                 from the "top" of the canvas. *Default 0*.
+:``fill``: The character to pad out the rest of the canvas if
+           ``shape1.height() < shape2.height()`` or vice versa.
+:``join_left``: If true, will instead join ``shape2`` to the left of
+                ``shape1``. This is achieved by swapping the parameters.
+                *Default False*.
+:``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
+                     ``shape2`` where they overlap with the parts of ``shape1``.
+:``collection``: If true, returns a ShapeCollection instead of a canvas.
+                 *Default False*.
+:``offset_both``: If true, the ``top_offset`` will be applied to both
+                  shapes. *Default False*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _underneath:
+
+function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Take two shapes and combine them into one by drawing ``shape1`` and then
+drawing ``shape2`` directly beneath it.
+
+:``shape1``: The first shape to be drawn. *Required*.
+:``shape2``: The second shape to be drawn; this will be drawn
+             underneath ``shape1``. *Required*.
+:``left_offset``: How many columns to offset the shapes by. *Default 0*.
+:``overlap``: How many rows ``shape2`` should overlap ``shape1``.
+              *Default 0*.
+:``fill``: Character to be used in filling out the canvas.
+           *Default None*.
+:``join_top``: Draw ``shape2`` on top of ``shape1`` instead. *Default*
+               *False*.
+:``skip_conflicts``: Where ``shape2`` conflicts with ``shape1``, keep
+                     ``shape1``'s glyphs. *Default False*
+:``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
+:``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
+:``collection``: If true, returns a ShapeCollection instead of a canvas.
+                 *Default False*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _atop:
+
+function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Take two shapes and combine them into one by drawing ``shape1`` and then
+drawing ``shape2`` directly above it. This is an alias for ``underneath``
+with the ``join_top`` flag set to True.
+
+:``shape1``: The first shape to be drawn. *Required*.
+:``shape2``: The second shape to be drawn; this will be drawn
+             above ``shape1``. *Required*.
+:``left_offset``: How many columns to offset the shapes by. *Default 0*.
+:``overlap``: How many rows ``shape2`` should overlap ``shape1``.
+              *Default 0*.
+:``fill``: Character to be used in filling out the canvas.
+           *Default None*.
+:``join_bottom``: Draw ``shape2`` beneath of ``shape1`` instead. *Default*
+                  *False*.
+:``skip_conflicts``: Where ``shape2`` conflicts with ``shape1``, keep
+                     ``shape1``'s glyphs. *Default False*
+:``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
+:``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
+:``collection``: If true, returns a ShapeCollection instead of a canvas.
+                 *Default False*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Automatic shapes:
+
+Automatic shapes
+----------------
+
+Classes
+#######
+
+- `AutoShape`_.
+
+.. _AutoShape:
+
+class *AutoShape*
+^^^^^^^^^^^^^^^^^
+
+An unsized Shape that expands to suit needs.
+
+Methods
+#######
+
+1. `AutoShape::__init__`_.
+2. `AutoShape::actual_height`_.
+3. `AutoShape::actual_size`_.
+4. `AutoShape::actual_width`_.
+5. `AutoShape::as_shape`_.
+6. `AutoShape::height`_.
+7. `AutoShape::normalise`_.
+8. `AutoShape::size`_.
+9. `AutoShape::width`_.
+10. `AutoShape::_actual_wrapper`_.
+11. `AutoShape::__getitem__`_.
+12. `AutoShape::__setitem__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::__init__:
+
+**AutoShape::__init__** (self, fill=None)
+
+Initiate the automatic shape.
+
+:``fill``: What character should be used when normalising the shape.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::actual_height:
+
+**AutoShape::actual_height** (self, \*args, \*\*kwargs)
+
+To compensate for automatic sizing, actual heights of the AutoShape are
+accessed via suffixing "actual" to the function name.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::actual_size:
+
+**AutoShape::actual_size** (self, \*args, \*\*kwargs)
+
+To compensate for automatic sizing, actual sizes of the AutoShape are
+accessed via suffixing "actual" to the function name.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::actual_width:
+
+**AutoShape::actual_width** (self, \*args, \*\*kwargs)
+
+To compensate for automatic sizing, actual widths of the AutoShape are
+accessed via suffixing "actual" to the function name.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::as_shape:
+
+**AutoShape::as_shape** (self)
+
+Attempts to convert the current AutoShape into a Shape, and then returns
+it.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::height:
+
+**AutoShape::height** (self)
+
+To compensate for the automatic sizing of the shape, height returns an
+"infinite" height. To get the actual height of the shape, use
+``AutoShape::actual_width``.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::normalise:
+
+**AutoShape::normalise** (self, \*args, \*\*kwargs)
+
+Extend either the width, the height, or both, of a Shape to the relevant
+value, using the provided fill value.
+
+:``width``: The width to which the Shape should be extended. This
+            integer value should be greater than the current width
+            of the Shape, or None to perform no width normalisation.
+            *Default None*.
+:``height``: The height to which the Shape should be extended. As per
+             ``width`` above. *Default None*.
+:``fill``: The fill character which should be used when extending
+           rows and columns. *Default None*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::size:
+
+**AutoShape::size** (self)
+
+To compensate for the automatic sizing of the shape, size returns an
+"infinite" size. To get the actual size of the shape, use
+``AutoShape::actual_size.``
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::width:
+
+**AutoShape::width** (self)
+
+To compensate for the automatic sizing of the shape, width returns an
+"inifinite" width. To get the actual width of the shape, use
+``AutoShape::actual_width``.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::_actual_wrapper:
+
+**AutoShape::_actual_wrapper** (function)
+
+Performs hot-swapping of actual_width, actual_height and actual_size
+into the relevant width, height and size functions before executing
+the function. Once performed, hot-swaps the functions back again.
+
+:``function``: The function to be wrapped.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::__getitem__:
+
+**AutoShape::__getitem__** (self, item)
+
+Attempt to access ``item``. If ``item`` is outside of the bounds of the
+current shape, it is sized accordingly.
+
+:``item``: The item to be accessed.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _AutoShape::__setitem__:
+
+**AutoShape::__setitem__** (self, item, value)
+
+Attempt to set ``item`` to ``value``. If ``item`` if outside of the
+bounds of the current shape, it is sized accordingly.
+
+:``item``: The item to be set.
+:``value``: The value to be set.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Miscellaneous:
+
+Miscellaneous
+-------------
+
+Classes
+#######
+
+- `ShapeError`_.
+
+.. _ShapeError:
+
+class *ShapeError*
+^^^^^^^^^^^^^^^^^^
+
+A generic Shape-related error.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection module:
+
+ShapeCollection module
+======================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Collections:
 
 Collections
@@ -904,274 +1196,6 @@ Wraper over self.shape.width.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Shape Manipulation:
-
-Shape Manipulation
-------------------
-
-Methods
-#######
-
-.. _adjoin:
-
-function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Take two shapes and combine them into one. This method places shapes
-side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
-``overlap`` is greater than zero, ``shape2`` will overlap ``shape1`` on the
-left by ``overlap``. Finally, the resultant shape will be padded using
-``fill``.
-
-:``shape1``: The first shape. *Required*.
-:``shape2``: The second shape. *Required*.
-:``overlap``: How much to overlap ``shape1`` with ``shape2``. *Default*
-              *0*.
-:``top_offset``: If specified, once the overlap has been calculated, the
-                 second shape will be vertically offset by ``top_offset``
-                 from the "top" of the canvas. *Default 0*.
-:``fill``: The character to pad out the rest of the canvas if
-           ``shape1.height() < shape2.height()`` or vice versa.
-:``join_left``: If true, will instead join ``shape2`` to the left of
-                ``shape1``. This is achieved by swapping the parameters.
-                *Default False*.
-:``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
-                     ``shape2`` where they overlap with the parts of ``shape1``.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
-                 *Default False*.
-:``offset_both``: If true, the ``top_offset`` will be applied to both
-                  shapes. *Default False*.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _underneath:
-
-function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Take two shapes and combine them into one by drawing ``shape1`` and then
-drawing ``shape2`` directly beneath it.
-
-:``shape1``: The first shape to be drawn. *Required*.
-:``shape2``: The second shape to be drawn; this will be drawn
-             underneath ``shape1``. *Required*.
-:``left_offset``: How many columns to offset the shapes by. *Default 0*.
-:``overlap``: How many rows ``shape2`` should overlap ``shape1``.
-              *Default 0*.
-:``fill``: Character to be used in filling out the canvas.
-           *Default None*.
-:``join_top``: Draw ``shape2`` on top of ``shape1`` instead. *Default*
-               *False*.
-:``skip_conflicts``: Where ``shape2`` conflicts with ``shape1``, keep
-                     ``shape1``'s glyphs. *Default False*
-:``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
-:``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
-                 *Default False*.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _atop:
-
-function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Take two shapes and combine them into one by drawing ``shape1`` and then
-drawing ``shape2`` directly above it. This is an alias for ``underneath``
-with the ``join_top`` flag set to True.
-
-:``shape1``: The first shape to be drawn. *Required*.
-:``shape2``: The second shape to be drawn; this will be drawn
-             above ``shape1``. *Required*.
-:``left_offset``: How many columns to offset the shapes by. *Default 0*.
-:``overlap``: How many rows ``shape2`` should overlap ``shape1``.
-              *Default 0*.
-:``fill``: Character to be used in filling out the canvas.
-           *Default None*.
-:``join_bottom``: Draw ``shape2`` beneath of ``shape1`` instead. *Default*
-                  *False*.
-:``skip_conflicts``: Where ``shape2`` conflicts with ``shape1``, keep
-                     ``shape1``'s glyphs. *Default False*
-:``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
-:``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
-                 *Default False*.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _Automatic shapes:
-
-Automatic shapes
-----------------
-
-Classes
-#######
-
-- `AutoShape`_.
-
-.. _AutoShape:
-
-class *AutoShape*
-^^^^^^^^^^^^^^^^^
-
-An unsized Shape that expands to suit needs.
-
-Methods
-#######
-
-1. `AutoShape::__init__`_.
-2. `AutoShape::actual_height`_.
-3. `AutoShape::actual_size`_.
-4. `AutoShape::actual_width`_.
-5. `AutoShape::height`_.
-6. `AutoShape::normalise`_.
-7. `AutoShape::size`_.
-8. `AutoShape::width`_.
-9. `AutoShape::_actual_wrapper`_.
-10. `AutoShape::__getitem__`_.
-11. `AutoShape::__setitem__`_.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::__init__:
-
-**AutoShape::__init__** (self, fill=None)
-
-Initiate the automatic shape.
-
-:``fill``: What character should be used when normalising the shape.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::actual_height:
-
-**AutoShape::actual_height** (self, \*args, \*\*kwargs)
-
-To compensate for automatic sizing, actual heights of the AutoShape are
-accessed via suffixing "actual" to the function name.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::actual_size:
-
-**AutoShape::actual_size** (self, \*args, \*\*kwargs)
-
-To compensate for automatic sizing, actual sizes of the AutoShape are
-accessed via suffixing "actual" to the function name.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::actual_width:
-
-**AutoShape::actual_width** (self, \*args, \*\*kwargs)
-
-To compensate for automatic sizing, actual widths of the AutoShape are
-accessed via suffixing "actual" to the function name.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::height:
-
-**AutoShape::height** (self)
-
-To compensate for the automatic sizing of the shape, height returns an
-"infinite" height. To get the actual height of the shape, use
-``AutoShape::actual_width``.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::normalise:
-
-**AutoShape::normalise** (self, \*args, \*\*kwargs)
-
-Extend either the width, the height, or both, of a Shape to the relevant
-value, using the provided fill value.
-
-:``width``: The width to which the Shape should be extended. This
-            integer value should be greater than the current width
-            of the Shape, or None to perform no width normalisation.
-            *Default None*.
-:``height``: The height to which the Shape should be extended. As per
-             ``width`` above. *Default None*.
-:``fill``: The fill character which should be used when extending
-           rows and columns. *Default None*.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::size:
-
-**AutoShape::size** (self)
-
-To compensate for the automatic sizing of the shape, size returns an
-"infinite" size. To get the actual size of the shape, use
-``AutoShape::actual_size.``
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::width:
-
-**AutoShape::width** (self)
-
-To compensate for the automatic sizing of the shape, width returns an
-"inifinite" width. To get the actual width of the shape, use
-``AutoShape::actual_width``.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::_actual_wrapper:
-
-**AutoShape::_actual_wrapper** (function)
-
-Performs hot-swapping of actual_width, actual_height and actual_size
-into the relevant width, height and size functions before executing
-the function. Once performed, hot-swaps the functions back again.
-
-:``function``: The function to be wrapped.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::__getitem__:
-
-**AutoShape::__getitem__** (self, item)
-
-Attempt to access ``item``. If ``item`` is outside of the bounds of the
-current shape, it is sized accordingly.
-
-:``item``: The item to be accessed.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _AutoShape::__setitem__:
-
-**AutoShape::__setitem__** (self, item, value)
-
-Attempt to set ``item`` to ``value``. If ``item`` if outside of the
-bounds of the current shape, it is sized accordingly.
-
-:``item``: The item to be set.
-:``value``: The value to be set.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _Miscellaneous:
-
-Miscellaneous
--------------
-
-Classes
-#######
-
-- `ShapeError`_.
-
-.. _ShapeError:
-
-class *ShapeError*
-^^^^^^^^^^^^^^^^^^
-
-A generic Shape-related error.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. _Coord module:
 
 Coord module
@@ -1354,6 +1378,467 @@ It is always larger than other integers, never less than nor equal to.
 Methods
 #######
 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Peeople and suspect module:
+
+Peeople and suspect module
+==========================
+
+Set up characters, their basic traits and relationships.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _People:
+
+People
+------
+
+Classes
+#######
+
+- `Person`_.
+- `SuspectList`_.
+
+.. _Person:
+
+class *Person*
+^^^^^^^^^^^^^^
+
+Person class. To define persons and access their characteristics.
+
+Methods
+#######
+
+1. `Person::__init__`_.
+2. `Person::chance_of_children`_.
+3. `Person::chance_of_spouse`_.
+4. `Person::check_has_relative`_.
+5. `Person::create_child`_.
+6. `Person::create_spouse`_.
+7. `Person::describe`_.
+8. `Person::describe_relations`_.
+9. `Person::get_fullname`_.
+10. `Person::get_mirrored_gender`_.
+11. `Person::get_name`_.
+12. `Person::get_relative`_.
+13. `Person::has_children`_.
+14. `Person::is_married`_.
+15. `Person::is_servant`_.
+16. `Person::set_random_age`_.
+17. `Person::set_random_hair_colour`_.
+18. `Person::set_random_last_name`_.
+19. `Person::set_relative`_.
+20. `Person::__str__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::__init__:
+
+**Person::__init__** (self, role='ROLE_GUEST', gender=None, last=None, age=None)
+
+Initialize a new person.
+
+:``role``: One of ``ROLE_OWNER``, ``ROLE_FAMILY``, ``ROLE_GUEST`` or ``ROLE_SERVANT``. *Default ``ROLE_GUEST``*.
+           The role influences the choice of surname, age, and honorifics.
+:``gender``: Gender: ``'m'`` or ``'f'``. *Default random*.
+:``last``: Last name. *Default random*.
+:``age``: Age. *Default random*.
+
+In addition, the hair colour is randomly chosen.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::chance_of_children:
+
+**Person::chance_of_children** (self)
+
+Returns True if we should generate children.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::chance_of_spouse:
+
+**Person::chance_of_spouse** (self)
+
+Returns True if we should generate a spouse.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::check_has_relative:
+
+**Person::check_has_relative** (self, type)
+
+Returns whether a given relationship type exists for this
+person.
+
+:``type``: The type of the relationship: ``REL_SPOUSE``,
+           ``REL_PARENT``, ``REL_CHILD`` or ``REL_ENGAGED``. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::create_child:
+
+**Person::create_child** (self)
+
+Generates a child for the current person.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::create_spouse:
+
+**Person::create_spouse** (self)
+
+Generates a husband or wife for the current person.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::describe:
+
+**Person::describe** (self, list)
+
+Prints the person's description and lists their relationships.
+
+:``list``: An object of type SuspectList. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::describe_relations:
+
+**Person::describe_relations** (self, list)
+
+Prints a listing of this person's relatives.
+
+:``list``: An object of type SuspectList. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::get_fullname:
+
+**Person::get_fullname** (self)
+
+Returns a person's full name, including titles.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::get_mirrored_gender:
+
+**Person::get_mirrored_gender** (self)
+
+Returns the opposite gender to the current person one's.
+Used to decide spouses' genders.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::get_name:
+
+**Person::get_name** (self)
+
+Returns a person's full name, excluding titles.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::get_relative:
+
+**Person::get_relative** (self, type)
+
+Returns the first relative (suspects[] index) that matches a
+given relationship type. Only really makes sense for binary
+relationships, i.e. spouses or fiances.
+
+:``type``: The type of the relationship: ``REL_SPOUSE``,
+           ``REL_PARENT``, ``REL_CHILD`` or ``REL_ENGAGED``. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::has_children:
+
+**Person::has_children** (self)
+
+Returns whether a person has children.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::is_married:
+
+**Person::is_married** (self)
+
+Returns whether a person is married.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::is_servant:
+
+**Person::is_servant** (self)
+
+Returns whether a person is part of the staff.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::set_random_age:
+
+**Person::set_random_age** (self, age=None)
+
+Sets a person's appropriate age depending on their role.
+
+:``age``: Age. *Default random*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::set_random_hair_colour:
+
+**Person::set_random_hair_colour** (self)
+
+Assigns a random hair colour.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::set_random_last_name:
+
+**Person::set_random_last_name** (self, last=None)
+
+Sets a person's appropriate last name (upperclass, middleclass,
+lowerclass) depending on their role.
+
+:``last``: Last name. *Default random*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::set_relative:
+
+**Person::set_relative** (self, idx, type)
+
+Add a relative to this person's relationship list.
+Requires suspects[] index and relationship type
+('spouse', 'parent', 'child', 'engaged').
+
+:``idx``: The current person's index in the suspect list. *Required*.
+:``type``: The type of the relationship: ``REL_SPOUSE``,
+           ``REL_PARENT``, ``REL_CHILD`` or ``REL_ENGAGED``. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Person::__str__:
+
+**Person::__str__** (self)
+
+Prints a single-line description of the person.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList:
+
+class *SuspectList*
+^^^^^^^^^^^^^^^^^^^
+
+A representation of all suspects, in form of a list of Persons
+and the indices of victim and murderer.
+
+Methods
+#######
+
+1. `SuspectList::__init__`_.
+2. `SuspectList::add_child`_.
+3. `SuspectList::add_honorifics`_.
+4. `SuspectList::add_occupation`_.
+5. `SuspectList::add_relatives`_.
+6. `SuspectList::add_spouse`_.
+7. `SuspectList::ensure_unique_names`_.
+8. `SuspectList::get_murderer`_.
+9. `SuspectList::get_suspect`_.
+10. `SuspectList::get_suspect_list`_.
+11. `SuspectList::get_victim`_.
+12. `SuspectList::is_murderer`_.
+13. `SuspectList::is_victim`_.
+14. `SuspectList::no_of_suspects`_.
+15. `SuspectList::pick_murderer`_.
+16. `SuspectList::pick_victim`_.
+17. `SuspectList::print_suspects`_.
+18. `SuspectList::real_no_of_suspects`_.
+19. `SuspectList::update_child`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::__init__:
+
+**SuspectList::__init__** (self, max_suspects)
+
+As long as more suspects are needed, generate new persons
+and, in another loop, also their relatives.
+
+:``max_suspects``: The maximum number of suspects. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_child:
+
+**SuspectList::add_child** (self, parent_idx)
+
+Generates a child for a given person, and sets the necessary
+relationship.
+
+:``idx``: The current person's index in the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_honorifics:
+
+**SuspectList::add_honorifics** (self)
+
+Add honorifics to some of the suspects, as befits their role.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_occupation:
+
+**SuspectList::add_occupation** (self)
+
+Add occupations for the staff, and also to some of the other
+suspects, as befits their role.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_relatives:
+
+**SuspectList::add_relatives** (self, role, max_persons, count)
+
+Given the current index (count), generates more persons
+related to the people already in the sub-list suspects[count:].
+
+:``role``: One of ``ROLE_OWNER``, ``ROLE_FAMILY``, ``ROLE_GUEST``
+           or ``ROLE_SERVANT``. *Required*.
+:``max_persons``: The maximum total number of suspects. *Required*.
+:``count``: The index of the first person to begin the iteration
+            over the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_spouse:
+
+**SuspectList::add_spouse** (self, idx)
+
+Generates a husband or wife for a given person, and sets the
+necessary relationship.
+
+:``idx``: The index of the current person in the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::ensure_unique_names:
+
+**SuspectList::ensure_unique_names** (self)
+
+Reroll names that start with the same letters as names already
+in the list. This greatly reduces the danger of the player
+getting the characters mixed up.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_murderer:
+
+**SuspectList::get_murderer** (self)
+
+Returns the murderer in form of a Person object.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_suspect:
+
+**SuspectList::get_suspect** (self, idx)
+
+Returns a Person object matching the given index in the
+suspects[] list.
+
+:``idx``: An index of the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_suspect_list:
+
+**SuspectList::get_suspect_list** (self)
+
+Returns the suspects list of type Person[].
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_victim:
+
+**SuspectList::get_victim** (self)
+
+Returns the victim in form of a Person object.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::is_murderer:
+
+**SuspectList::is_murderer** (self, idx)
+
+Returns True if the given index matches the murderer.
+
+:``idx``: An index of the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::is_victim:
+
+**SuspectList::is_victim** (self, idx)
+
+Returns True if the given index matches the victim.
+
+:``idx``: An index of the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::no_of_suspects:
+
+**SuspectList::no_of_suspects** (self)
+
+Returns the length of the suspects list.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::pick_murderer:
+
+**SuspectList::pick_murderer** (self)
+
+Randomly pick the murderer.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::pick_victim:
+
+**SuspectList::pick_victim** (self)
+
+Randomly pick the victim. Staff are excluded.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::print_suspects:
+
+**SuspectList::print_suspects** (self)
+
+Prints the complete list of suspects and their relationships.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::real_no_of_suspects:
+
+**SuspectList::real_no_of_suspects** (self)
+
+Returns the real number of suspects, i.e. excludes the victim.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::update_child:
+
+**SuspectList::update_child** (self, idx_parent, idx_child)
+
+Updates relationship and age range for a parent and child,
+passed as indices.
+
+:``idx_parent``: The parent's index in the suspects[] list. *Required*.
+:``idx_child``: The child's index in the suspects[] list. *Required*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2281,140 +2766,182 @@ Iterators over the provided filename, parses it, and returns a ``Document``.
 Index
 =====
 
-+--------------------------------------+--------------------------------------+
-|`adjoin`_                             |`atop`_                               |
-+--------------------------------------+--------------------------------------+
-|`AutoDimension`_                      |`AutoShape`_                          |
-+--------------------------------------+--------------------------------------+
-|`AutoShape::__init__`_                |`AutoShape::actual_height`_           |
-+--------------------------------------+--------------------------------------+
-|`AutoShape::actual_size`_             |`AutoShape::actual_width`_            |
-+--------------------------------------+--------------------------------------+
-|`AutoShape::height`_                  |`AutoShape::normalise`_               |
-+--------------------------------------+--------------------------------------+
-|`AutoShape::size`_                    |`AutoShape::width`_                   |
-+--------------------------------------+--------------------------------------+
-|`AutoShape::_actual_wrapper`_         |`AutoShape::__getitem__`_             |
-+--------------------------------------+--------------------------------------+
-|`AutoShape::__setitem__`_             |`AutoSize`_                           |
-+--------------------------------------+--------------------------------------+
-|`AutoSize::__init__`_                 |`AutoSize::valid`_                    |
-+--------------------------------------+--------------------------------------+
-|`Box`_                                |`Box::__init__`_                      |
-+--------------------------------------+--------------------------------------+
-|`Box::perimeter`_                     |`build_from_file_name`_               |
-+--------------------------------------+--------------------------------------+
-|`check_name_db`_                      |`coinflip`_                           |
-+--------------------------------------+--------------------------------------+
-|`Column`_                             |`Column::__init__`_                   |
-+--------------------------------------+--------------------------------------+
-|`Coord`_                              |`Coord::__init__`_                    |
-+--------------------------------------+--------------------------------------+
-|`Coord::as_tuple`_                    |`Coord::valid`_                       |
-+--------------------------------------+--------------------------------------+
-|`Database`_                           |`Database::__init__`_                 |
-+--------------------------------------+--------------------------------------+
-|`Database::copy`_                     |`Database::random`_                   |
-+--------------------------------------+--------------------------------------+
-|`Database::random_pop`_               |`DatabaseException`_                  |
-+--------------------------------------+--------------------------------------+
-|`DatabaseException::__init__`_        |`database_exists`_                    |
-+--------------------------------------+--------------------------------------+
-|`db_random_pop_default`_              |`docparser`_                          |
-+--------------------------------------+--------------------------------------+
-|`Document`_                           |`Document::__init__`_                 |
-+--------------------------------------+--------------------------------------+
-|`Document::lookup_module`_            |`Document::__iter__`_                 |
-+--------------------------------------+--------------------------------------+
-|`Document::__str__`_                  |`get_database`_                       |
-+--------------------------------------+--------------------------------------+
-|`get_databases`_                      |`get_random_female_name`_             |
-+--------------------------------------+--------------------------------------+
-|`get_random_first_name`_              |`get_random_fullname`_                |
-+--------------------------------------+--------------------------------------+
-|`get_random_lastname_combo`_          |`get_random_lastname_family`_         |
-+--------------------------------------+--------------------------------------+
-|`get_random_lastname_irish`_          |`get_random_lastname_lowerclass`_     |
-+--------------------------------------+--------------------------------------+
-|`get_random_lastname_middleclass`_    |`get_random_lastname_nameson`_        |
-+--------------------------------------+--------------------------------------+
-|`get_random_lastname_scottish`_       |`get_random_lastname_simple`_         |
-+--------------------------------------+--------------------------------------+
-|`get_random_lastname_upperclass`_     |`get_random_last_name`_               |
-+--------------------------------------+--------------------------------------+
-|`get_random_male_name`_               |`Module`_                             |
-+--------------------------------------+--------------------------------------+
-|`Module::__init__`_                   |`num_databases`_                      |
-+--------------------------------------+--------------------------------------+
-|`one_chance_in`_                      |`parse_spec`_                         |
-+--------------------------------------+--------------------------------------+
-|`RectangleIterator`_                  |`RectangleIterator::__init__`_        |
-+--------------------------------------+--------------------------------------+
-|`Section`_                            |`Section::__init__`_                  |
-+--------------------------------------+--------------------------------------+
-|`Shape`_                              |`Shape::__init__`_                    |
-+--------------------------------------+--------------------------------------+
-|`Shape::column`_                      |`Shape::draw_on`_                     |
-+--------------------------------------+--------------------------------------+
-|`Shape::height`_                      |`Shape::normalise`_                   |
-+--------------------------------------+--------------------------------------+
-|`Shape::row`_                         |`Shape::section`_                     |
-+--------------------------------------+--------------------------------------+
-|`Shape::size`_                        |`Shape::trim`_                        |
-+--------------------------------------+--------------------------------------+
-|`Shape::width`_                       |`Shape::__getitem__`_                 |
-+--------------------------------------+--------------------------------------+
-|`Shape::__iter__`_                    |`Shape::__setitem__`_                 |
-+--------------------------------------+--------------------------------------+
-|`Shape::__str__`_                     |`ShapeCollection`_                    |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::__init__`_          |`ShapeCollection::append`_            |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::combine`_           |`ShapeCollection::copy`_              |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::extend`_            |`ShapeCollection::height`_            |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::offset`_            |`ShapeCollection::pop`_               |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::size`_              |`ShapeCollection::sort`_              |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::width`_             |`ShapeCollection::__getitem__`_       |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::__iter__`_          |`ShapeCollection::__len__`_           |
-+--------------------------------------+--------------------------------------+
-|`ShapeCollection::__setitem__`_       |`ShapeColumn`_                        |
-+--------------------------------------+--------------------------------------+
-|`ShapeColumn::col`_                   |`ShapeColumn::copy`_                  |
-+--------------------------------------+--------------------------------------+
-|`ShapeColumn::parent`_                |`ShapeColumn::__getitem__`_           |
-+--------------------------------------+--------------------------------------+
-|`ShapeColumn::__iter__`_              |`ShapeColumn::__repr__`_              |
-+--------------------------------------+--------------------------------------+
-|`ShapeColumn::__setitem__`_           |`ShapeColumn::__str__`_               |
-+--------------------------------------+--------------------------------------+
-|`ShapeCoord`_                         |`ShapeCoord::height`_                 |
-+--------------------------------------+--------------------------------------+
-|`ShapeCoord::size`_                   |`ShapeCoord::width`_                  |
-+--------------------------------------+--------------------------------------+
-|`ShapeCoord::__getattribute__`_       |`ShapeError`_                         |
-+--------------------------------------+--------------------------------------+
-|`ShapeRow`_                           |`ShapeRow::copy`_                     |
-+--------------------------------------+--------------------------------------+
-|`ShapeRow::parent`_                   |`ShapeRow::row`_                      |
-+--------------------------------------+--------------------------------------+
-|`ShapeRow::__getitem__`_              |`ShapeRow::__iter__`_                 |
-+--------------------------------------+--------------------------------------+
-|`ShapeRow::__repr__`_                 |`ShapeRow::__setitem__`_              |
-+--------------------------------------+--------------------------------------+
-|`ShapeRow::__str__`_                  |`Size`_                               |
-+--------------------------------------+--------------------------------------+
-|`Size::__init__`_                     |`split_escaped_delim`_                |
-+--------------------------------------+--------------------------------------+
-|`underneath`_                         |`WeightedDatabase`_                   |
-+--------------------------------------+--------------------------------------+
-|`WeightedDatabase::random`_           |`WeightedDatabase::random_pick`_      |
-+--------------------------------------+--------------------------------------+
-|`WeightedDatabase::random_pop`_       |`WeightedDatabase::total_weight`_     |
-+--------------------------------------+--------------------------------------+
-|`WeightedString`_                     |`WeightedString::__init__`_           |
-+--------------------------------------+--------------------------------------+
++----------------------------------------+----------------------------------------+
+|`adjoin`_                               |`atop`_                                 |
++----------------------------------------+----------------------------------------+
+|`AutoDimension`_                        |`AutoShape`_                            |
++----------------------------------------+----------------------------------------+
+|`AutoShape::__init__`_                  |`AutoShape::actual_height`_             |
++----------------------------------------+----------------------------------------+
+|`AutoShape::actual_size`_               |`AutoShape::actual_width`_              |
++----------------------------------------+----------------------------------------+
+|`AutoShape::as_shape`_                  |`AutoShape::height`_                    |
++----------------------------------------+----------------------------------------+
+|`AutoShape::normalise`_                 |`AutoShape::size`_                      |
++----------------------------------------+----------------------------------------+
+|`AutoShape::width`_                     |`AutoShape::_actual_wrapper`_           |
++----------------------------------------+----------------------------------------+
+|`AutoShape::__getitem__`_               |`AutoShape::__setitem__`_               |
++----------------------------------------+----------------------------------------+
+|`AutoSize`_                             |`AutoSize::__init__`_                   |
++----------------------------------------+----------------------------------------+
+|`AutoSize::valid`_                      |`Box`_                                  |
++----------------------------------------+----------------------------------------+
+|`Box::__init__`_                        |`Box::perimeter`_                       |
++----------------------------------------+----------------------------------------+
+|`build_from_file_name`_                 |`check_name_db`_                        |
++----------------------------------------+----------------------------------------+
+|`coinflip`_                             |`Column`_                               |
++----------------------------------------+----------------------------------------+
+|`Column::__init__`_                     |`Coord`_                                |
++----------------------------------------+----------------------------------------+
+|`Coord::__init__`_                      |`Coord::as_tuple`_                      |
++----------------------------------------+----------------------------------------+
+|`Coord::valid`_                         |`Database`_                             |
++----------------------------------------+----------------------------------------+
+|`Database::__init__`_                   |`Database::copy`_                       |
++----------------------------------------+----------------------------------------+
+|`Database::random`_                     |`Database::random_pop`_                 |
++----------------------------------------+----------------------------------------+
+|`DatabaseException`_                    |`DatabaseException::__init__`_          |
++----------------------------------------+----------------------------------------+
+|`database_exists`_                      |`db_random_pop_default`_                |
++----------------------------------------+----------------------------------------+
+|`docparser`_                            |`Document`_                             |
++----------------------------------------+----------------------------------------+
+|`Document::__init__`_                   |`Document::lookup_module`_              |
++----------------------------------------+----------------------------------------+
+|`Document::__iter__`_                   |`Document::__str__`_                    |
++----------------------------------------+----------------------------------------+
+|`get_database`_                         |`get_databases`_                        |
++----------------------------------------+----------------------------------------+
+|`get_random_female_name`_               |`get_random_first_name`_                |
++----------------------------------------+----------------------------------------+
+|`get_random_fullname`_                  |`get_random_lastname_combo`_            |
++----------------------------------------+----------------------------------------+
+|`get_random_lastname_family`_           |`get_random_lastname_irish`_            |
++----------------------------------------+----------------------------------------+
+|`get_random_lastname_lowerclass`_       |`get_random_lastname_middleclass`_      |
++----------------------------------------+----------------------------------------+
+|`get_random_lastname_nameson`_          |`get_random_lastname_scottish`_         |
++----------------------------------------+----------------------------------------+
+|`get_random_lastname_simple`_           |`get_random_lastname_upperclass`_       |
++----------------------------------------+----------------------------------------+
+|`get_random_last_name`_                 |`get_random_male_name`_                 |
++----------------------------------------+----------------------------------------+
+|`Module`_                               |`Module::__init__`_                     |
++----------------------------------------+----------------------------------------+
+|`num_databases`_                        |`one_chance_in`_                        |
++----------------------------------------+----------------------------------------+
+|`parse_spec`_                           |`Person`_                               |
++----------------------------------------+----------------------------------------+
+|`Person::__init__`_                     |`Person::chance_of_children`_           |
++----------------------------------------+----------------------------------------+
+|`Person::chance_of_spouse`_             |`Person::check_has_relative`_           |
++----------------------------------------+----------------------------------------+
+|`Person::create_child`_                 |`Person::create_spouse`_                |
++----------------------------------------+----------------------------------------+
+|`Person::describe`_                     |`Person::describe_relations`_           |
++----------------------------------------+----------------------------------------+
+|`Person::get_fullname`_                 |`Person::get_mirrored_gender`_          |
++----------------------------------------+----------------------------------------+
+|`Person::get_name`_                     |`Person::get_relative`_                 |
++----------------------------------------+----------------------------------------+
+|`Person::has_children`_                 |`Person::is_married`_                   |
++----------------------------------------+----------------------------------------+
+|`Person::is_servant`_                   |`Person::set_random_age`_               |
++----------------------------------------+----------------------------------------+
+|`Person::set_random_hair_colour`_       |`Person::set_random_last_name`_         |
++----------------------------------------+----------------------------------------+
+|`Person::set_relative`_                 |`Person::__str__`_                      |
++----------------------------------------+----------------------------------------+
+|`RectangleIterator`_                    |`RectangleIterator::__init__`_          |
++----------------------------------------+----------------------------------------+
+|`Section`_                              |`Section::__init__`_                    |
++----------------------------------------+----------------------------------------+
+|`Shape`_                                |`Shape::__init__`_                      |
++----------------------------------------+----------------------------------------+
+|`Shape::column`_                        |`Shape::draw_on`_                       |
++----------------------------------------+----------------------------------------+
+|`Shape::height`_                        |`Shape::normalise`_                     |
++----------------------------------------+----------------------------------------+
+|`Shape::row`_                           |`Shape::section`_                       |
++----------------------------------------+----------------------------------------+
+|`Shape::size`_                          |`Shape::trim`_                          |
++----------------------------------------+----------------------------------------+
+|`Shape::width`_                         |`Shape::__getitem__`_                   |
++----------------------------------------+----------------------------------------+
+|`Shape::__iter__`_                      |`Shape::__setitem__`_                   |
++----------------------------------------+----------------------------------------+
+|`Shape::__str__`_                       |`ShapeCollection`_                      |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::__init__`_            |`ShapeCollection::append`_              |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::combine`_             |`ShapeCollection::copy`_                |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::extend`_              |`ShapeCollection::height`_              |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::offset`_              |`ShapeCollection::pop`_                 |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::size`_                |`ShapeCollection::sort`_                |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::width`_               |`ShapeCollection::__getitem__`_         |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::__iter__`_            |`ShapeCollection::__len__`_             |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::__setitem__`_         |`ShapeColumn`_                          |
++----------------------------------------+----------------------------------------+
+|`ShapeColumn::col`_                     |`ShapeColumn::copy`_                    |
++----------------------------------------+----------------------------------------+
+|`ShapeColumn::parent`_                  |`ShapeColumn::__getitem__`_             |
++----------------------------------------+----------------------------------------+
+|`ShapeColumn::__iter__`_                |`ShapeColumn::__repr__`_                |
++----------------------------------------+----------------------------------------+
+|`ShapeColumn::__setitem__`_             |`ShapeColumn::__str__`_                 |
++----------------------------------------+----------------------------------------+
+|`ShapeCoord`_                           |`ShapeCoord::height`_                   |
++----------------------------------------+----------------------------------------+
+|`ShapeCoord::size`_                     |`ShapeCoord::width`_                    |
++----------------------------------------+----------------------------------------+
+|`ShapeCoord::__getattribute__`_         |`ShapeError`_                           |
++----------------------------------------+----------------------------------------+
+|`ShapeRow`_                             |`ShapeRow::copy`_                       |
++----------------------------------------+----------------------------------------+
+|`ShapeRow::parent`_                     |`ShapeRow::row`_                        |
++----------------------------------------+----------------------------------------+
+|`ShapeRow::__getitem__`_                |`ShapeRow::__iter__`_                   |
++----------------------------------------+----------------------------------------+
+|`ShapeRow::__repr__`_                   |`ShapeRow::__setitem__`_                |
++----------------------------------------+----------------------------------------+
+|`ShapeRow::__str__`_                    |`Size`_                                 |
++----------------------------------------+----------------------------------------+
+|`Size::__init__`_                       |`split_escaped_delim`_                  |
++----------------------------------------+----------------------------------------+
+|`SuspectList`_                          |`SuspectList::__init__`_                |
++----------------------------------------+----------------------------------------+
+|`SuspectList::add_child`_               |`SuspectList::add_honorifics`_          |
++----------------------------------------+----------------------------------------+
+|`SuspectList::add_occupation`_          |`SuspectList::add_relatives`_           |
++----------------------------------------+----------------------------------------+
+|`SuspectList::add_spouse`_              |`SuspectList::ensure_unique_names`_     |
++----------------------------------------+----------------------------------------+
+|`SuspectList::get_murderer`_            |`SuspectList::get_suspect`_             |
++----------------------------------------+----------------------------------------+
+|`SuspectList::get_suspect_list`_        |`SuspectList::get_victim`_              |
++----------------------------------------+----------------------------------------+
+|`SuspectList::is_murderer`_             |`SuspectList::is_victim`_               |
++----------------------------------------+----------------------------------------+
+|`SuspectList::no_of_suspects`_          |`SuspectList::pick_murderer`_           |
++----------------------------------------+----------------------------------------+
+|`SuspectList::pick_victim`_             |`SuspectList::print_suspects`_          |
++----------------------------------------+----------------------------------------+
+|`SuspectList::real_no_of_suspects`_     |`SuspectList::update_child`_            |
++----------------------------------------+----------------------------------------+
+|`underneath`_                           |`WeightedDatabase`_                     |
++----------------------------------------+----------------------------------------+
+|`WeightedDatabase::random`_             |`WeightedDatabase::random_pick`_        |
++----------------------------------------+----------------------------------------+
+|`WeightedDatabase::random_pop`_         |`WeightedDatabase::total_weight`_       |
++----------------------------------------+----------------------------------------+
+|`WeightedString`_                       |`WeightedString::__init__`_             |
++----------------------------------------+----------------------------------------+
