@@ -278,16 +278,20 @@ def build_L (base=None, rooms=2, rooms_wide=1):
 def build_Z (base=None):
     if base is None:
         base = base_builder()
+    return base
 
 def build_N (base=None):
     if base is None:
         base = base_builder()
+    return base
 
 def build_H (base=None):
     if base is None:
         base = base_builder()
+    return base
 
 def build_O (base=None):
     if base is None:
         base = base_builder()
+    return base
 
