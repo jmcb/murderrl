@@ -91,8 +91,8 @@ class ShapeCollection (object):
         if shapes is not None:
             for s in shapes:
                 if not isinstance(s, ShapeCoord):
-                    if isinstance(s, Shape):
-                        s = ShapeCoord(s, Coord(0, 0))
+                    if isinstance(s, shape.Shape):
+                        s = ShapeCoord(s, coord.Coord(0, 0))
                     elif isinstance(s, tuple) or isinstance(s, list) and len(s) == 2:
                         s = ShapeCoord(s[0], s[1])
                     else:
@@ -121,7 +121,7 @@ class ShapeCollection (object):
         """
         self._shapes.sort(cmp=lambda a, b: cmp(b.shape.size(), a.shape.size()))
 
-    def append (self, item, coord=None):
+    def append (self, item, c=None):
         """
         As with the initialisation function, all Shapes passed in are here
         converted into ShapeCoords, using Coord(0, 0) as their offset. All other
@@ -130,8 +130,8 @@ class ShapeCollection (object):
         if isinstance(item, ShapeCoord):
             self._shapes.append(item)
         else:
-            if coord is not None:
-                item = ShapeCoord(item, coord)
+            if c is not None:
+                item = ShapeCoord(item, c)
             elif isinstance(item, shape.Shape):
                 item = ShapeCoord(item, coord.Coord(0, 0))
 

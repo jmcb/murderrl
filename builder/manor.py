@@ -190,7 +190,7 @@ N_LAYOUT = "N-corridors"
 H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
 
-def build_L (base=None, rooms=2):
+def build_L (base=None, rooms=2, rooms_wide=1):
     """
     Modifies the results of base_builder() to result in an L shape in any
     orientation.
@@ -206,9 +206,14 @@ def build_L (base=None, rooms=2):
     new_rooms = collection.ShapeCollection()
 
     for row in xrange(rooms):
-        room1 = Room().as_shape()
-        room2 = Room().as_shape()
-        this_row = shape.adjoin(room1, room2, overlap=-1, collection=True)
+        if rooms_wide == 2:
+            room1 = Room().as_shape()
+            room2 = Room().as_shape()
+            this_row = shape.adjoin(room1, room2, overlap=-1, collection=True)
+        else:
+            this_row = collection.ShapeCollection()
+            this_row.append(Room().as_shape())
+
         new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collection=True)
 
     # Find the corridor
