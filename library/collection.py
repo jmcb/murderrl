@@ -1,8 +1,29 @@
 #!/usr/bin/env python
 
-from library.shape import *
-from library.coord import *
+import shape, coord
 from collections import namedtuple
+import copy
+
+class CollectionCoord (coord.Coord):
+    def __init__ (self, coord, collection):
+        self.collection = collection
+        coord.Coord.__init__(self, coord)
+
+    def get (self):
+        result = self.collection[self]
+        if result == []:
+            return None
+        else:
+            return result
+
+    def set (self, value):
+        self.collection[self] = value
+
+    def __str__ (self):
+        return str(self.get())
+
+    def __repr__ (self):
+        return "<CollectionCoord %s,%s: %s>" % (self.x, self.y, self.get())
 
 class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
     """
@@ -67,7 +88,7 @@ class ShapeCollection (object):
         """
         # We take the largest and work on that, ignoring its coord.
 
-        base = AutoShape()
+        base = shape.AutoShape()
 
         for sc in self._shapes:
             base.draw_on(sc.shape, sc.coord, False)
@@ -91,10 +112,10 @@ class ShapeCollection (object):
         else:
             if coord is not None:
                 item = ShapeCoord(item, coord)
-            elif isinstance(item, Shape):
-                item = ShapeCoord(item, Coord(0, 0))
-            else:
-                assert isinstance(item, ShapeCoord)
+            elif isinstance(item, shape.Shape):
+                item = ShapeCoord(item, coord.Coord(0, 0))
+
+            assert isinstance(item, ShapeCoord)
             self._shapes.append(item)
 
     def extend (self, items):
@@ -132,14 +153,14 @@ class ShapeCollection (object):
         """
         Returns the size required to contain each member.
         """
-        size = Size()
+        size = coord.Size()
 
-        for shape in self:
-            shape, coord = shape
-            if shape.width() + coord.x > size.width:
-                size.width = shape.width() + coord.x
-            if shape.height() + coord.y > size.height:
-                size.height = shape.height() + coord.y
+        for shape in self._shapes:
+            shape, c = shape
+            if shape.width() + c.x > size.width:
+                size.width = shape.width() + c.x
+            if shape.height() + c.y > size.height:
+                size.height = shape.height() + c.y
 
         return size
 
@@ -147,7 +168,27 @@ class ShapeCollection (object):
         """
         Returns a copy of this collection.
         """
-        return ShapeCollection(self._shapes[:])
+        return ShapeCollection(copy.copy(self._shapes))
+
+    def column (self, column):
+        """
+        Provides an iteration of CollectionCoords.
+
+        :``column``: Which column you want to iterate over.
+        """
+        assert column <= self.width()
+        for y in xrange(self.height()):
+            yield CollectionCoord(self, coord.Coord(column, y))
+
+    def row (self, row):
+        """
+        Provides an iteration of CollectionCoords.
+
+        :``row``: Which row you want to iterate over.
+        """
+        assert row <= self.height()
+        for x in xrange(self.width()):
+            yield CollectionCoord(self, coord.Coord(x, row))
 
     def offset (self, offset):
         """
@@ -162,25 +203,47 @@ class ShapeCollection (object):
         new_self = []
 
         for index, sc in enumerate(self):
-            if sc.coord < Coord(0, 0):
-                raise ShapeError, "Shape indexed %s already had a negative offset!" % index
-            if sc.coord+offset < Coord(0, 0):
-                raise ShapeError, "Adding %s to %s results in %s! Cannot perform negative offsetting." % (offset, sc.coord, sc.coorrd+offset)
+            if sc.coord < coord.Coord(0, 0):
+                raise shape.ShapeError, "Shape indexed %s already had a negative offset!" % index
+            if sc.coord+offset < coord.Coord(0, 0):
+                raise shape.ShapeError, "Adding %s to %s results in %s! Cannot perform negative offsetting." % (offset, sc.coord, sc.coorrd+offset)
 
-            new_self.append(ShapeCoord(sc.shape, Coord(sc.coord + offset)))
+            new_self.append(ShapeCoord(sc.shape, coord.Coord(sc.coord + offset)))
 
         self._shapes = new_self
 
     def __getitem__ (self, item):
         """
+        If ``item`` is an integer:
+
         Fetch item index ``item`` from the collection of ShapeCoords.
 
-        :``item``: The item to be fetched.
+        If ``item`` is a Coord instance:
+
+        Attempt to locate ``item`` in the contained ShapeCoords. If ``item`` is
+        contained within multiple shapes, a list of them will be returned.
+
+        :``item``: The item to be fetched. Either an integer or a Coord.
         """
-        return self._shapes.__getitem__(item)
+        if isinstance(item, int):
+            return self._shapes.__getitem__(item)
+        else:
+            results = []
+            for sc in self._shapes:
+                try:
+                    results.append(sc.shape[sc.coord+item])
+                except:
+                    pass
+            results = list(set(results))
+            if len(results) == 1:
+                return results[0]
+            else:
+                return results
 
     def __setitem__ (self, item, value):
         """
+        If ``item`` is an integer:
+
         Insert ``value`` at ``item``, replacing whatever ShapeCoord is existent
         there.
 
@@ -189,12 +252,94 @@ class ShapeCollection (object):
                     from a Shape into a ShapeCoord(Shape, Coord(0, 0)).
                     Otherwise it is assumed to be a ShapeCoord. All other
                     types will cause an error.
+
+        If ``item`` is an instance of Coord:
+
+        Insert ``value`` at ``item`` in each Shape contained within. If ``item``
+        is found in multiple shapes, it will set ``value`` in each one; if
+        ``value`` is iterable and multiple instances are found, values will be
+        applied from ``value[0]`` onwards. If it runs out of values in
+        ``value``, it will cease setting and return.
+
+        :``item``: Instance of Coord.
+        :``value``: Either one of or a list of width one strings.
         """
-        if isinstance(value, Shape):
-            value = ShapeCoord(shape, Coord(0, 0))
-        assert isinstance(value, ShapeCoord)
-        result = self._shapes.__setitem__(item, value)
-        return result
+        if isinstance(item, int):
+            if isinstance(value, shape.Shape):
+                value = ShapeCoord(shape, coord.Coord(0, 0))
+            assert isinstance(value, ShapeCoord)
+            result = self._shapes.__setitem__(item, value)
+            return result
+        else:
+            if not isinstance(value, list):
+                value = [value] * len(self)
+
+            for sc in self._shapes:
+                if len(value) == 0:
+                    return
+
+                try:
+                    sc.shape[sc.coord+item] = value[0]
+                except Exception:
+                    pass
+                else:
+                    value.pop(0)
+
+    def reverse (self):
+        """
+        Performs an in-place reversing of the contents of this ShapeCollection.
+        This has the effect of reversing the priority: items added earlier will
+        be drawn later, and vice versa. For example::
+
+          >> coll = ShapeCollection()
+          >> coll.append(Shape(3, 3, "Y"))
+          >> coll.append(Shape(3, 3, "X"))
+
+        Combining this will result in::
+
+          >> print coll.combine()
+          XXX
+          XXX
+          XXX
+
+        Calling reverse before combining results in:
+
+          >> coll.reverse()
+          >> print coll.combine()
+          YYY
+          YYY
+          YYY
+        """
+        self._shapes.reverse()
+
+    def reversed (self):
+        """
+        Returns a copy of this collection that has been reversed. See
+        ``ShapeCollection::reverse``.
+        """
+        copy = self.copy()
+        copy.reverse()
+        return copy
+
+    def prioritise (self, index, priority=True):
+        """
+        Alter the priority of ``index``. Priority basically equates to the
+        location within the ShapeCollection: indexes with a higher priority are
+        drawn later and are thus less likely to be overriden by another shape;
+        likewise, indexes with lower priorities are drawn earlier and a thus
+        more likely to be override by another shape.
+
+        Priorities are only as valid as long as new items are not added to the
+        collection.
+
+        :``index``: The index you wish to prioritise.
+        :``priority``: The priority you want to set the index to. Negative
+                       numbers will decrease the priority, and positive numbers
+                       increase it. If True, the priority will be increased to
+                       as high as possible. If False, it will be decreased to as
+                       low as possible. *Default True*.
+        """
+        assert False
 
     def __iter__ (self):
         """

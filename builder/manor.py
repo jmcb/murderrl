@@ -196,19 +196,19 @@ def build_L (base=None):
 
 
 
-def build_Z (base=none):
-    if base is none:
+def build_Z (base=None):
+    if base is None:
         base = base_builder()
 
-def build_N (base=none):
-    if base is none:
+def build_N (base=None):
+    if base is None:
         base = base_builder()
 
-def build_H (base=none):
-    if base is none:
+def build_H (base=None):
+    if base is None:
         base = base_builder()
 
-def build_O (base=none):
-    if base is none:
+def build_O (base=None):
+    if base is None:
         base = base_builder()
 
