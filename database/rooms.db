@@ -32,6 +32,14 @@ name=lavatory
 %
 name=porch
 %
+name=guest room
+%
+name=lounge
+%
+name=study
+%
+name=parlour
+%
 name=kitchen
 section=utility
 %
@@ -39,5 +47,20 @@ name=scullery
 section=utility
 %
 name=servant's hall
+section=utility
+%
+name=pantry
+section=utility
+%
+name=attic
+section=utility
+%
+name=wine cellar
+section=utility
+%
+name=laundry
+section=utility
+%
+name=tool shed
 section=utility
 %
