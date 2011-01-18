@@ -209,7 +209,7 @@ class WeightedDatabase (Database):
             if checkfn is not None and not checkfn(item):
                 continue
 
-            if item.weight < n:
+            if item.weight >= n:
                 return num, item
             n = n - item.weight
 
