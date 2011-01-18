@@ -708,7 +708,7 @@ class SuspectList (object):
 
         return confirmed
 
-    def print_alibis(self, alibis):
+    def print_alibis (self, alibis):
         """
         Prints basic alibi statements mentioning room and witness.
 
@@ -727,7 +727,7 @@ class SuspectList (object):
                 w = ""
             print "%s: %s%s" % (p.get_name(), a.room, w)
 
-    def add_hair_colours(self):
+    def add_hair_colours (self):
         """
         Assign hair colours to the suspects in such a way that if both
         the murderer's hair colour and all alibis are known, only the

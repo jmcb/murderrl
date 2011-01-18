@@ -24,9 +24,10 @@ def get_rooms (num = 10):
             new_room = "nowhere"
         rooms.append(new_room)
 
+    print rooms
     return rooms
 
-def print_mystery(self, num = 10):
+def print_mystery (num = 10):
     """
     Generates a set of suspects, their alibis and hair colours, and
     outputs the result.
