@@ -21,7 +21,6 @@ Attempt to create a "manor" akin to:
 
 import random
 from library import shape, coord, collection
-from database import database
 
 # Specific build styles:
 BASE_SHAPE = "single-corridor"
@@ -66,10 +65,6 @@ def base_builder ():
                 Currently on ``ONE_CORRIDOR`` is supported. *Default
                 ONE_CORRIDOR*.
     """
-    room_names = database.rooms.copy()
-
-    rooms = []
-
     # Top row of rooms
     row1 = []
     # Corridor, then bottom row of rooms
