@@ -14,6 +14,7 @@ classes.
 
 import coord
 import collection
+import warnings
 
 def iterable (obj):
     """
@@ -908,7 +909,8 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
                       shapes. *Default False*.
     """
     if (isinstance(shape1, collection.ShapeCollection) or isinstance(shape2, collection.ShapeCollection)) and not collect:
-        raise ShapeError, "Passed a collection but ``collect=False``!"
+        warnings.warn("Passed a collection but ``collect=False``, assuming ``collect=True``.", SyntaxWarning, stacklevel=2)
+        collect = True
 
     if join_left:
         s1 = shape2
@@ -965,7 +967,8 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
                      *Default False*.
     """
     if (isinstance(shape1, collection.ShapeCollection) or isinstance(shape2, collection.ShapeCollection)) and not collect:
-        raise ShapeError, "Passed a collection but ``collect=False``!"
+        warnings.warn("Passed a collection but ``collect=False``, assuming ``collect=True``.", SyntaxWarning, stacklevel=2)
+        collect = True
 
     if join_top:
         s1 = shape2
