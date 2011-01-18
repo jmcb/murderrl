@@ -12,8 +12,9 @@ classes.
 
 """
 
-from library.coord import *
-from library.collection import *
+import coord
+import collection
+import warnings
 
 def iterable (obj):
     """
@@ -340,7 +341,7 @@ class Shape (object):
         to have varying lengths of rows, with the 'gap' being represented on
         the right side of the object.*
         """
-        return Size(self.width(), self.height())
+        return coord.Size(self.width(), self.height())
 
     def column (self, column):
         """
@@ -377,7 +378,7 @@ class Shape (object):
             __getitem__.__doc__ = _ShapeColumn.__getitem__.__doc__
             def __iter__ (s):
                 for i in xrange(self.height()):
-                    yield (Coord(column, i), self._canvas[i][column])
+                    yield (coord.Coord(column, i), self._canvas[i][column])
             __iter__.__doc__ = _ShapeColumn.__iter__.__doc__
 
         return ShapeColumn()
@@ -412,7 +413,7 @@ class Shape (object):
                 return self._canvas[row][column]
             def __iter__ (s):
                 for i in xrange(len(self._canvas[row])):
-                    return (Coord(i, row), self._canvas[row][i])
+                    return (coord.Coord(i, row), self._canvas[row][i])
 
         return ShapeRow()
 
@@ -501,7 +502,7 @@ class Shape (object):
             while len(self._canvas) > height:
                 self._canvas.pop(pop)
 
-    def draw_on (self, shape, offset=Coord(0, 0), check_conflict=True, conflict_error=False):
+    def draw_on (self, shape, offset=coord.Coord(0, 0), check_conflict=True, conflict_error=False):
         """
         Attempt to draw Shape instance ``shape`` on top of self, starting at
         offset ``offset``. Conflict checking is enable by default (ie, it will
@@ -523,7 +524,7 @@ class Shape (object):
                              accidental overwriting. *Default False*.
         """
         assert isinstance(shape, Shape)
-        assert Size(offset)+shape.size() <= self.size()
+        assert coord.Size(offset)+shape.size() <= self.size()
         for xy, char in shape:
             nxy = xy+offset
             if check_conflict and self[nxy] != None:
@@ -547,15 +548,15 @@ class Shape (object):
         """
         if section_stop is None:
             section_stop = section_start
-            section_start = Coord(0, 0)
+            section_start = coord.Coord(0, 0)
 
         assert section_start < section_stop
 
         offset = section_stop - section_start
 
         new_shape = Shape(offset.x, offset.y)
-        for coord in RectangleIterator(section_start, section_stop):
-            new_shape[coord-section_start] = self[coord]
+        for c in coord.RectangleIterator(section_start, section_stop):
+            new_shape[c-section_start] = self[c]
 
         return new_shape
 
@@ -566,7 +567,7 @@ class Shape (object):
         """
         for rownum in xrange(len(self._canvas)):
             for colnum in xrange(len(self._canvas[rownum])):
-                yield (Coord(colnum, rownum), self._canvas[rownum][colnum])
+                yield (coord.Coord(colnum, rownum), self._canvas[rownum][colnum])
 
     def __getitem__ (self, item):
         """
@@ -577,7 +578,7 @@ class Shape (object):
                    an "x" axis integer. The latter will return a ShapeColumn
                    object that references the column.
         """
-        if isinstance(item, Coord):
+        if isinstance(item, coord.Coord):
             return self._canvas[item.y][item.x]
         elif isinstance(item, slice):
             raise Exception, "Do not slice Shape!"
@@ -599,7 +600,7 @@ class Shape (object):
                     checking for conflict).
         """
         assert (value is None) or (isinstance(value, list) or isinstance(value, Shape) or isinstance(value, Column)) or (len(value) == 1)
-        if isinstance(item, Coord):
+        if isinstance(item, coord.Coord):
             self._canvas[item.y][item.x] = value
         elif isinstance(item, slice):
             raise ShapeError, "Cannot slice Shape!"
@@ -610,7 +611,7 @@ class Shape (object):
                 value = Column(value)
             else:
                 raise ShapeError, "Invalid type '%s' for assignation to %s." % (type(value), item)
-            self.draw_on(value, Coord(item, 0), False, False)
+            self.draw_on(value, coord.Coord(item, 0), False, False)
 
     def __len__ (self):
         return self.width()
@@ -653,7 +654,7 @@ class AutoShape (Shape):
         "infinite" size. To get the actual size of the shape, use
         ``AutoShape::actual_size.``
         """
-        return AutoSize()
+        return coord.AutoSize()
 
     def width (self):
         """
@@ -661,7 +662,7 @@ class AutoShape (Shape):
         "inifinite" width. To get the actual width of the shape, use
         ``AutoShape::actual_width``.
         """
-        return AutoDimension()
+        return coord.AutoDimension()
 
     def height (self):
         """
@@ -739,7 +740,7 @@ class AutoShape (Shape):
 
         :``item``: The item to be accessed.
         """
-        if isinstance(item, Coord):
+        if isinstance(item, coord.Coord):
             if item.x >= self.actual_width():
                 self.normalise(width=item.x+1, fill=self.fill)
             if item.y >= self.actual_height():
@@ -757,7 +758,7 @@ class AutoShape (Shape):
         :``item``: The item to be set.
         :``value``: The value to be set.
         """
-        if isinstance(item, Coord):
+        if isinstance(item, coord.Coord):
             if item.x >= self.actual_width():
                 self.normalise(width=item.x+1, fill=self.fill)
             if item.y >= self.actual_height():
@@ -800,18 +801,18 @@ class Box (Shape):
         # Top section.
         for x in xrange(w):
             for y in xrange(self.border):
-                yield Coord(x, y)
+                yield coord.Coord(x, y)
 
         # Sides!
         for x in xrange(self.border):
             for y in xrange(self.border, h-self.border):
-                yield Coord(x, y)
-                yield Coord(w-x-1, y)
+                yield coord.Coord(x, y)
+                yield coord.Coord(w-x-1, y)
 
         # Bottom section
         for x in xrange(w):
             for y in xrange(h-self.border, h):
-                yield Coord(x, y)
+                yield coord.Coord(x, y)
 
 class Column (Shape):
     """
@@ -880,7 +881,7 @@ class Row (Shape):
             Shape.__init__(self, nshape, height=height, fill=fill)
 
 
-def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False):
+def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collect=False, offset_both=False):
     """
     Take two shapes and combine them into one. This method places shapes
     side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -902,46 +903,48 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
                     *Default False*.
     :``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
                          ``shape2`` where they overlap with the parts of ``shape1``.
-    :``collection``: If true, returns a ShapeCollection instead of a canvas.
+    :``collect``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
     :``offset_both``: If true, the ``top_offset`` will be applied to both
                       shapes. *Default False*.
     """
-    if (isinstance(shape1, ShapeCollection) or isinstance(shape2, ShapeCollection)) and not collection:
-        raise ShapeError, "Passed a collection but ``collection=False``!"
+    if (isinstance(shape1, collection.ShapeCollection) or isinstance(shape2, collection.ShapeCollection)) and not collect:
+        warnings.warn("Passed a collection but ``collect=False``, assuming ``collect=True``.", SyntaxWarning, stacklevel=2)
+        collect = True
 
     if join_left:
         s1 = shape2
         shape2 = shape1
         shape1 = s1
 
-    new_size = Size(width=shape1.width()+shape2.width(), height=max(shape1.height(), shape2.height()))
+    new_size = coord.Size(width=shape1.width()+shape2.width(), height=max(shape1.height(), shape2.height()))
+
     new_canvas = Shape(width=new_size.width-overlap, height=new_size.height, fill=fill)
 
     if offset_both:
-        first_offset = Coord(0, top_offset)
+        first_offset = coord.Coord(0, top_offset)
 
-    if collection:
-        if isinstance(shape1, ShapeCollection):
-            collection = shape1.copy()
+    if collect:
+        if isinstance(shape1, collection.ShapeCollection):
+            collect = shape1.copy()
         else:
-            collection = ShapeCollection()
+            collect = collection.ShapeCollection()
             y = 0
             if offset_both:
                 y = top_offset
-            collection.append(ShapeCoord(shape1, Coord(max(collection.width(), 0), y)))
-        if isinstance(shape2, ShapeCollection):
-            shape2.offset(Coord(shape1.width()-overlap, top_offset))
-            collection.extend(shape2)
+            collect.append(collection.ShapeCoord(shape1, coord.Coord(max(collect.width(), 0), y)))
+        if isinstance(shape2, collection.ShapeCollection):
+            shape2.offset(coord.Coord(shape1.width()-overlap, top_offset))
+            collect.extend(shape2)
         else:
-            collection.append(ShapeCoord(shape2, Coord(shape1.width()-overlap, top_offset)))
-        return collection
+            collect.append(collection.ShapeCoord(shape2, coord.Coord(shape1.width()-overlap, top_offset)))
+        return collect
     else:
         new_canvas.draw_on(shape1, offset=first_offset, check_conflict=skip_conflicts)
-        new_canvas.draw_on(shape2, offset=Coord(shape1.width()-overlap, top_offset), check_conflict=skip_conflicts)
+        new_canvas.draw_on(shape2, offset=coord.Coord(shape1.width()-overlap, top_offset), check_conflict=skip_conflicts)
         return new_canvas
 
-def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False):
+def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collect=False):
     """
     Take two shapes and combine them into one by drawing ``shape1`` and then
     drawing ``shape2`` directly beneath it.
@@ -960,46 +963,47 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
                          ``shape1``'s glyphs. *Default False*
     :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
     :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-    :``collection``: If true, returns a ShapeCollection instead of a canvas.
+    :``collect``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
     """
-    if (isinstance(shape1, ShapeCollection) or isinstance(shape2, ShapeCollection)) and not collection:
-        raise ShapeError, "Passed a collection but ``collection=False``!"
+    if (isinstance(shape1, collection.ShapeCollection) or isinstance(shape2, collection.ShapeCollection)) and not collect:
+        warnings.warn("Passed a collection but ``collect=False``, assuming ``collect=True``.", SyntaxWarning, stacklevel=2)
+        collect = True
 
     if join_top:
         s1 = shape2
         shape2 = shape1
         shape1 = s1
 
-    new_size = Size(width=max(shape1.width()+left_offset, shape2.width()+left_offset), height=shape1.height()+shape2.height())
+    new_size = coord.Size(width=max(shape1.width()+left_offset, shape2.width()+left_offset), height=shape1.height()+shape2.height())
     new_canvas = Shape(width=new_size.width, height=new_size.height-overlap, fill=fill)
-    shape1_offset = Coord(0, 0)
-    shape2_offset = Coord(0, shape1.height()-overlap)
+    shape1_offset = coord.Coord(0, 0)
+    shape2_offset = coord.Coord(0, shape1.height()-overlap)
     if offset_first:
-        shape1_offset = Coord(left_offset, 0)
+        shape1_offset = coord.Coord(left_offset, 0)
     if offset_second:
         shape2_offset.x = left_offset
-    if collection:
-        if isinstance(shape1, ShapeCollection):
-            collection = shape1.copy()
+    if collect:
+        if isinstance(shape1, collection.ShapeCollection):
+            collect = shape1.copy()
         else:
-            collection = ShapeCollection()
-            shape1_offset.height += collection.height()
-            shape2_offset.height += collection.height()
-            collection.append(ShapeCoord(shape1, shape1_offset))
+            collect = collection.ShapeCollection()
+            shape1_offset.height += collect.height()
+            shape2_offset.height += collect.height()
+            collect.append(collection.ShapeCoord(shape1, shape1_offset))
 
-        if isinstance(shape2, ShapeCollection):
+        if isinstance(shape2, collection.ShapeCollection):
             shape2.offset(shape2_offset)
-            collection.extend(shape2)
+            collect.extend(shape2)
         else:
-            collection.append(ShapeCoord(shape2, shape2_offset))
-        return collection
+            collect.append(collection.ShapeCoord(shape2, shape2_offset))
+        return collect
     else:
         new_canvas.draw_on(shape1, shape1_offset)
         new_canvas.draw_on(shape2, shape2_offset, skip_conflicts)
         return new_canvas
 
-def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False):
+def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collect=False):
     """
     Take two shapes and combine them into one by drawing ``shape1`` and then
     drawing ``shape2`` directly above it. This is an alias for ``underneath``
@@ -1019,7 +1023,7 @@ def atop (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False
                          ``shape1``'s glyphs. *Default False*
     :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
     :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-    :``collection``: If true, returns a ShapeCollection instead of a canvas.
+    :``collect``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
     """
-    return underneath(shape1, shape2, left_offset, overlap, fill, not join_bottom, skip_conflicts, offset_first, offset_second, collection)
+    return underneath(shape1, shape2, left_offset, overlap, fill, not join_bottom, skip_conflicts, offset_first, offset_second, collect)

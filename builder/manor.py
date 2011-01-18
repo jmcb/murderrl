@@ -149,9 +149,9 @@ def base_builder ():
     # First row
     first_room = row1[0].as_shape()
     second_room = row1[1].as_shape()
-    row1_collection = shape.adjoin(first_room, second_room, overlap=1, collection=True)
+    row1_collection = shape.adjoin(first_room, second_room, overlap=1, collect=True)
     for room in row1[2:]:
-        row1_collection = shape.adjoin(row1_collection, room.as_shape(), overlap=1, collection=True)
+        row1_collection = shape.adjoin(row1_collection, room.as_shape(), overlap=1, collect=True)
 
     # second row
     first_room = row2[0].as_shape()
@@ -162,26 +162,26 @@ def base_builder ():
     if first_room.height() == second_room.height():
         offset_both = True
 
-    row2_collection = shape.adjoin(first_room, second_room, top_offset=top_offset, overlap=1, collection=True, offset_both=offset_both)
+    row2_collection = shape.adjoin(first_room, second_room, top_offset=top_offset, overlap=1, collect=True, offset_both=offset_both)
     for room in row2[2:]:
         to = top_offset
         room_shape = room.as_shape()
         if room_shape.height() == first_room.height() and not offset_both or room_shape.height() > first_room.height():
             to = 0
-        row2_collection = shape.adjoin(row2_collection, room_shape, top_offset=to, overlap=1, collection=True)
+        row2_collection = shape.adjoin(row2_collection, room_shape, top_offset=to, overlap=1, collect=True)
 
     # Finally, make a corridor!
     room_width = Room().width
     room_height = Room().height
 
-    collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collection=True)
+    my_collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collect=True)
 
-    corridor_length = collection.width() - room_width * 2
+    corridor_length = my_collection.width() - room_width * 2
     corridor = shape.Row(width=corridor_length, fill=".")
 
-    collection.append(shape.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
+    my_collection.append(collection.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
 
-    return collection
+    return my_collection
 
 BASE_SHAPE = "single-corridor"
 L_LAYOUT = "L-corridors"
@@ -209,12 +209,12 @@ def build_L (base=None, rooms=2, rooms_wide=1):
         if rooms_wide == 2:
             room1 = Room().as_shape()
             room2 = Room().as_shape()
-            this_row = shape.adjoin(room1, room2, overlap=-1, collection=True)
+            this_row = shape.adjoin(room1, room2, overlap=-1, collect=True)
         else:
             this_row = collection.ShapeCollection()
             this_row.append(Room().as_shape())
 
-        new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collection=True)
+        new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collect=True)
 
     # Find the corridor
     corridor = None
@@ -249,13 +249,13 @@ def build_L (base=None, rooms=2, rooms_wide=1):
     vert = None
 
     if random.randint(1, 2) == 1:
-        base = shape.underneath(base, new_rooms, overlap=1, collection=True)
+        base = shape.underneath(base, new_rooms, overlap=1, collect=True)
         new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
         corridor_offset = coord.Coord(y_offset, Room().height)
         base.append(new_corridor, corridor_offset)
         vert = "bottom"
     else:
-        base = shape.underneath(new_rooms, base, overlap=1, collection=True)
+        base = shape.underneath(new_rooms, base, overlap=1, collect=True)
         new_corridor[coord.Coord(0, 0)] = "#"
         corridor_offset = coord.Coord(y_offset, 0)
         base.append(new_corridor, corridor_offset)
