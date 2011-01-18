@@ -21,16 +21,14 @@ Suspect generation
 Manor building
 ==============
 
-1. Extend the builder to generate Z, N, T, H, U, O, C, etc, interfaces.
-2. Implement coord-access to ShapeCollections if that coord falls within a
-   contained shape.
-3. Provide translation layer from iterators in Shapes in ShapeCollections to an
-   iterator of ShapeCollection.
-4. Provide "corridor" iterator that returns the length of the manor corridor.
-5. Find a good algorithm for compartmentalising the house into "domestic" and
+1. Extend builder's leg generation to support multiple configurations.
+2. Provide "corridor" iterator that returns the length of the manor corridor.
+3. Find a good algorithm for compartmentalising the house into "domestic" and
    "utility" sections.
-6. Randomise room sizes; some rooms should be smaller than others.
-7. Casting of AutoShape into Shapes.
+4. Randomise room sizes; some rooms should be smaller than others.
+5. Finish implementing the ManorCollection.
+6. Implement "join" function for ShapeCollections: combine two overlapping
+   shapes into one shape that replaces both indexes.
 
 User interface
 ==============
