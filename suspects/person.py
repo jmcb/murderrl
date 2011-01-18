@@ -18,6 +18,26 @@ REL_ENGAGED  = 'engaged'
 REL_PARENT   = 'parent'
 REL_CHILD    = 'child'
 
+# Hair colours
+HAIR_RED     = 'red'
+HAIR_BLOND   = 'blond'
+HAIR_BROWN   = 'brown'
+HAIR_BLACK   = 'black'
+
+class Alibi (object):
+    """
+    Alibi class. Where was a suspect at the time of the murder, and with whom?
+    """
+    def __init__ (self, place, witness = -1):
+        """
+        Initialize a suspect's alibi.
+
+        :``place``: A room name. *Required*.
+        :``witness``: Index of a suspect who can confirm the alibi, or -1 if none. *Default -1*.
+        """
+        self.room = place
+        self.witness = witness
+
 class Person (object):
     """
     Person class. To define persons and access their characteristics.
@@ -43,11 +63,12 @@ class Person (object):
 
         self.set_random_last_name(last)
         self.set_random_age(age)
-        self.set_random_hair_colour()
 
-        self.rel = []
+        self.hair = None
+        self.rel  = []
         self.title = ''
         self.occupation = ''
+        self.alibi = None
 
     def __str__ (self):
         """
@@ -56,8 +77,8 @@ class Person (object):
         job = ''
         if self.occupation:
             job = "%s, " % self.occupation
-        return "%s (%s), %s%shaired, aged %s" % (self.get_fullname(),
-               self.gender, job, self.hair, self.age)
+        return "%s (%s), %s%s, aged %s" % (self.get_fullname(),
+               self.gender, job, self.describe_hair(), self.age)
 
     def set_random_last_name (self, last = None):
         """
@@ -90,12 +111,29 @@ class Person (object):
         else:
             self.age = random.randint(25,70)
 
-    def set_random_hair_colour (self):
+    def set_random_hair_colour (self, hair_list, exception = None):
         """
         Assigns a random hair colour.
+
+        :``hair_list``: List of allowed hair colours. *Required*.
+        :``exception``: Forbidden hair colour, if any. *Default none*.
         """
-        hair = ['red', 'blond', 'brown', 'black']
-        self.hair = random.choice(hair)
+        while True:
+            self.hair = random.choice(hair_list)
+            if self.hair != exception:
+                break
+
+    def describe_hair (self):
+        """
+        Returns a description of the person's hair colour.
+        """
+        if not self.hair:
+            return "unknown hair colour"
+
+        if self.hair == HAIR_BLOND:
+            return self.hair
+        else:
+            return "%shaired" % self.hair
 
     def set_relative (self, idx, type):
         """
@@ -108,6 +146,27 @@ class Person (object):
                    ``REL_PARENT``, ``REL_CHILD`` or ``REL_ENGAGED``. *Required*.
         """
         self.rel.append((idx, type))
+
+    def set_alibi (self, room, witness = -1):
+        """
+        Provides this person with an alibi.
+
+        :``room``: A room name (string). *Required*.
+        :``witness``: Suspect list index of another person. *Default -1*.
+        """
+        self.alibi = Alibi(room, witness)
+
+    def has_alibi_witness (self):
+        """
+        Returns true if the person has an alibi confirmed by someone else.
+        """
+        if not self.alibi:
+            return False
+
+        if self.alibi.witness == -1:
+            return False
+
+        return True
 
     def get_name (self):
         """
@@ -276,12 +335,13 @@ class SuspectList (object):
 
     suspects = []
 
-    def __init__ (self, max_suspects):
+    def __init__ (self, max_suspects, rooms = None):
         """
         As long as more suspects are needed, generate new persons
         and, in another loop, also their relatives.
 
         :``max_suspects``: The maximum number of suspects. *Required*.
+        :``rooms``: List of room names. Required for calculating alibis. *Default none*.
         """
         # Define function shortcut for speed-up.
         sappend  = self.suspects.append
@@ -316,6 +376,9 @@ class SuspectList (object):
         self.add_occupation()
         self.pick_victim()
         self.pick_murderer()
+        if rooms:
+            self.get_create_alibis(rooms)
+            self.add_hair_colours()
 
     def get_suspect_list (self):
         """
@@ -569,6 +632,151 @@ class SuspectList (object):
                         s.occupation = 'actress'
                 elif s.gender == 'm' and one_chance_in(10):
                     s.occupation = 'painter'
+
+    def create_paired_alibi (self, p1, p2, room):
+        """
+        Set mutual alibis for two suspects confirming one another.
+
+        :``p1``: Index of a suspect. *Required*.
+        :``p2``: Index of another suspect. *Required*.
+        :``room``: Room name. *Required*.
+        """
+        self.get_suspect(p1).set_alibi(room, p2)
+        self.get_suspect(p2).set_alibi(room, p1)
+
+    def create_alibis (self, rooms):
+        """
+        Generate alibis for all suspects.
+
+        :``rooms``: A list of possible room names. *Required*.
+        """
+
+        suspects = range(0, len(self.suspects))
+        # The victim doesn't need an alibi, and the murderer is
+        # handled specially.
+        suspects.remove(self.victim)
+        suspects.remove(self.murderer)
+
+        random.shuffle(suspects)
+        # Re-add murderer at the end of the shuffled list.
+        suspects.append(self.murderer)
+
+        # First, create alibis for suspects who were together at the time.
+        # For ease of computation, only consider pairs of suspects.
+        # The number of pairs depends on the total number of suspects.
+        N = len(suspects)
+        PAIRED = 2 * max(1, random.randint((N+1)/5, (N+1)/3))
+        # print "N: %d -> min: %d, max: %d -> pairs: %d" % (N, (N+1)/5, (N+1)/3, PAIRED/2)
+        for i in range(0, PAIRED, 2):
+            if i+1 >= N:
+                break
+            room = rooms.pop()
+            p1   = suspects[i]
+            p2   = suspects[i+1]
+            self.create_paired_alibi(p1, p2, room)
+
+        # The remaining suspects don't have a witness.
+        # This includes the murderer.
+        # TODO: Sometimes allow the murderer to lie about having a witness.
+        idx_range = range(PAIRED, N)
+        for i in idx_range:
+            p = suspects[i]
+            self.get_suspect(p).set_alibi(rooms.pop())
+
+    def get_create_alibis (self, rooms):
+        """
+        Generates alibis for all suspects. Returns a list of Alibis.
+
+        :``rooms``: A list of room names (strings). *Required*.
+        """
+        self.create_alibis(rooms)
+        alibis = []
+        for i in xrange(len(self.suspects)):
+            p = self.get_suspect(i)
+            alibis.append(p.alibi)
+
+        return alibis
+
+    def get_cleared_suspects (self):
+        """
+        Returns a list of indices of suspects with a confirmed alibi.
+        """
+        confirmed = []
+        for i in xrange(len(self.suspects)):
+            if self.get_suspect(i).has_alibi_witness():
+                confirmed.append(i)
+
+        return confirmed
+
+    def print_alibis(self, alibis):
+        """
+        Prints basic alibi statements mentioning room and witness.
+
+        :``alibis``: A list of suspect indices. *Required*.
+        """
+        for i in xrange(len(alibis)):
+            idx = alibis[i]
+            p = self.get_suspect(idx)
+            if not p.alibi:
+                continue
+
+            a = p.alibi
+            if p.has_alibi_witness():
+                w = ", witness: %s" % self.get_suspect(a.witness).get_name()
+            else:
+                w = ""
+            print "%s: %s%s" % (p.get_name(), a.room, w)
+
+    def add_hair_colours(self):
+        """
+        Assign hair colours to the suspects in such a way that if both
+        the murderer's hair colour and all alibis are known, only the
+        murderer remains suspect.
+        """
+        # First, pick the maximum number of hair colours. The more suspects
+        # there are, the likelier is using all 4 colours. Minimum 2.
+        max_hair_num = max(2, (len(self.suspects) - 1)/2)
+        HAIR_NUM     = min(4, random.randint(2, max_hair_num))
+
+        full_hair_list = [HAIR_RED, HAIR_BLOND, HAIR_BROWN, HAIR_BLACK]
+        hair_list      = random.sample(full_hair_list, HAIR_NUM)
+        #print "max. hair: %d -> HAIR_NUM: %d -> %s" % (max_hair_num, HAIR_NUM, hair_list)
+
+        # Pick a random hair colour for the murderer.
+        self.get_murderer().set_random_hair_colour(hair_list)
+        m_hair = self.get_murderer().hair
+
+        # Try to give the victim a hair colour outside of hair list.
+        other_list = full_hair_list
+        if HAIR_NUM < 4:
+            other_list = list(set(full_hair_list) - set(hair_list))
+        self.get_victim().set_random_hair_colour(other_list, m_hair)
+
+        # confirmed and unconfirmed alibis
+        confirmed      = self.get_cleared_suspects()
+        total_suspects = range(0, len(self.suspects))
+        unconfirmed    = list(set(total_suspects) - set(confirmed))
+        unconfirmed.remove(self.murderer)
+        unconfirmed.remove(self.victim)
+
+        # Give each non-cleared suspect a different hair colour than
+        # the murderer's.
+        for i in xrange(len(unconfirmed)):
+            p = unconfirmed[i]
+            self.get_suspect(p).set_random_hair_colour(hair_list, m_hair)
+
+        # Make sure there are at least unconfirmed/HAIR_NUM suspects
+        # with the same hair colour as the murderer.
+        random.shuffle(confirmed)
+        expected_hair_count = min(len(unconfirmed)/HAIR_NUM, confirmed)
+        for i in xrange(expected_hair_count):
+            p = confirmed[i]
+            self.get_suspect(p).hair = m_hair
+
+        # Give the remaining suspects a truly random hair colour.
+        for i in xrange(expected_hair_count, len(confirmed)):
+            p = confirmed[i]
+            self.get_suspect(p).set_random_hair_colour(hair_list)
 
     def print_suspects (self):
         """
