@@ -232,6 +232,29 @@ class ShapeCollection (object):
 
         self._shapes = new_self
 
+    def insert (self, index, item):
+        """
+        Insert ``item`` at ``index``, shifting contents down by one. If the
+        index is beyond the bounds of the collection, it will be appended
+        instead.
+
+        Returns the index that the item was actually inserted at.
+
+        :``index``: What index to insert the item at.
+        :``item``: The shape to insert.
+        """
+        if not isinstance(item, ShapeCoord):
+            item = ShapeCoord(item, coord.Coord(0, 0))
+
+        assert isinstance(item, ShapeCoord)
+
+        if len(self) <= index:
+            self._shapes.append(item)
+            return len(self) - 1
+
+        self._shapes.insert(index, item)
+        return index
+
     def __getitem__ (self, item):
         """
         If ``item`` is an integer:
@@ -352,6 +375,8 @@ class ShapeCollection (object):
         Priorities are only as valid as long as new items are not added to the
         collection.
 
+        Returns the new index of the item.
+
         :``index``: The index you wish to prioritise.
         :``priority``: The priority you want to set the index to. Negative
                        numbers will decrease the priority, and positive numbers
@@ -359,7 +384,37 @@ class ShapeCollection (object):
                        as high as possible. If False, it will be decreased to as
                        low as possible. *Default True*.
         """
-        assert False
+        assert isinstance(index, int)
+
+        if index < 0:
+            index = len(self) + index
+
+        assert index < len(self)
+
+        if priority is True:
+            item = self.pop(index)
+            self.append(item)
+            return len(self)-1
+        elif priority is False:
+            item = self.pop(index)
+            self.insert(0, item)
+            return 0
+
+        assert isinstance(priority, int)
+
+        if priority < 0:
+            new_priority = len(self) + priority
+        else:
+            new_priority = index + priority
+
+        assert new_priority >= 0
+        item = self.pop(index)
+        self.insert(new_priority, item)
+
+        if new_priority >= len(self):
+            return len(self) - 1
+
+        return new_priority
 
     def __iter__ (self):
         """
