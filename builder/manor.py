@@ -19,7 +19,7 @@ Attempt to create a "manor" akin to:
 
 """
 
-import random
+import random, copy
 from library import shape, coord, collection
 
 # Specific build styles:
@@ -185,6 +185,96 @@ N_LAYOUT = "N-corridors"
 H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
 
+SIDE_LEFT = "left"
+SIDE_RIGHT = "right"
+PLACE_TOP = "top"
+PLACE_BOTTOM = "bottom"
+
+class ManorCollection (collection.ShapeCollection):
+    corridors = None
+    rooms = None
+    def __init__ (self, *args, **kwargs):
+        collection.ShapeCollection.__init__(self, *args, **kwargs)
+        self.rebuild()
+
+    def copy (self):
+        my_copy = ManorCollection(copy.copy(self._shapes))
+        return my_copy
+
+    def rebuild (self):
+        self.corridors = []
+        self.rooms = []
+        for index, sh in enumerate(self):
+            if isinstance(sh.shape, shape.Corridor):
+                self.corridors.append(index)
+            else:
+                self.rooms.append(index)
+
+    def corridors (self):
+        return self.corridors
+
+    def rooms (self):
+        return self.rooms
+
+    def _rebuild_wrap (function):
+        def wrapper (self, *args, **kwargs):
+            function(self, *args, **kwargs)
+            self.rebuild()
+        wrapper.__name__ = function.__name__
+        wrapper.__doc__ = function.__doc__ + "\n\nCalling this function automatically rebuilds the ManorCollection index."
+        return wrapper
+
+    __setitem__ = _rebuild_wrap(collection.ShapeCollection.__setitem__)
+    append      = _rebuild_wrap(collection.ShapeCollection.append)
+    extend      = _rebuild_wrap(collection.ShapeCollection.extend)
+    insert      = _rebuild_wrap(collection.ShapeCollection.insert)
+    pop         = _rebuild_wrap(collection.ShapeCollection.pop)
+    prioritise  = _rebuild_wrap(collection.ShapeCollection.prioritise)
+    reverse     = _rebuild_wrap(collection.ShapeCollection.reverse)
+    reversed    = _rebuild_wrap(collection.ShapeCollection.reversed)
+    sort        = _rebuild_wrap(collection.ShapeCollection.sort)
+    append      = _rebuild_wrap(collection.ShapeCollection.append)
+    prioritise  = _rebuild_wrap(collection.ShapeCollection.prioritise)
+
+def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
+    """
+    Take a result of base_builder() and attach a leg.
+
+    :``base``: The base shape collection.
+    :``leg``: The leg shape collection.
+    :``side``: Which side the leg should be placed on. *Default SIDE_LEFT*.
+    :``placement``: Whether the leg should be placed above or below. *Default PLACE_TOP*.
+    """
+    pass
+
+def build_leg (rooms_tall=2, rooms_wide=2, make_corridor=True, do_cleanup=True):
+    """
+    Create and return a "leg" to be used with add_leg.
+
+    :``rooms_tall``: How many rooms tall to make the leg. *Default 2*.
+    :``rooms_wide``: How many rooms wide to make the leg. *Max 2. Default 2*.
+    :``make_corridor``: Include a corridor when building. *Default True*.
+    :``do_cleanup``: Perform corridor, etc, clean-up when built. *Default True*.
+    """
+    assert rooms_wide >= 1 and rooms_wide <= 2
+    assert rooms_tall >= 1
+    new_rooms = collection.ShapeCollection()
+
+    for row in xrange(rooms_tall):
+        rooms = []
+        for room in xrange(rooms_wide):
+            rooms.append(Room().as_shape())
+
+        this_row = collection.ShapeCollection()
+        this_row = shape.adjoin(rooms.pop(), this_row, overlap=-1, collect=True)
+
+        for room in rooms:
+            this_row = shape.adjoin(this_row, room, overlap=-1, collect=True)
+
+        new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collect=True)
+
+    return new_rooms
+
 def build_L (base=None, rooms=2, rooms_wide=1):
     """
     Modifies the results of base_builder() to result in an L shape in any
@@ -198,18 +288,7 @@ def build_L (base=None, rooms=2, rooms_wide=1):
         base = base_builder()
 
     # Draw the new rooms.
-    new_rooms = collection.ShapeCollection()
-
-    for row in xrange(rooms):
-        if rooms_wide == 2:
-            room1 = Room().as_shape()
-            room2 = Room().as_shape()
-            this_row = shape.adjoin(room1, room2, overlap=-1, collect=True)
-        else:
-            this_row = collection.ShapeCollection()
-            this_row.append(Room().as_shape())
-
-        new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collect=True)
+    new_rooms = build_leg(rooms, rooms_wide)
 
     # Find the corridor
     corridor = None
