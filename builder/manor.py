@@ -176,13 +176,14 @@ def base_builder ():
     room_height = Room().height
 
     my_collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collect=True)
+    manor = ManorCollection(my_collection)
 
     corridor_length = my_collection.width() - room_width * 2
-    corridor = shape.Row(width=corridor_length, fill=".")
+    corridor = MainCorridor(shape.Row(width=corridor_length, fill="."))
 
-    my_collection.append(collection.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
+    manor.append(collection.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
 
-    return my_collection
+    return manor
 
 BASE_SHAPE = "single-corridor"
 L_LAYOUT = "L-corridors"
