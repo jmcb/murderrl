@@ -363,7 +363,7 @@ def build_leg (rooms_tall=2, rooms_wide=2, make_corridor=True, do_cleanup=True):
 
     return new_rooms
 
-def build_L (base=None, rooms=2, rooms_wide=1):
+def build_L (base=None, rooms=2, rooms_wide=2):
     """
     Modifies the results of base_builder() to result in an L shape in any
     orientation.
