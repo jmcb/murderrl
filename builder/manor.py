@@ -192,10 +192,23 @@ N_LAYOUT = "N-corridors"
 H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
 
-SIDE_LEFT = "left"
-SIDE_RIGHT = "right"
-PLACE_TOP = "top"
-PLACE_BOTTOM = "bottom"
+class Placement (object):
+    def __init__ (self, side1, side2, this_side):
+        self.sides = [side1, side2]
+        self.this_side = this_side
+    def opposite (self):
+        return self.sides[self.this_side-1]
+    def __hash__ (self):
+        return hash(str(self))
+    def __str__ (self):
+        return self.sides[self.this_side]
+    def __repr__ (self):
+        return "<Placement %s>" % self
+
+SIDE_LEFT = Placement("left", "right", 0)
+SIDE_RIGHT = Placement("left", "right", 1)
+PLACE_TOP = Placement("top", "bottom", 0)
+PLACE_BOTTOM = Placement("top", "bottogm", 1)
 
 class ManorCollection (collection.ShapeCollection):
     corridors = None
