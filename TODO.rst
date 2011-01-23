@@ -29,6 +29,9 @@ Manor building
 5. Finish implementing the ManorCollection.
 6. Implement "join" function for ShapeCollections: combine two overlapping
    shapes into one shape that replaces both indexes.
+7. Write ShapeCollection::place_on(collection, offset). Offsets collection and
+   appends its contents to the target collection.
+8. Write ShapeCollection::draw_on(shape, offset).
 
 User interface
 ==============
