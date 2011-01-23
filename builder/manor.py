@@ -56,6 +56,12 @@ class Room (object):
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
+class Corridor (shape.Shape):
+    pass
+
+class MainCorridor (Corridor):
+    pass
+
 def base_builder ():
     """
     Attempts to build a manor based on the style provided. It returns
