@@ -404,3 +404,17 @@ def build_O (base=None):
         base = base_builder()
     return base
 
+def build_U (base=None, rooms=2, rooms_wide=2):
+    if base is None:
+        base = base_builder()
+
+    # Draw the new rooms.
+    new_rooms1 = build_leg(rooms, rooms_wide)
+    new_rooms2 = build_leg(rooms, rooms_wide)
+
+    placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
+
+    base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
+    base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement)
+    return base
+

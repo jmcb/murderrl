@@ -22,6 +22,8 @@ if __name__=="__main__":
         m = manor.build_H()
     elif type == 'O':
         m = manor.build_O()
+    elif type == 'U':
+        m = manor.build_U()
     else:
         m = manor.base_builder()
 
