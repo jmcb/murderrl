@@ -213,6 +213,9 @@ PLACE_BOTTOM = Placement("top", "bottogm", 1)
 class ManorCollection (collection.ShapeCollection):
     corridors = None
     rooms = None
+    legs = None
+    main_corridor = None
+
     def __init__ (self, *args, **kwargs):
         collection.ShapeCollection.__init__(self, *args, **kwargs)
         self.rebuild()
@@ -224,17 +227,38 @@ class ManorCollection (collection.ShapeCollection):
     def rebuild (self):
         self.corridors = []
         self.rooms = []
+        self.legs = []
         for index, sh in enumerate(self):
-            if isinstance(sh.shape, shape.Corridor):
+            if isinstance(sh.shape, MainCorridor):
+                self.main_corridor = index
+
+            if isinstance(sh.shape, Corridor):
                 self.corridors.append(index)
             else:
                 self.rooms.append(index)
 
+    def corridor (self, index):
+        assert index in self.corridors
+        return self[index]
+
     def corridors (self):
         return self.corridors
 
+    def room (self, index):
+        assert index in self.rooms
+        return self[index]
+
     def rooms (self):
         return self.rooms
+
+    def mark_leg (self, side, placement):
+        self.legs.append((side, placement))
+
+    def count_legs (self):
+        return len(self.legs)
+
+    def leg_at (self, side, placement):
+        return (side, placement) in self.legs
 
     def _rebuild_wrap (function):
         def wrapper (self, *args, **kwargs):
