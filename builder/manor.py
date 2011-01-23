@@ -289,7 +289,51 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     :``side``: Which side the leg should be placed on. *Default SIDE_LEFT*.
     :``placement``: Whether the leg should be placed above or below. *Default PLACE_TOP*.
     """
-    pass
+    assert not base.leg_at(side, placement)
+
+    no_vert_offset = False
+    if base.leg_at(side.opposite(), placement):
+        no_vert_offset = True
+
+    # Find the corridor
+    corridor, start = base.corridor(base.main_corridor)
+    assert corridor is not None
+
+    # Find the corridor's starting point
+    stop = coord.Coord(start)
+    stop.x = corridor.width()
+
+    if side == SIDE_LEFT:
+        leg.offset(coord.Coord(stop.x-1, 0))
+        y_offset = stop.x + (Room().width - 1)
+    elif side == SIDE_RIGHT:
+        y_offset = start.x
+
+    new_corridor = shape.Column(height=leg.height() + Room().height, fill=".")
+
+    corridor_offset = None
+
+    if placement == PLACE_BOTTOM:
+        base = shape.underneath(base, leg, overlap=1, collect=True)
+        new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
+        corridor_offset = coord.Coord(y_offset, Room().height)
+        base.append(new_corridor, corridor_offset)
+    elif placement == PLACE_TOP:
+        base = shape.underneath(leg, base, overlap=1, collect=True)
+        new_corridor[coord.Coord(0, 0)] = "#"
+        corridor_offset = coord.Coord(y_offset, 0)
+        base.append(new_corridor, corridor_offset)
+
+    if placement == PLACE_TOP:
+        start = coord.Coord(corridor_offset.x - 1, leg.height() - 1)
+    elif placement == PLACE_BOTTOM:
+        start = coord.Coord(corridor_offset.x - 1, Room().height + 1)
+
+    new_shape = shape.Shape(width=3, height=Room().height, fill="#")
+    new_shape.draw_on(shape.Shape(width=1, height=Room().height, fill="."), offset=coord.Coord(1, 0), check_conflict=False)
+
+    base.append(new_shape, start)
+    return ManorCollection(base)
 
 def build_leg (rooms_tall=2, rooms_wide=2, make_corridor=True, do_cleanup=True):
     """
@@ -334,63 +378,10 @@ def build_L (base=None, rooms=2, rooms_wide=1):
     # Draw the new rooms.
     new_rooms = build_leg(rooms, rooms_wide)
 
-    # Find the corridor
-    corridor = None
+    side = random.choice([SIDE_LEFT, SIDE_RIGHT])
+    placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
-    for s in base:
-        if s.height() == 1:
-            corridor = s
-            break
-
-    assert corridor is not None
-    corridor, start = corridor
-
-    stop = coord.Coord(start)
-    stop.x = corridor.width()
-
-    side = random.choice(["left", "right"])
-
-    y_offset = 0
-
-    # Pick either the right or left end of the corridor.
-
-    if side == "right":
-        new_rooms.offset(coord.Coord(stop.x-1, 0))
-        y_offset = stop.x + (Room().width - 1)
-    else:
-        y_offset = start.x
-
-    new_corridor = shape.Column(height=Room().height * (rooms + 1) - (rooms - 1), fill=".")
-
-    corridor_offset = None
-
-    vert = None
-
-    if random.randint(1, 2) == 1:
-        base = shape.underneath(base, new_rooms, overlap=1, collect=True)
-        new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
-        corridor_offset = coord.Coord(y_offset, Room().height)
-        base.append(new_corridor, corridor_offset)
-        vert = "bottom"
-    else:
-        base = shape.underneath(new_rooms, base, overlap=1, collect=True)
-        new_corridor[coord.Coord(0, 0)] = "#"
-        corridor_offset = coord.Coord(y_offset, 0)
-        base.append(new_corridor, corridor_offset)
-        vert = "top"
-
-    # Finally, fixup the broken wall.
-    start = None
-
-    if vert == "top":
-        start = coord.Coord(corridor_offset.x - 1, Room().height * rooms - rooms)
-    else:
-        start = coord.Coord(corridor_offset.x - 1, Room().height + 1)
-
-    new_shape = shape.Shape(width=3, height=Room().height, fill="#")
-    new_shape.draw_on(shape.Shape(width=1, height=Room().height, fill="."), offset=coord.Coord(1, 0), check_conflict=False)
-
-    base.append(new_shape, start)
+    base = attach_leg(base, new_rooms, side=side, placement=placement)
     return base
 
 def build_Z (base=None):
