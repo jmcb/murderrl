@@ -204,11 +204,13 @@ class Placement (object):
         return self.sides[self.this_side]
     def __repr__ (self):
         return "<Placement %s>" % self
+    def __cmp__ (self, other):
+        return cmp(str(self), str(other))
 
 SIDE_LEFT = Placement("left", "right", 0)
 SIDE_RIGHT = Placement("left", "right", 1)
 PLACE_TOP = Placement("top", "bottom", 0)
-PLACE_BOTTOM = Placement("top", "bottogm", 1)
+PLACE_BOTTOM = Placement("top", "bottom", 1)
 
 class ManorCollection (collection.ShapeCollection):
     corridors = None
