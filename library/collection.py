@@ -364,6 +364,19 @@ class ShapeCollection (object):
         copy.reverse()
         return copy
 
+    def place_on (self, new_collection, offset=None):
+        """
+        Offset the contents of ``new_collection`` by ``offset`` and then extend
+        this collection with the contents of ``new_collection``.
+
+        ``new_collection``: An instance of ShapeCollection, or one of its
+                            subclasses.
+        ``offset``: A Coord denoting by how much the ``new_collection`` should
+                    be offset. *Default None*.
+        """
+        new_collection.offset(offset)
+        self.extend(new_collection)
+
     def prioritise (self, index, priority=True):
         """
         Alter the priority of ``index``. Priority basically equates to the

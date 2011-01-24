@@ -878,7 +878,7 @@ class Row (Shape):
             nshape = []
             for row in shape:
                 nshape.append([row])
-            Shape.__init__(self, nshape, height=height, fill=fill)
+            Shape.__init__(self, nshape, width=width, fill=fill)
 
 
 def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collect=False, offset_both=False):
@@ -908,8 +908,14 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
     :``offset_both``: If true, the ``top_offset`` will be applied to both
                       shapes. *Default False*.
     """
+    cl_class = collection.ShapeCollection
+
     if (isinstance(shape1, collection.ShapeCollection) or isinstance(shape2, collection.ShapeCollection)) and not collect:
         warnings.warn("Passed a collection but ``collect=False``, assuming ``collect=True``.", SyntaxWarning, stacklevel=2)
+        if isinstance(shape1, collection.ShapeCollection):
+            cl_class = shape1.__class__
+        else:
+            cl_class = shape2.__class__
         collect = True
 
     if join_left:
@@ -928,7 +934,7 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
         if isinstance(shape1, collection.ShapeCollection):
             collect = shape1.copy()
         else:
-            collect = collection.ShapeCollection()
+            collect = cl_class()
             y = 0
             if offset_both:
                 y = top_offset
@@ -966,8 +972,15 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
     :``collect``: If true, returns a ShapeCollection instead of a canvas.
                      *Default False*.
     """
+    cl_class = collection.ShapeCollection
+
     if (isinstance(shape1, collection.ShapeCollection) or isinstance(shape2, collection.ShapeCollection)) and not collect:
         warnings.warn("Passed a collection but ``collect=False``, assuming ``collect=True``.", SyntaxWarning, stacklevel=2)
+        if isinstance(shape1, collection.ShapeCollection):
+            cl_class = shape1.__class__
+        else:
+            cl_class = shape2.__class__
+
         collect = True
 
     if join_top:
@@ -987,7 +1000,7 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
         if isinstance(shape1, collection.ShapeCollection):
             collect = shape1.copy()
         else:
-            collect = collection.ShapeCollection()
+            collect = cl_class()
             shape1_offset.height += collect.height()
             shape2_offset.height += collect.height()
             collect.append(collection.ShapeCoord(shape1, shape1_offset))

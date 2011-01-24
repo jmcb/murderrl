@@ -299,6 +299,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     assert not base.leg_at(side, placement)
 
     no_vert_offset = False
+
     if base.leg_at(side.opposite(), placement):
         no_vert_offset = True
 
@@ -321,12 +322,18 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     corridor_offset = None
 
     if placement == PLACE_BOTTOM:
-        base = shape.underneath(base, leg, overlap=1, collect=True)
+        if no_vert_offset:
+            base.place_on(leg)
+        else:
+            base = shape.underneath(base, leg, overlap=1, collect=True)
         new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
         corridor_offset = coord.Coord(y_offset, Room().height)
         base.append(new_corridor, corridor_offset)
     elif placement == PLACE_TOP:
-        base = shape.underneath(leg, base, overlap=1, collect=True)
+        if no_vert_offset:
+            base.place_on(leg)
+        else:
+            base = shape.underneath(leg, base, overlap=1, collect=True)
         new_corridor[coord.Coord(0, 0)] = "#"
         corridor_offset = coord.Coord(y_offset, 0)
         base.append(new_corridor, corridor_offset)
@@ -339,8 +346,12 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     new_shape = shape.Shape(width=3, height=Room().height, fill="#")
     new_shape.draw_on(shape.Shape(width=1, height=Room().height, fill="."), offset=coord.Coord(1, 0), check_conflict=False)
 
+    base = ManorCollection(base)
+
     base.append(new_shape, start)
-    return ManorCollection(base)
+    base.mark_leg(side, placement)
+
+    return base
 
 def build_leg (rooms_tall=2, rooms_wide=2, make_corridor=True, do_cleanup=True):
     """
