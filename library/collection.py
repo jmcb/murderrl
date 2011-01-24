@@ -374,7 +374,8 @@ class ShapeCollection (object):
         ``offset``: A Coord denoting by how much the ``new_collection`` should
                     be offset. *Default None*.
         """
-        new_collection.offset(offset)
+        if offset:
+            new_collection.offset(offset)
         self.extend(new_collection)
 
     def prioritise (self, index, priority=True):
