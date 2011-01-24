@@ -218,12 +218,17 @@ class ManorCollection (collection.ShapeCollection):
     legs = None
     main_corridor = None
 
-    def __init__ (self, *args, **kwargs):
-        collection.ShapeCollection.__init__(self, *args, **kwargs)
+    def __init__ (self, c=[]):
+
+        if c != [] and isinstance(c, ManorCollection):
+            self.legs = c.legs
+
+        collection.ShapeCollection.__init__(self, c)
         self.rebuild()
 
     def copy (self):
         my_copy = ManorCollection(copy.copy(self._shapes))
+        my_copy.legs = copy.copy(self.legs)
         return my_copy
 
     def rebuild (self):
