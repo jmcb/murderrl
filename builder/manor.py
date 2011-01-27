@@ -323,7 +323,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
 
     if placement == PLACE_BOTTOM:
         if no_vert_offset:
-            base.place_on(leg)
+            base.place_on(leg, offset=coord.Coord(0, Room().height*2))
         else:
             base = shape.underneath(base, leg, overlap=1, collect=True)
         new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
