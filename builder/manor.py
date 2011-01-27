@@ -323,6 +323,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
 
     if placement == PLACE_BOTTOM:
         if no_vert_offset:
+            # XXX: This assumes all legs are 2 rooms high. Oops.
             base.place_on(leg, offset=coord.Coord(0, Room().height*2))
         else:
             base = shape.underneath(base, leg, overlap=1, collect=True)
@@ -415,6 +416,11 @@ def build_N (base=None):
 def build_H (base=None):
     if base is None:
         base = base_builder()
+
+    # Ordering matters, unfortunately. See XXX in attach_leg.
+    base = build_U(base, placement=PLACE_BOTTOM)
+    base = build_U(base, placement=PLACE_TOP)
+
     return base
 
 def build_O (base=None):
@@ -422,7 +428,7 @@ def build_O (base=None):
         base = base_builder()
     return base
 
-def build_U (base=None, rooms=2, rooms_wide=2):
+def build_U (base=None, rooms=2, rooms_wide=2, placement=None):
     if base is None:
         base = base_builder()
 
@@ -430,9 +436,9 @@ def build_U (base=None, rooms=2, rooms_wide=2):
     new_rooms1 = build_leg(rooms, rooms_wide)
     new_rooms2 = build_leg(rooms, rooms_wide)
 
-    placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
+    if placement is None:
+        placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
     base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
     base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement)
     return base
-
