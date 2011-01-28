@@ -367,6 +367,22 @@ class ShapeCollection (object):
         copy.reverse()
         return copy
 
+    def draw_on (self, target, offset=None):
+        """
+        Via direct canvas access, draws the contents of ``shape`` onto the
+        relevant spots of each canvas contained within.
+
+        ``target``: The shape that should be drawn on this collection.
+        ``offset``: A Coord denoting by how much the shape should be offset
+                    before drawing. *Default None*
+        """
+        assert isinstance(target, shape.Shape)
+
+        for point, glyph in target:
+            if offset is not None:
+                point += offset
+            self[point] = glyph
+
     def place_on (self, new_collection, offset=None):
         """
         Offset the contents of ``new_collection`` by ``offset`` and then extend
