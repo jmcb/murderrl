@@ -124,12 +124,12 @@ Returns a copy of this collection.
 Via direct canvas access, draws the contents of ``shape`` onto the
 relevant spots of each canvas contained within.
 
-``target_shape``: The shape that should be drawn on this collection. If
-                  the shape is larger than the contained shapes, only
-                  the section that can be contained within the contained
-                  shapes will be drawn.
-``offset``: A Coord denoting by how much the shape should be offset
-            before drawing. *Default None*.
+:``target``: The shape that should be drawn on this collection. If
+             the shape is larger than the contained shapes, only
+             the section that can be contained within the contained
+             shapes will be drawn.
+:``offset``: A Coord denoting by how much the shape should be offset
+             before drawing. *Default None*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
