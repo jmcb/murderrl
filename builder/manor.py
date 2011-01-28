@@ -380,7 +380,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
 
     base = ManorCollection(base)
 
-    base.append(new_shape, start)
+    base.draw_on(new_shape, start)
     base.mark_leg(Leg(side, placement, leg=old_leg))
 
     return base
