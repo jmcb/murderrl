@@ -89,10 +89,11 @@ Methods
 8. `Shape::size`_.
 9. `Shape::trim`_.
 10. `Shape::width`_.
-11. `Shape::__getitem__`_.
-12. `Shape::__iter__`_.
-13. `Shape::__setitem__`_.
-14. `Shape::__str__`_.
+11. `Shape::wipe`_.
+12. `Shape::__getitem__`_.
+13. `Shape::__iter__`_.
+14. `Shape::__setitem__`_.
+15. `Shape::__str__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -247,6 +248,14 @@ shape.
 Returns the smallest width that can contain the largest row of the
 shape. *Note: rows padded with None are not equivalent in length
 to rows without padding.*
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Shape::wipe:
+
+**Shape::wipe** (self)
+
+Iterate over the entire canvas and set every square to None.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -589,8 +598,8 @@ Methods
 
 .. _adjoin:
 
-function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collect=False, offset_both=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one. This method places shapes
 side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -612,7 +621,7 @@ left by ``overlap``. Finally, the resultant shape will be padded using
                 *Default False*.
 :``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
                      ``shape2`` where they overlap with the parts of ``shape1``.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
+:``collect``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
 :``offset_both``: If true, the ``top_offset`` will be applied to both
                   shapes. *Default False*.
@@ -621,8 +630,8 @@ left by ``overlap``. Finally, the resultant shape will be padded using
 
 .. _underneath:
 
-function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collect=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one by drawing ``shape1`` and then
 drawing ``shape2`` directly beneath it.
@@ -641,15 +650,15 @@ drawing ``shape2`` directly beneath it.
                      ``shape1``'s glyphs. *Default False*
 :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
 :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
+:``collect``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _atop:
 
-function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collect=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one by drawing ``shape1`` and then
 drawing ``shape2`` directly above it. This is an alias for ``underneath``
@@ -669,7 +678,7 @@ with the ``join_top`` flag set to True.
                      ``shape1``'s glyphs. *Default False*
 :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
 :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
+:``collect``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -893,27 +902,29 @@ Index
 +---------------------------------+---------------------------------+
 |`Shape::size`_                   |`Shape::trim`_                   |
 +---------------------------------+---------------------------------+
-|`Shape::width`_                  |`Shape::__getitem__`_            |
+|`Shape::width`_                  |`Shape::wipe`_                   |
 +---------------------------------+---------------------------------+
-|`Shape::__iter__`_               |`Shape::__setitem__`_            |
+|`Shape::__getitem__`_            |`Shape::__iter__`_               |
 +---------------------------------+---------------------------------+
-|`Shape::__str__`_                |`ShapeColumn`_                   |
+|`Shape::__setitem__`_            |`Shape::__str__`_                |
 +---------------------------------+---------------------------------+
-|`ShapeColumn::col`_              |`ShapeColumn::copy`_             |
+|`ShapeColumn`_                   |`ShapeColumn::col`_              |
 +---------------------------------+---------------------------------+
-|`ShapeColumn::parent`_           |`ShapeColumn::__getitem__`_      |
+|`ShapeColumn::copy`_             |`ShapeColumn::parent`_           |
 +---------------------------------+---------------------------------+
-|`ShapeColumn::__iter__`_         |`ShapeColumn::__repr__`_         |
+|`ShapeColumn::__getitem__`_      |`ShapeColumn::__iter__`_         |
 +---------------------------------+---------------------------------+
-|`ShapeColumn::__setitem__`_      |`ShapeColumn::__str__`_          |
+|`ShapeColumn::__repr__`_         |`ShapeColumn::__setitem__`_      |
 +---------------------------------+---------------------------------+
-|`ShapeError`_                    |`ShapeRow`_                      |
+|`ShapeColumn::__str__`_          |`ShapeError`_                    |
 +---------------------------------+---------------------------------+
-|`ShapeRow::copy`_                |`ShapeRow::parent`_              |
+|`ShapeRow`_                      |`ShapeRow::copy`_                |
 +---------------------------------+---------------------------------+
-|`ShapeRow::row`_                 |`ShapeRow::__getitem__`_         |
+|`ShapeRow::parent`_              |`ShapeRow::row`_                 |
 +---------------------------------+---------------------------------+
-|`ShapeRow::__iter__`_            |`ShapeRow::__repr__`_            |
+|`ShapeRow::__getitem__`_         |`ShapeRow::__iter__`_            |
 +---------------------------------+---------------------------------+
-|`ShapeRow::__setitem__`_         |`ShapeRow::__str__`_             |
+|`ShapeRow::__repr__`_            |`ShapeRow::__setitem__`_         |
++---------------------------------+---------------------------------+
+|`ShapeRow::__str__`_             |`underneath`_                    |
 +---------------------------------+---------------------------------+

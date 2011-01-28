@@ -46,19 +46,27 @@ Methods
 
 1. `ShapeCollection::__init__`_.
 2. `ShapeCollection::append`_.
-3. `ShapeCollection::combine`_.
-4. `ShapeCollection::copy`_.
-5. `ShapeCollection::extend`_.
-6. `ShapeCollection::height`_.
-7. `ShapeCollection::offset`_.
-8. `ShapeCollection::pop`_.
-9. `ShapeCollection::size`_.
-10. `ShapeCollection::sort`_.
-11. `ShapeCollection::width`_.
-12. `ShapeCollection::__getitem__`_.
-13. `ShapeCollection::__iter__`_.
-14. `ShapeCollection::__len__`_.
-15. `ShapeCollection::__setitem__`_.
+3. `ShapeCollection::column`_.
+4. `ShapeCollection::combine`_.
+5. `ShapeCollection::copy`_.
+6. `ShapeCollection::draw_on`_.
+7. `ShapeCollection::extend`_.
+8. `ShapeCollection::height`_.
+9. `ShapeCollection::insert`_.
+10. `ShapeCollection::offset`_.
+11. `ShapeCollection::place_on`_.
+12. `ShapeCollection::pop`_.
+13. `ShapeCollection::prioritise`_.
+14. `ShapeCollection::reverse`_.
+15. `ShapeCollection::reversed`_.
+16. `ShapeCollection::row`_.
+17. `ShapeCollection::size`_.
+18. `ShapeCollection::sort`_.
+19. `ShapeCollection::width`_.
+20. `ShapeCollection::__getitem__`_.
+21. `ShapeCollection::__iter__`_.
+22. `ShapeCollection::__len__`_.
+23. `ShapeCollection::__setitem__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -72,11 +80,21 @@ Methods
 
 .. _ShapeCollection::append:
 
-**ShapeCollection::append** (self, item, coord=None)
+**ShapeCollection::append** (self, item, c=None)
 
 As with the initialisation function, all Shapes passed in are here
 converted into ShapeCoords, using Coord(0, 0) as their offset. All other
 instances are not allowed.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::column:
+
+**ShapeCollection::column** (self, column)
+
+Provides an iteration of CollectionCoords.
+
+:``column``: Which column you want to iterate over.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -99,6 +117,19 @@ Returns a copy of this collection.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::draw_on:
+
+**ShapeCollection::draw_on** (self, target, offset=None)
+
+Via direct canvas access, draws the contents of ``shape`` onto the
+relevant spots of each canvas contained within.
+
+``target``: The shape that should be drawn on this collection.
+``offset``: A Coord denoting by how much the shape should be offset
+            before drawing. *Default None*
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::extend:
 
 **ShapeCollection::extend** (self, items)
@@ -118,6 +149,21 @@ Returns the height required to contain each member.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::insert:
+
+**ShapeCollection::insert** (self, index, item)
+
+Insert ``item`` at ``index``, shifting contents down by one. If the
+index is beyond the bounds of the collection, it will be appended
+instead.
+
+Returns the index that the item was actually inserted at.
+
+:``index``: What index to insert the item at.
+:``item``: The shape to insert.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::offset:
 
 **ShapeCollection::offset** (self, offset)
@@ -132,6 +178,20 @@ Offsets each member of the ShapeCollection by the passed offset.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::place_on:
+
+**ShapeCollection::place_on** (self, new_collection, offset=None)
+
+Offset the contents of ``new_collection`` by ``offset`` and then extend
+this collection with the contents of ``new_collection``.
+
+``new_collection``: An instance of ShapeCollection, or one of its
+                    subclasses.
+``offset``: A Coord denoting by how much the ``new_collection`` should
+            be offset. *Default None*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::pop:
 
 **ShapeCollection::pop** (self, index=-1)
@@ -139,6 +199,78 @@ Offsets each member of the ShapeCollection by the passed offset.
 Pop index ``index`` item from the collection of ShapeCoords.
 
 :``index``: The index in question. *Default -1*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::prioritise:
+
+**ShapeCollection::prioritise** (self, index, priority=True)
+
+Alter the priority of ``index``. Priority basically equates to the
+location within the ShapeCollection: indexes with a higher priority are
+drawn later and are thus less likely to be overriden by another shape;
+likewise, indexes with lower priorities are drawn earlier and a thus
+more likely to be override by another shape.
+
+Priorities are only as valid as long as new items are not added to the
+collection.
+
+Returns the new index of the item.
+
+:``index``: The index you wish to prioritise.
+:``priority``: The priority you want to set the index to. Negative
+               numbers will decrease the priority, and positive numbers
+               increase it. If True, the priority will be increased to
+               as high as possible. If False, it will be decreased to as
+               low as possible. *Default True*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::reverse:
+
+**ShapeCollection::reverse** (self)
+
+Performs an in-place reversing of the contents of this ShapeCollection.
+This has the effect of reversing the priority: items added earlier will
+be drawn later, and vice versa. For example::
+
+  >> coll = ShapeCollection()
+  >> coll.append(Shape(3, 3, "Y"))
+  >> coll.append(Shape(3, 3, "X"))
+
+Combining this will result in::
+
+  >> print coll.combine()
+  XXX
+  XXX
+  XXX
+
+Calling reverse before combining results in:
+
+  >> coll.reverse()
+  >> print coll.combine()
+  YYY
+  YYY
+  YYY
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::reversed:
+
+**ShapeCollection::reversed** (self)
+
+Returns a copy of this collection that has been reversed. See
+``ShapeCollection::reverse``.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::row:
+
+**ShapeCollection::row** (self, row)
+
+Provides an iteration of CollectionCoords.
+
+:``row``: Which row you want to iterate over.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -170,9 +302,16 @@ Returns the width required to contain each member.
 
 **ShapeCollection::__getitem__** (self, item)
 
+If ``item`` is an integer:
+
 Fetch item index ``item`` from the collection of ShapeCoords.
 
-:``item``: The item to be fetched.
+If ``item`` is a Coord instance:
+
+Attempt to locate ``item`` in the contained ShapeCoords. If ``item`` is
+contained within multiple shapes, a list of them will be returned.
+
+:``item``: The item to be fetched. Either an integer or a Coord.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -196,6 +335,8 @@ Returns the number of ShapeCoords contained within.
 
 **ShapeCollection::__setitem__** (self, item, value)
 
+If ``item`` is an integer:
+
 Insert ``value`` at ``item``, replacing whatever ShapeCoord is existent
 there.
 
@@ -204,6 +345,17 @@ there.
             from a Shape into a ShapeCoord(Shape, Coord(0, 0)).
             Otherwise it is assumed to be a ShapeCoord. All other
             types will cause an error.
+
+If ``item`` is an instance of Coord:
+
+Insert ``value`` at ``item`` in each Shape contained within. If ``item``
+is found in multiple shapes, it will set ``value`` in each one; if
+``value`` is iterable and multiple instances are found, values will be
+applied from ``value[0]`` onwards. If it runs out of values in
+``value``, it will cease setting and return.
+
+:``item``: Instance of Coord.
+:``value``: Either one of or a list of width one strings.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -265,13 +417,21 @@ Index
 +------------------------------------+------------------------------------+
 |`ShapeCollection`_                  |`ShapeCollection::__init__`_        |
 +------------------------------------+------------------------------------+
-|`ShapeCollection::append`_          |`ShapeCollection::combine`_         |
+|`ShapeCollection::append`_          |`ShapeCollection::column`_          |
 +------------------------------------+------------------------------------+
-|`ShapeCollection::copy`_            |`ShapeCollection::extend`_          |
+|`ShapeCollection::combine`_         |`ShapeCollection::copy`_            |
 +------------------------------------+------------------------------------+
-|`ShapeCollection::height`_          |`ShapeCollection::offset`_          |
+|`ShapeCollection::draw_on`_         |`ShapeCollection::extend`_          |
 +------------------------------------+------------------------------------+
-|`ShapeCollection::pop`_             |`ShapeCollection::size`_            |
+|`ShapeCollection::height`_          |`ShapeCollection::insert`_          |
++------------------------------------+------------------------------------+
+|`ShapeCollection::offset`_          |`ShapeCollection::place_on`_        |
++------------------------------------+------------------------------------+
+|`ShapeCollection::pop`_             |`ShapeCollection::prioritise`_      |
++------------------------------------+------------------------------------+
+|`ShapeCollection::reverse`_         |`ShapeCollection::reversed`_        |
++------------------------------------+------------------------------------+
+|`ShapeCollection::row`_             |`ShapeCollection::size`_            |
 +------------------------------------+------------------------------------+
 |`ShapeCollection::sort`_            |`ShapeCollection::width`_           |
 +------------------------------------+------------------------------------+

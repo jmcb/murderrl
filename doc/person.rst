@@ -48,19 +48,22 @@ Methods
 5. `Person::create_child`_.
 6. `Person::create_spouse`_.
 7. `Person::describe`_.
-8. `Person::describe_relations`_.
-9. `Person::get_fullname`_.
-10. `Person::get_mirrored_gender`_.
-11. `Person::get_name`_.
-12. `Person::get_relative`_.
-13. `Person::has_children`_.
-14. `Person::is_married`_.
-15. `Person::is_servant`_.
-16. `Person::set_random_age`_.
-17. `Person::set_random_hair_colour`_.
-18. `Person::set_random_last_name`_.
-19. `Person::set_relative`_.
-20. `Person::__str__`_.
+8. `Person::describe_hair`_.
+9. `Person::describe_relations`_.
+10. `Person::get_fullname`_.
+11. `Person::get_mirrored_gender`_.
+12. `Person::get_name`_.
+13. `Person::get_relative`_.
+14. `Person::has_alibi_witness`_.
+15. `Person::has_children`_.
+16. `Person::is_married`_.
+17. `Person::is_servant`_.
+18. `Person::set_alibi`_.
+19. `Person::set_random_age`_.
+20. `Person::set_random_hair_colour`_.
+21. `Person::set_random_last_name`_.
+22. `Person::set_relative`_.
+23. `Person::__str__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,6 +137,14 @@ Prints the person's description and lists their relationships.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Person::describe_hair:
+
+**Person::describe_hair** (self)
+
+Returns a description of the person's hair colour.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Person::describe_relations:
 
 **Person::describe_relations** (self, list)
@@ -182,6 +193,14 @@ relationships, i.e. spouses or fiances.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Person::has_alibi_witness:
+
+**Person::has_alibi_witness** (self)
+
+Returns true if the person has an alibi confirmed by someone else.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Person::has_children:
 
 **Person::has_children** (self)
@@ -206,6 +225,17 @@ Returns whether a person is part of the staff.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Person::set_alibi:
+
+**Person::set_alibi** (self, room, witness=-1)
+
+Provides this person with an alibi.
+
+:``room``: A room name (string). *Required*.
+:``witness``: Suspect list index of another person. *Default -1*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Person::set_random_age:
 
 **Person::set_random_age** (self, age=None)
@@ -218,9 +248,12 @@ Sets a person's appropriate age depending on their role.
 
 .. _Person::set_random_hair_colour:
 
-**Person::set_random_hair_colour** (self)
+**Person::set_random_hair_colour** (self, hair_list, exception=None)
 
 Assigns a random hair colour.
+
+:``hair_list``: List of allowed hair colours. *Required*.
+:``exception``: Forbidden hair colour, if any. *Default none*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -270,34 +303,41 @@ Methods
 
 1. `SuspectList::__init__`_.
 2. `SuspectList::add_child`_.
-3. `SuspectList::add_honorifics`_.
-4. `SuspectList::add_occupation`_.
-5. `SuspectList::add_relatives`_.
-6. `SuspectList::add_spouse`_.
-7. `SuspectList::ensure_unique_names`_.
-8. `SuspectList::get_murderer`_.
-9. `SuspectList::get_suspect`_.
-10. `SuspectList::get_suspect_list`_.
-11. `SuspectList::get_victim`_.
-12. `SuspectList::is_murderer`_.
-13. `SuspectList::is_victim`_.
-14. `SuspectList::no_of_suspects`_.
-15. `SuspectList::pick_murderer`_.
-16. `SuspectList::pick_victim`_.
-17. `SuspectList::print_suspects`_.
-18. `SuspectList::real_no_of_suspects`_.
-19. `SuspectList::update_child`_.
+3. `SuspectList::add_hair_colours`_.
+4. `SuspectList::add_honorifics`_.
+5. `SuspectList::add_occupation`_.
+6. `SuspectList::add_relatives`_.
+7. `SuspectList::add_spouse`_.
+8. `SuspectList::create_alibis`_.
+9. `SuspectList::create_paired_alibi`_.
+10. `SuspectList::ensure_unique_names`_.
+11. `SuspectList::get_cleared_suspects`_.
+12. `SuspectList::get_create_alibis`_.
+13. `SuspectList::get_murderer`_.
+14. `SuspectList::get_suspect`_.
+15. `SuspectList::get_suspect_list`_.
+16. `SuspectList::get_victim`_.
+17. `SuspectList::is_murderer`_.
+18. `SuspectList::is_victim`_.
+19. `SuspectList::no_of_suspects`_.
+20. `SuspectList::pick_murderer`_.
+21. `SuspectList::pick_victim`_.
+22. `SuspectList::print_alibis`_.
+23. `SuspectList::print_suspects`_.
+24. `SuspectList::real_no_of_suspects`_.
+25. `SuspectList::update_child`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _SuspectList::__init__:
 
-**SuspectList::__init__** (self, max_suspects)
+**SuspectList::__init__** (self, max_suspects, rooms=None)
 
 As long as more suspects are needed, generate new persons
 and, in another loop, also their relatives.
 
 :``max_suspects``: The maximum number of suspects. *Required*.
+:``rooms``: List of room names. Required for calculating alibis. *Default none*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -309,6 +349,16 @@ Generates a child for a given person, and sets the necessary
 relationship.
 
 :``idx``: The current person's index in the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_hair_colours:
+
+**SuspectList::add_hair_colours** (self)
+
+Assign hair colours to the suspects in such a way that if both
+the murderer's hair colour and all alibis are known, only the
+murderer remains suspect.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -355,6 +405,28 @@ necessary relationship.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _SuspectList::create_alibis:
+
+**SuspectList::create_alibis** (self, rooms)
+
+Generate alibis for all suspects.
+
+:``rooms``: A list of possible room names. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::create_paired_alibi:
+
+**SuspectList::create_paired_alibi** (self, p1, p2, room)
+
+Set mutual alibis for two suspects confirming one another.
+
+:``p1``: Index of a suspect. *Required*.
+:``p2``: Index of another suspect. *Required*.
+:``room``: Room name. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _SuspectList::ensure_unique_names:
 
 **SuspectList::ensure_unique_names** (self)
@@ -362,6 +434,24 @@ necessary relationship.
 Reroll names that start with the same letters as names already
 in the list. This greatly reduces the danger of the player
 getting the characters mixed up.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_cleared_suspects:
+
+**SuspectList::get_cleared_suspects** (self)
+
+Returns a list of indices of suspects with a confirmed alibi.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_create_alibis:
+
+**SuspectList::get_create_alibis** (self, rooms)
+
+Generates alibis for all suspects. Returns a list of Alibis.
+
+:``rooms``: A list of room names (strings). *Required*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -444,6 +534,16 @@ Randomly pick the victim. Staff are excluded.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _SuspectList::print_alibis:
+
+**SuspectList::print_alibis** (self, alibis)
+
+Prints basic alibi statements mentioning room and witness.
+
+:``alibis``: A list of suspect indices. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _SuspectList::print_suspects:
 
 **SuspectList::print_suspects** (self)
@@ -486,27 +586,35 @@ Index
 +----------------------------------------+----------------------------------------+
 |`Person::create_spouse`_                |`Person::describe`_                     |
 +----------------------------------------+----------------------------------------+
-|`Person::describe_relations`_           |`Person::get_fullname`_                 |
+|`Person::describe_hair`_                |`Person::describe_relations`_           |
 +----------------------------------------+----------------------------------------+
-|`Person::get_mirrored_gender`_          |`Person::get_name`_                     |
+|`Person::get_fullname`_                 |`Person::get_mirrored_gender`_          |
 +----------------------------------------+----------------------------------------+
-|`Person::get_relative`_                 |`Person::has_children`_                 |
+|`Person::get_name`_                     |`Person::get_relative`_                 |
++----------------------------------------+----------------------------------------+
+|`Person::has_alibi_witness`_            |`Person::has_children`_                 |
 +----------------------------------------+----------------------------------------+
 |`Person::is_married`_                   |`Person::is_servant`_                   |
 +----------------------------------------+----------------------------------------+
-|`Person::set_random_age`_               |`Person::set_random_hair_colour`_       |
+|`Person::set_alibi`_                    |`Person::set_random_age`_               |
 +----------------------------------------+----------------------------------------+
-|`Person::set_random_last_name`_         |`Person::set_relative`_                 |
+|`Person::set_random_hair_colour`_       |`Person::set_random_last_name`_         |
 +----------------------------------------+----------------------------------------+
-|`Person::__str__`_                      |`SuspectList`_                          |
+|`Person::set_relative`_                 |`Person::__str__`_                      |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::__init__`_                |`SuspectList::add_child`_               |
+|`SuspectList`_                          |`SuspectList::__init__`_                |
++----------------------------------------+----------------------------------------+
+|`SuspectList::add_child`_               |`SuspectList::add_hair_colours`_        |
 +----------------------------------------+----------------------------------------+
 |`SuspectList::add_honorifics`_          |`SuspectList::add_occupation`_          |
 +----------------------------------------+----------------------------------------+
 |`SuspectList::add_relatives`_           |`SuspectList::add_spouse`_              |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::ensure_unique_names`_     |`SuspectList::get_murderer`_            |
+|`SuspectList::create_alibis`_           |`SuspectList::create_paired_alibi`_     |
++----------------------------------------+----------------------------------------+
+|`SuspectList::ensure_unique_names`_     |`SuspectList::get_cleared_suspects`_    |
++----------------------------------------+----------------------------------------+
+|`SuspectList::get_create_alibis`_       |`SuspectList::get_murderer`_            |
 +----------------------------------------+----------------------------------------+
 |`SuspectList::get_suspect`_             |`SuspectList::get_suspect_list`_        |
 +----------------------------------------+----------------------------------------+
@@ -516,5 +624,7 @@ Index
 +----------------------------------------+----------------------------------------+
 |`SuspectList::pick_murderer`_           |`SuspectList::pick_victim`_             |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::print_suspects`_          |`SuspectList::real_no_of_suspects`_     |
+|`SuspectList::print_alibis`_            |`SuspectList::print_suspects`_          |
++----------------------------------------+----------------------------------------+
+|`SuspectList::real_no_of_suspects`_     |`SuspectList::update_child`_            |
 +----------------------------------------+----------------------------------------+

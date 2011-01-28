@@ -182,10 +182,11 @@ Methods
 8. `Shape::size`_.
 9. `Shape::trim`_.
 10. `Shape::width`_.
-11. `Shape::__getitem__`_.
-12. `Shape::__iter__`_.
-13. `Shape::__setitem__`_.
-14. `Shape::__str__`_.
+11. `Shape::wipe`_.
+12. `Shape::__getitem__`_.
+13. `Shape::__iter__`_.
+14. `Shape::__setitem__`_.
+15. `Shape::__str__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -340,6 +341,14 @@ shape.
 Returns the smallest width that can contain the largest row of the
 shape. *Note: rows padded with None are not equivalent in length
 to rows without padding.*
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Shape::wipe:
+
+**Shape::wipe** (self)
+
+Iterate over the entire canvas and set every square to None.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -682,8 +691,8 @@ Methods
 
 .. _adjoin:
 
-function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collection=False, offset_both=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *adjoin* (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False, skip_conflicts=False, collect=False, offset_both=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one. This method places shapes
 side-by-side with ``shape1`` on the left and ``shape2`` on the right. If
@@ -705,7 +714,7 @@ left by ``overlap``. Finally, the resultant shape will be padded using
                 *Default False*.
 :``skip_conflicts``: If true and ``overlap`` > 0, will not draw the parts of
                      ``shape2`` where they overlap with the parts of ``shape1``.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
+:``collect``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
 :``offset_both``: If true, the ``top_offset`` will be applied to both
                   shapes. *Default False*.
@@ -714,8 +723,8 @@ left by ``overlap``. Finally, the resultant shape will be padded using
 
 .. _underneath:
 
-function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *underneath* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=False, skip_conflicts=False, offset_first=False, offset_second=True, collect=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one by drawing ``shape1`` and then
 drawing ``shape2`` directly beneath it.
@@ -734,15 +743,15 @@ drawing ``shape2`` directly beneath it.
                      ``shape1``'s glyphs. *Default False*
 :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
 :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
+:``collect``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _atop:
 
-function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collection=False)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+function *atop* (shape1, shape2, left_offset=0, overlap=0, fill=None, join_bottom=False, skip_conflicts=False, offset_first=False, offset_second=True, collect=False)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Take two shapes and combine them into one by drawing ``shape1`` and then
 drawing ``shape2`` directly above it. This is an alias for ``underneath``
@@ -762,7 +771,7 @@ with the ``join_top`` flag set to True.
                      ``shape1``'s glyphs. *Default False*
 :``offset_first``: Offset ``shape1`` by ``left_offset``. *Default False*.
 :``offset_second``: Offset ``shape2`` by ``left_offset``. *Default True*.
-:``collection``: If true, returns a ShapeCollection instead of a canvas.
+:``collect``: If true, returns a ShapeCollection instead of a canvas.
                  *Default False*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -985,19 +994,27 @@ Methods
 
 1. `ShapeCollection::__init__`_.
 2. `ShapeCollection::append`_.
-3. `ShapeCollection::combine`_.
-4. `ShapeCollection::copy`_.
-5. `ShapeCollection::extend`_.
-6. `ShapeCollection::height`_.
-7. `ShapeCollection::offset`_.
-8. `ShapeCollection::pop`_.
-9. `ShapeCollection::size`_.
-10. `ShapeCollection::sort`_.
-11. `ShapeCollection::width`_.
-12. `ShapeCollection::__getitem__`_.
-13. `ShapeCollection::__iter__`_.
-14. `ShapeCollection::__len__`_.
-15. `ShapeCollection::__setitem__`_.
+3. `ShapeCollection::column`_.
+4. `ShapeCollection::combine`_.
+5. `ShapeCollection::copy`_.
+6. `ShapeCollection::draw_on`_.
+7. `ShapeCollection::extend`_.
+8. `ShapeCollection::height`_.
+9. `ShapeCollection::insert`_.
+10. `ShapeCollection::offset`_.
+11. `ShapeCollection::place_on`_.
+12. `ShapeCollection::pop`_.
+13. `ShapeCollection::prioritise`_.
+14. `ShapeCollection::reverse`_.
+15. `ShapeCollection::reversed`_.
+16. `ShapeCollection::row`_.
+17. `ShapeCollection::size`_.
+18. `ShapeCollection::sort`_.
+19. `ShapeCollection::width`_.
+20. `ShapeCollection::__getitem__`_.
+21. `ShapeCollection::__iter__`_.
+22. `ShapeCollection::__len__`_.
+23. `ShapeCollection::__setitem__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1011,11 +1028,21 @@ Methods
 
 .. _ShapeCollection::append:
 
-**ShapeCollection::append** (self, item, coord=None)
+**ShapeCollection::append** (self, item, c=None)
 
 As with the initialisation function, all Shapes passed in are here
 converted into ShapeCoords, using Coord(0, 0) as their offset. All other
 instances are not allowed.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::column:
+
+**ShapeCollection::column** (self, column)
+
+Provides an iteration of CollectionCoords.
+
+:``column``: Which column you want to iterate over.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1038,6 +1065,19 @@ Returns a copy of this collection.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::draw_on:
+
+**ShapeCollection::draw_on** (self, target, offset=None)
+
+Via direct canvas access, draws the contents of ``shape`` onto the
+relevant spots of each canvas contained within.
+
+``target``: The shape that should be drawn on this collection.
+``offset``: A Coord denoting by how much the shape should be offset
+            before drawing. *Default None*
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::extend:
 
 **ShapeCollection::extend** (self, items)
@@ -1057,6 +1097,21 @@ Returns the height required to contain each member.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::insert:
+
+**ShapeCollection::insert** (self, index, item)
+
+Insert ``item`` at ``index``, shifting contents down by one. If the
+index is beyond the bounds of the collection, it will be appended
+instead.
+
+Returns the index that the item was actually inserted at.
+
+:``index``: What index to insert the item at.
+:``item``: The shape to insert.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::offset:
 
 **ShapeCollection::offset** (self, offset)
@@ -1071,6 +1126,20 @@ Offsets each member of the ShapeCollection by the passed offset.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _ShapeCollection::place_on:
+
+**ShapeCollection::place_on** (self, new_collection, offset=None)
+
+Offset the contents of ``new_collection`` by ``offset`` and then extend
+this collection with the contents of ``new_collection``.
+
+``new_collection``: An instance of ShapeCollection, or one of its
+                    subclasses.
+``offset``: A Coord denoting by how much the ``new_collection`` should
+            be offset. *Default None*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _ShapeCollection::pop:
 
 **ShapeCollection::pop** (self, index=-1)
@@ -1078,6 +1147,78 @@ Offsets each member of the ShapeCollection by the passed offset.
 Pop index ``index`` item from the collection of ShapeCoords.
 
 :``index``: The index in question. *Default -1*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::prioritise:
+
+**ShapeCollection::prioritise** (self, index, priority=True)
+
+Alter the priority of ``index``. Priority basically equates to the
+location within the ShapeCollection: indexes with a higher priority are
+drawn later and are thus less likely to be overriden by another shape;
+likewise, indexes with lower priorities are drawn earlier and a thus
+more likely to be override by another shape.
+
+Priorities are only as valid as long as new items are not added to the
+collection.
+
+Returns the new index of the item.
+
+:``index``: The index you wish to prioritise.
+:``priority``: The priority you want to set the index to. Negative
+               numbers will decrease the priority, and positive numbers
+               increase it. If True, the priority will be increased to
+               as high as possible. If False, it will be decreased to as
+               low as possible. *Default True*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::reverse:
+
+**ShapeCollection::reverse** (self)
+
+Performs an in-place reversing of the contents of this ShapeCollection.
+This has the effect of reversing the priority: items added earlier will
+be drawn later, and vice versa. For example::
+
+  >> coll = ShapeCollection()
+  >> coll.append(Shape(3, 3, "Y"))
+  >> coll.append(Shape(3, 3, "X"))
+
+Combining this will result in::
+
+  >> print coll.combine()
+  XXX
+  XXX
+  XXX
+
+Calling reverse before combining results in:
+
+  >> coll.reverse()
+  >> print coll.combine()
+  YYY
+  YYY
+  YYY
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::reversed:
+
+**ShapeCollection::reversed** (self)
+
+Returns a copy of this collection that has been reversed. See
+``ShapeCollection::reverse``.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _ShapeCollection::row:
+
+**ShapeCollection::row** (self, row)
+
+Provides an iteration of CollectionCoords.
+
+:``row``: Which row you want to iterate over.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1109,9 +1250,16 @@ Returns the width required to contain each member.
 
 **ShapeCollection::__getitem__** (self, item)
 
+If ``item`` is an integer:
+
 Fetch item index ``item`` from the collection of ShapeCoords.
 
-:``item``: The item to be fetched.
+If ``item`` is a Coord instance:
+
+Attempt to locate ``item`` in the contained ShapeCoords. If ``item`` is
+contained within multiple shapes, a list of them will be returned.
+
+:``item``: The item to be fetched. Either an integer or a Coord.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1135,6 +1283,8 @@ Returns the number of ShapeCoords contained within.
 
 **ShapeCollection::__setitem__** (self, item, value)
 
+If ``item`` is an integer:
+
 Insert ``value`` at ``item``, replacing whatever ShapeCoord is existent
 there.
 
@@ -1143,6 +1293,17 @@ there.
             from a Shape into a ShapeCoord(Shape, Coord(0, 0)).
             Otherwise it is assumed to be a ShapeCoord. All other
             types will cause an error.
+
+If ``item`` is an instance of Coord:
+
+Insert ``value`` at ``item`` in each Shape contained within. If ``item``
+is found in multiple shapes, it will set ``value`` in each one; if
+``value`` is iterable and multiple instances are found, values will be
+applied from ``value[0]`` onwards. If it runs out of values in
+``value``, it will cease setting and return.
+
+:``item``: Instance of Coord.
+:``value``: Either one of or a list of width one strings.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1418,19 +1579,22 @@ Methods
 5. `Person::create_child`_.
 6. `Person::create_spouse`_.
 7. `Person::describe`_.
-8. `Person::describe_relations`_.
-9. `Person::get_fullname`_.
-10. `Person::get_mirrored_gender`_.
-11. `Person::get_name`_.
-12. `Person::get_relative`_.
-13. `Person::has_children`_.
-14. `Person::is_married`_.
-15. `Person::is_servant`_.
-16. `Person::set_random_age`_.
-17. `Person::set_random_hair_colour`_.
-18. `Person::set_random_last_name`_.
-19. `Person::set_relative`_.
-20. `Person::__str__`_.
+8. `Person::describe_hair`_.
+9. `Person::describe_relations`_.
+10. `Person::get_fullname`_.
+11. `Person::get_mirrored_gender`_.
+12. `Person::get_name`_.
+13. `Person::get_relative`_.
+14. `Person::has_alibi_witness`_.
+15. `Person::has_children`_.
+16. `Person::is_married`_.
+17. `Person::is_servant`_.
+18. `Person::set_alibi`_.
+19. `Person::set_random_age`_.
+20. `Person::set_random_hair_colour`_.
+21. `Person::set_random_last_name`_.
+22. `Person::set_relative`_.
+23. `Person::__str__`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1504,6 +1668,14 @@ Prints the person's description and lists their relationships.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Person::describe_hair:
+
+**Person::describe_hair** (self)
+
+Returns a description of the person's hair colour.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Person::describe_relations:
 
 **Person::describe_relations** (self, list)
@@ -1552,6 +1724,14 @@ relationships, i.e. spouses or fiances.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Person::has_alibi_witness:
+
+**Person::has_alibi_witness** (self)
+
+Returns true if the person has an alibi confirmed by someone else.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Person::has_children:
 
 **Person::has_children** (self)
@@ -1576,6 +1756,17 @@ Returns whether a person is part of the staff.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Person::set_alibi:
+
+**Person::set_alibi** (self, room, witness=-1)
+
+Provides this person with an alibi.
+
+:``room``: A room name (string). *Required*.
+:``witness``: Suspect list index of another person. *Default -1*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Person::set_random_age:
 
 **Person::set_random_age** (self, age=None)
@@ -1588,9 +1779,12 @@ Sets a person's appropriate age depending on their role.
 
 .. _Person::set_random_hair_colour:
 
-**Person::set_random_hair_colour** (self)
+**Person::set_random_hair_colour** (self, hair_list, exception=None)
 
 Assigns a random hair colour.
+
+:``hair_list``: List of allowed hair colours. *Required*.
+:``exception``: Forbidden hair colour, if any. *Default none*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1640,34 +1834,41 @@ Methods
 
 1. `SuspectList::__init__`_.
 2. `SuspectList::add_child`_.
-3. `SuspectList::add_honorifics`_.
-4. `SuspectList::add_occupation`_.
-5. `SuspectList::add_relatives`_.
-6. `SuspectList::add_spouse`_.
-7. `SuspectList::ensure_unique_names`_.
-8. `SuspectList::get_murderer`_.
-9. `SuspectList::get_suspect`_.
-10. `SuspectList::get_suspect_list`_.
-11. `SuspectList::get_victim`_.
-12. `SuspectList::is_murderer`_.
-13. `SuspectList::is_victim`_.
-14. `SuspectList::no_of_suspects`_.
-15. `SuspectList::pick_murderer`_.
-16. `SuspectList::pick_victim`_.
-17. `SuspectList::print_suspects`_.
-18. `SuspectList::real_no_of_suspects`_.
-19. `SuspectList::update_child`_.
+3. `SuspectList::add_hair_colours`_.
+4. `SuspectList::add_honorifics`_.
+5. `SuspectList::add_occupation`_.
+6. `SuspectList::add_relatives`_.
+7. `SuspectList::add_spouse`_.
+8. `SuspectList::create_alibis`_.
+9. `SuspectList::create_paired_alibi`_.
+10. `SuspectList::ensure_unique_names`_.
+11. `SuspectList::get_cleared_suspects`_.
+12. `SuspectList::get_create_alibis`_.
+13. `SuspectList::get_murderer`_.
+14. `SuspectList::get_suspect`_.
+15. `SuspectList::get_suspect_list`_.
+16. `SuspectList::get_victim`_.
+17. `SuspectList::is_murderer`_.
+18. `SuspectList::is_victim`_.
+19. `SuspectList::no_of_suspects`_.
+20. `SuspectList::pick_murderer`_.
+21. `SuspectList::pick_victim`_.
+22. `SuspectList::print_alibis`_.
+23. `SuspectList::print_suspects`_.
+24. `SuspectList::real_no_of_suspects`_.
+25. `SuspectList::update_child`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _SuspectList::__init__:
 
-**SuspectList::__init__** (self, max_suspects)
+**SuspectList::__init__** (self, max_suspects, rooms=None)
 
 As long as more suspects are needed, generate new persons
 and, in another loop, also their relatives.
 
 :``max_suspects``: The maximum number of suspects. *Required*.
+:``rooms``: List of room names. Required for calculating alibis. *Default none*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1679,6 +1880,16 @@ Generates a child for a given person, and sets the necessary
 relationship.
 
 :``idx``: The current person's index in the suspects[] list. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::add_hair_colours:
+
+**SuspectList::add_hair_colours** (self)
+
+Assign hair colours to the suspects in such a way that if both
+the murderer's hair colour and all alibis are known, only the
+murderer remains suspect.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1725,6 +1936,28 @@ necessary relationship.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _SuspectList::create_alibis:
+
+**SuspectList::create_alibis** (self, rooms)
+
+Generate alibis for all suspects.
+
+:``rooms``: A list of possible room names. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::create_paired_alibi:
+
+**SuspectList::create_paired_alibi** (self, p1, p2, room)
+
+Set mutual alibis for two suspects confirming one another.
+
+:``p1``: Index of a suspect. *Required*.
+:``p2``: Index of another suspect. *Required*.
+:``room``: Room name. *Required*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _SuspectList::ensure_unique_names:
 
 **SuspectList::ensure_unique_names** (self)
@@ -1732,6 +1965,24 @@ necessary relationship.
 Reroll names that start with the same letters as names already
 in the list. This greatly reduces the danger of the player
 getting the characters mixed up.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_cleared_suspects:
+
+**SuspectList::get_cleared_suspects** (self)
+
+Returns a list of indices of suspects with a confirmed alibi.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::get_create_alibis:
+
+**SuspectList::get_create_alibis** (self, rooms)
+
+Generates alibis for all suspects. Returns a list of Alibis.
+
+:``rooms``: A list of room names (strings). *Required*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1811,6 +2062,16 @@ Randomly pick the murderer.
 **SuspectList::pick_victim** (self)
 
 Randomly pick the victim. Staff are excluded.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _SuspectList::print_alibis:
+
+**SuspectList::print_alibis** (self, alibis)
+
+Prints basic alibi statements mentioning room and witness.
+
+:``alibis``: A list of suspect indices. *Required*.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2841,35 +3102,39 @@ Index
 +----------------------------------------+----------------------------------------+
 |`Person::create_child`_                 |`Person::create_spouse`_                |
 +----------------------------------------+----------------------------------------+
-|`Person::describe`_                     |`Person::describe_relations`_           |
+|`Person::describe`_                     |`Person::describe_hair`_                |
 +----------------------------------------+----------------------------------------+
-|`Person::get_fullname`_                 |`Person::get_mirrored_gender`_          |
+|`Person::describe_relations`_           |`Person::get_fullname`_                 |
 +----------------------------------------+----------------------------------------+
-|`Person::get_name`_                     |`Person::get_relative`_                 |
+|`Person::get_mirrored_gender`_          |`Person::get_name`_                     |
++----------------------------------------+----------------------------------------+
+|`Person::get_relative`_                 |`Person::has_alibi_witness`_            |
 +----------------------------------------+----------------------------------------+
 |`Person::has_children`_                 |`Person::is_married`_                   |
 +----------------------------------------+----------------------------------------+
-|`Person::is_servant`_                   |`Person::set_random_age`_               |
+|`Person::is_servant`_                   |`Person::set_alibi`_                    |
 +----------------------------------------+----------------------------------------+
-|`Person::set_random_hair_colour`_       |`Person::set_random_last_name`_         |
+|`Person::set_random_age`_               |`Person::set_random_hair_colour`_       |
 +----------------------------------------+----------------------------------------+
-|`Person::set_relative`_                 |`Person::__str__`_                      |
+|`Person::set_random_last_name`_         |`Person::set_relative`_                 |
 +----------------------------------------+----------------------------------------+
-|`RectangleIterator`_                    |`RectangleIterator::__init__`_          |
+|`Person::__str__`_                      |`RectangleIterator`_                    |
 +----------------------------------------+----------------------------------------+
-|`Section`_                              |`Section::__init__`_                    |
+|`RectangleIterator::__init__`_          |`Section`_                              |
 +----------------------------------------+----------------------------------------+
-|`Shape`_                                |`Shape::__init__`_                      |
+|`Section::__init__`_                    |`Shape`_                                |
 +----------------------------------------+----------------------------------------+
-|`Shape::column`_                        |`Shape::draw_on`_                       |
+|`Shape::__init__`_                      |`Shape::column`_                        |
 +----------------------------------------+----------------------------------------+
-|`Shape::height`_                        |`Shape::normalise`_                     |
+|`Shape::draw_on`_                       |`Shape::height`_                        |
 +----------------------------------------+----------------------------------------+
-|`Shape::row`_                           |`Shape::section`_                       |
+|`Shape::normalise`_                     |`Shape::row`_                           |
 +----------------------------------------+----------------------------------------+
-|`Shape::size`_                          |`Shape::trim`_                          |
+|`Shape::section`_                       |`Shape::size`_                          |
 +----------------------------------------+----------------------------------------+
-|`Shape::width`_                         |`Shape::__getitem__`_                   |
+|`Shape::trim`_                          |`Shape::width`_                         |
++----------------------------------------+----------------------------------------+
+|`Shape::wipe`_                          |`Shape::__getitem__`_                   |
 +----------------------------------------+----------------------------------------+
 |`Shape::__iter__`_                      |`Shape::__setitem__`_                   |
 +----------------------------------------+----------------------------------------+
@@ -2877,11 +3142,19 @@ Index
 +----------------------------------------+----------------------------------------+
 |`ShapeCollection::__init__`_            |`ShapeCollection::append`_              |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::combine`_             |`ShapeCollection::copy`_                |
+|`ShapeCollection::column`_              |`ShapeCollection::combine`_             |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::copy`_                |`ShapeCollection::draw_on`_             |
 +----------------------------------------+----------------------------------------+
 |`ShapeCollection::extend`_              |`ShapeCollection::height`_              |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::offset`_              |`ShapeCollection::pop`_                 |
+|`ShapeCollection::insert`_              |`ShapeCollection::offset`_              |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::place_on`_            |`ShapeCollection::pop`_                 |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::prioritise`_          |`ShapeCollection::reverse`_             |
++----------------------------------------+----------------------------------------+
+|`ShapeCollection::reversed`_            |`ShapeCollection::row`_                 |
 +----------------------------------------+----------------------------------------+
 |`ShapeCollection::size`_                |`ShapeCollection::sort`_                |
 +----------------------------------------+----------------------------------------+
@@ -2919,21 +3192,27 @@ Index
 +----------------------------------------+----------------------------------------+
 |`SuspectList`_                          |`SuspectList::__init__`_                |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::add_child`_               |`SuspectList::add_honorifics`_          |
+|`SuspectList::add_child`_               |`SuspectList::add_hair_colours`_        |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::add_occupation`_          |`SuspectList::add_relatives`_           |
+|`SuspectList::add_honorifics`_          |`SuspectList::add_occupation`_          |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::add_spouse`_              |`SuspectList::ensure_unique_names`_     |
+|`SuspectList::add_relatives`_           |`SuspectList::add_spouse`_              |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::get_murderer`_            |`SuspectList::get_suspect`_             |
+|`SuspectList::create_alibis`_           |`SuspectList::create_paired_alibi`_     |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::get_suspect_list`_        |`SuspectList::get_victim`_              |
+|`SuspectList::ensure_unique_names`_     |`SuspectList::get_cleared_suspects`_    |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::is_murderer`_             |`SuspectList::is_victim`_               |
+|`SuspectList::get_create_alibis`_       |`SuspectList::get_murderer`_            |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::no_of_suspects`_          |`SuspectList::pick_murderer`_           |
+|`SuspectList::get_suspect`_             |`SuspectList::get_suspect_list`_        |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::pick_victim`_             |`SuspectList::print_suspects`_          |
+|`SuspectList::get_victim`_              |`SuspectList::is_murderer`_             |
++----------------------------------------+----------------------------------------+
+|`SuspectList::is_victim`_               |`SuspectList::no_of_suspects`_          |
++----------------------------------------+----------------------------------------+
+|`SuspectList::pick_murderer`_           |`SuspectList::pick_victim`_             |
++----------------------------------------+----------------------------------------+
+|`SuspectList::print_alibis`_            |`SuspectList::print_suspects`_          |
 +----------------------------------------+----------------------------------------+
 |`SuspectList::real_no_of_suspects`_     |`SuspectList::update_child`_            |
 +----------------------------------------+----------------------------------------+
