@@ -212,6 +212,24 @@ SIDE_RIGHT = Placement("left", "right", 1)
 PLACE_TOP = Placement("top", "bottom", 0)
 PLACE_BOTTOM = Placement("top", "bottom", 1)
 
+class Leg (object):
+    def __init__ (self, h_placement, v_placement, width=None, height=None, leg=None):
+        assert not (leg is None and width is None and height is None)
+
+        if leg is not None:
+            width, height = leg.size()
+
+        self.placement = (h_placement, v_placement)
+        self.width = width
+        self.height = height
+    def __repr__ (self):
+        return "<Leg h:%s w:%s %s>" % (self.height, self.width, self.placement)
+    def __cmp__ (self, other):
+        if isinstance(other, Leg):
+            return cmp(self.placement, other.placement)
+        elif isinstance(other, tuple):
+            return cmp(self.placement, other)
+
 class ManorCollection (collection.ShapeCollection):
     corridors = None
     rooms = None
@@ -228,7 +246,7 @@ class ManorCollection (collection.ShapeCollection):
 
     def copy (self):
         my_copy = ManorCollection(copy.copy(self._shapes))
-        my_copy.legs = copy.copy(self.legs)
+        my_copy.legs = copy.deepcopy(self.legs)
         return my_copy
 
     def rebuild (self):
@@ -258,14 +276,21 @@ class ManorCollection (collection.ShapeCollection):
     def rooms (self):
         return self.rooms
 
-    def mark_leg (self, side, placement):
-        self.legs.append((side, placement))
+    def mark_leg (self, leg):
+        self.legs.append(leg)
 
     def count_legs (self):
         return len(self.legs)
 
     def leg_at (self, side, placement):
         return (side, placement) in self.legs
+
+    def get_leg (self, side, placement):
+        for leg in self.legs:
+            if leg == (side, placement):
+                return leg
+
+        return None
 
     def _rebuild_wrap (function):
         def wrapper (self, *args, **kwargs):
@@ -350,7 +375,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     base = ManorCollection(base)
 
     base.append(new_shape, start)
-    base.mark_leg(side, placement)
+    base.mark_leg(Leg(side, placement, leg=old_leg))
 
     return base
 
