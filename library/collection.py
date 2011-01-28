@@ -274,7 +274,7 @@ class ShapeCollection (object):
             results = []
             for sc in self._shapes:
                 try:
-                    results.append(sc.shape[sc.coord+item])
+                    results.append(sc.shape[item-sc.coord])
                 except:
                     pass
             results = list(set(results))
@@ -321,12 +321,15 @@ class ShapeCollection (object):
                 if len(value) == 0:
                     return
 
+                tval = value.pop(0)
+
+                if item - sc.coord < (0, 0):
+                    continue
+
                 try:
-                    sc.shape[sc.coord+item] = value[0]
+                    sc.shape[item-sc.coord] = tval;
                 except Exception:
                     pass
-                else:
-                    value.pop(0)
 
     def reverse (self):
         """
