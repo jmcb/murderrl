@@ -323,10 +323,17 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     """
     assert not base.leg_at(side, placement)
 
+    old_leg = leg.copy()
+
     no_vert_offset = False
+    vert_offset = 0
 
     if base.leg_at(side.opposite(), placement):
+        l = base.get_leg(side.opposite(), placement)
+        vert_offset = base.height() - l.height
         no_vert_offset = True
+    else:
+        vert_offset = base.height() - 1
 
     # Find the corridor
     corridor, start = base.corridor(base.main_corridor)
@@ -348,12 +355,11 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
 
     if placement == PLACE_BOTTOM:
         if no_vert_offset:
-            # XXX: This assumes all legs are 2 rooms high. Oops.
-            base.place_on(leg, offset=coord.Coord(0, Room().height*2))
+            base.place_on(leg, offset=coord.Coord(0, vert_offset))
         else:
             base = shape.underneath(base, leg, overlap=1, collect=True)
         new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
-        corridor_offset = coord.Coord(y_offset, Room().height)
+        corridor_offset = coord.Coord(y_offset, vert_offset - Room().height)
         base.append(new_corridor, corridor_offset)
     elif placement == PLACE_TOP:
         if no_vert_offset:
@@ -367,7 +373,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     if placement == PLACE_TOP:
         start = coord.Coord(corridor_offset.x - 1, leg.height() - 1)
     elif placement == PLACE_BOTTOM:
-        start = coord.Coord(corridor_offset.x - 1, Room().height + 1)
+        start = coord.Coord(corridor_offset.x - 1, vert_offset - Room().height + 1)
 
     new_shape = shape.Shape(width=3, height=Room().height, fill="#")
     new_shape.draw_on(shape.Shape(width=1, height=Room().height, fill="."), offset=coord.Coord(1, 0), check_conflict=False)
@@ -442,9 +448,8 @@ def build_H (base=None):
     if base is None:
         base = base_builder()
 
-    # Ordering matters, unfortunately. See XXX in attach_leg.
-    base = build_U(base, placement=PLACE_BOTTOM)
     base = build_U(base, placement=PLACE_TOP)
+    base = build_U(base, placement=PLACE_BOTTOM)
 
     return base
 
