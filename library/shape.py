@@ -560,6 +560,13 @@ class Shape (object):
 
         return new_shape
 
+    def wipe (self):
+        """
+        Iterate over the entire canvas and set every square to None.
+        """
+        for spot, glyph in self:
+            self[spot] = None
+
     def __iter__ (self):
         """
         Provide an iterator that returns (Coord(x, y), self[x][y]) for each
