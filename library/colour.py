@@ -18,7 +18,9 @@ class BaseColour (object):
         """
         Determines if this colour is a "base colour", that is, one of the 16
         "allowed" colours that are defined by Urwid. Colours that are not "base"
-        are those that are in hexadecimal notation (#fff, for instance)
+        are those that are in hexadecimal notation (#fff, for instance),
+        grey-scale notation (g40, g#cc, for instance), or specific colour
+        numbers (h8, for instance).
         """
         if self._colour.startswith("g") or self._colour.startswith("#") or self.colour.startswith("h"):
             return False
