@@ -55,7 +55,7 @@ class TextFeature (Feature):
         """
         self._glyph = glyph
         self._colour = colour
-        Feature.__init__(name=name, description=description, traversable=traversable)
+        Feature.__init__(self, name=name, description=description, traversable=traversable)
 
     def glyph (self):
         return self._glyph
