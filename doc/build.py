@@ -32,7 +32,6 @@ def main (args):
 
     parsed = docparser(conf)
 
-    modules = []
     previous_module = None
 
     class Scope:

@@ -107,7 +107,21 @@ Table of Contents
     m. `get_random_last_name`_
     n. `get_random_fullname`_
 
-7. `Documentation parser`_
+7. `Colour and style`_
+
+  A. `Colours`_
+
+    a. `BaseColour`_
+    b. `Colour`_
+
+8. `Feature representations`_
+
+  A. `Features`_
+
+    a. `Feature`_
+    b. `TextFeature`_
+
+9. `Documentation parser`_
 
   A. `Classes`_
 
@@ -119,7 +133,7 @@ Table of Contents
 
     a. `docparser`_
 
-8. `Index`_
+10. `Index`_
 
 .. _Shape module:
 
@@ -2718,6 +2732,219 @@ first and last names.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. _Colour and style:
+
+Colour and style
+================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Colours:
+
+Colours
+-------
+
+Classes
+#######
+
+- `BaseColour`_.
+- `Colour`_.
+
+.. _BaseColour:
+
+class *BaseColour*
+^^^^^^^^^^^^^^^^^^
+
+An agnostic representation of a basic, single-state colour, as used by
+Urwid.
+
+Methods
+#######
+
+1. `BaseColour::__init__`_.
+2. `BaseColour::is_base`_.
+3. `BaseColour::__rerp__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _BaseColour::__init__:
+
+**BaseColour::__init__** (self, colour_name)
+
+Create a new colour.
+
+:``colour_name``: The representation of the colour.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _BaseColour::is_base:
+
+**BaseColour::is_base** (self)
+
+Determines if this colour is a "base colour", that is, one of the 16
+"allowed" colours that are defined by Urwid. Colours that are not "base"
+are those that are in hexadecimal notation (#fff, for instance)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _BaseColour::__rerp__:
+
+**BaseColour::__rerp__** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Colour:
+
+class *Colour*
+^^^^^^^^^^^^^^
+
+A representation of agnostic colours in a variety of configurations:
+individually as either foreground or background colours, combined with
+foreground and background colours, individually as a style, or any
+combination of the previous with a style.
+
+Methods
+#######
+
+1. `Colour::__init__`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Colour::__init__:
+
+**Colour::__init__** (self, foreground=None, background=None, style=None)
+
+Create a new colour representation.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Feature representations:
+
+Feature representations
+=======================
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Features:
+
+Features
+--------
+
+Classes
+#######
+
+- `Feature`_.
+
+ - `TextFeature`_.
+
+
+.. _Feature:
+
+class *Feature*
+^^^^^^^^^^^^^^^
+
+A way of representing a specific feature in an agnostic manner. This should
+be subclassed for the different interfaces, never used directly.
+
+Methods
+#######
+
+1. `Feature::__init__`_.
+2. `Feature::description`_.
+3. `Feature::name`_.
+4. `Feature::traversable`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Feature::__init__:
+
+**Feature::__init__** (self, name, description, traversable=False)
+
+Create a new feature. 
+
+:``name``: The name of the feature, which will be used when describing the
+           feature upon examination.
+:``description``: This string value will be used to describe the feature
+           upon examination.
+:``traversable``: If True, this glyph is traversable.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Feature::description:
+
+**Feature::description** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Feature::name:
+
+**Feature::name** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _Feature::traversable:
+
+**Feature::traversable** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _TextFeature:
+
+class *TextFeature*
+^^^^^^^^^^^^^^^^^^^
+
+A representation of an agnostic ``Feature`` as text. This includes a
+variety of symbols and colours.
+
+Methods
+#######
+
+1. `TextFeature::__init__`_.
+2. `TextFeature::colour`_.
+3. `TextFeature::glyph`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _TextFeature::__init__:
+
+**TextFeature::__init__** (self, glyph=None, colour=None, name='', description='', traversable=False)
+
+Create a new TextFeature.
+
+:``glyph``: The glyph used to represent this feature.
+:``colour``: The colour used to colour this feature. Should be an
+             instance of Colour.
+:``name``: The name of this feature.
+:``description``: The description of this feature.
+:``traversable``: Whether or not this glyph can be traversed by the
+                  player or non-player characters.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _TextFeature::colour:
+
+**TextFeature::colour** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _TextFeature::glyph:
+
+**TextFeature::glyph** (self)
+
+*Method undocumented*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. _Documentation parser:
 
 Documentation parser
@@ -3049,13 +3276,19 @@ Index
 +----------------------------------------+----------------------------------------+
 |`AutoSize`_                             |`AutoSize::__init__`_                   |
 +----------------------------------------+----------------------------------------+
-|`AutoSize::valid`_                      |`Box`_                                  |
+|`AutoSize::valid`_                      |`BaseColour`_                           |
++----------------------------------------+----------------------------------------+
+|`BaseColour::__init__`_                 |`BaseColour::is_base`_                  |
++----------------------------------------+----------------------------------------+
+|`BaseColour::__rerp__`_                 |`Box`_                                  |
 +----------------------------------------+----------------------------------------+
 |`Box::__init__`_                        |`Box::perimeter`_                       |
 +----------------------------------------+----------------------------------------+
 |`build_from_file_name`_                 |`check_name_db`_                        |
 +----------------------------------------+----------------------------------------+
-|`coinflip`_                             |`Column`_                               |
+|`coinflip`_                             |`Colour`_                               |
++----------------------------------------+----------------------------------------+
+|`Colour::__init__`_                     |`Column`_                               |
 +----------------------------------------+----------------------------------------+
 |`Column::__init__`_                     |`Coord`_                                |
 +----------------------------------------+----------------------------------------+
@@ -3077,153 +3310,161 @@ Index
 +----------------------------------------+----------------------------------------+
 |`Document::__iter__`_                   |`Document::__str__`_                    |
 +----------------------------------------+----------------------------------------+
-|`get_database`_                         |`get_databases`_                        |
+|`Feature`_                              |`Feature::__init__`_                    |
 +----------------------------------------+----------------------------------------+
-|`get_random_female_name`_               |`get_random_first_name`_                |
+|`Feature::description`_                 |`Feature::name`_                        |
 +----------------------------------------+----------------------------------------+
-|`get_random_fullname`_                  |`get_random_lastname_combo`_            |
+|`Feature::traversable`_                 |`get_database`_                         |
 +----------------------------------------+----------------------------------------+
-|`get_random_lastname_family`_           |`get_random_lastname_irish`_            |
+|`get_databases`_                        |`get_random_female_name`_               |
 +----------------------------------------+----------------------------------------+
-|`get_random_lastname_lowerclass`_       |`get_random_lastname_middleclass`_      |
+|`get_random_first_name`_                |`get_random_fullname`_                  |
 +----------------------------------------+----------------------------------------+
-|`get_random_lastname_nameson`_          |`get_random_lastname_scottish`_         |
+|`get_random_lastname_combo`_            |`get_random_lastname_family`_           |
 +----------------------------------------+----------------------------------------+
-|`get_random_lastname_simple`_           |`get_random_lastname_upperclass`_       |
+|`get_random_lastname_irish`_            |`get_random_lastname_lowerclass`_       |
 +----------------------------------------+----------------------------------------+
-|`get_random_last_name`_                 |`get_random_male_name`_                 |
+|`get_random_lastname_middleclass`_      |`get_random_lastname_nameson`_          |
 +----------------------------------------+----------------------------------------+
-|`Module`_                               |`Module::__init__`_                     |
+|`get_random_lastname_scottish`_         |`get_random_lastname_simple`_           |
 +----------------------------------------+----------------------------------------+
-|`num_databases`_                        |`one_chance_in`_                        |
+|`get_random_lastname_upperclass`_       |`get_random_last_name`_                 |
 +----------------------------------------+----------------------------------------+
-|`parse_spec`_                           |`Person`_                               |
+|`get_random_male_name`_                 |`Module`_                               |
 +----------------------------------------+----------------------------------------+
-|`Person::__init__`_                     |`Person::chance_of_children`_           |
+|`Module::__init__`_                     |`num_databases`_                        |
 +----------------------------------------+----------------------------------------+
-|`Person::chance_of_spouse`_             |`Person::check_has_relative`_           |
+|`one_chance_in`_                        |`parse_spec`_                           |
 +----------------------------------------+----------------------------------------+
-|`Person::create_child`_                 |`Person::create_spouse`_                |
+|`Person`_                               |`Person::__init__`_                     |
 +----------------------------------------+----------------------------------------+
-|`Person::describe`_                     |`Person::describe_hair`_                |
+|`Person::chance_of_children`_           |`Person::chance_of_spouse`_             |
 +----------------------------------------+----------------------------------------+
-|`Person::describe_relations`_           |`Person::get_fullname`_                 |
+|`Person::check_has_relative`_           |`Person::create_child`_                 |
 +----------------------------------------+----------------------------------------+
-|`Person::get_mirrored_gender`_          |`Person::get_name`_                     |
+|`Person::create_spouse`_                |`Person::describe`_                     |
 +----------------------------------------+----------------------------------------+
-|`Person::get_relative`_                 |`Person::has_alibi_witness`_            |
+|`Person::describe_hair`_                |`Person::describe_relations`_           |
 +----------------------------------------+----------------------------------------+
-|`Person::has_children`_                 |`Person::is_married`_                   |
+|`Person::get_fullname`_                 |`Person::get_mirrored_gender`_          |
 +----------------------------------------+----------------------------------------+
-|`Person::is_servant`_                   |`Person::set_alibi`_                    |
+|`Person::get_name`_                     |`Person::get_relative`_                 |
 +----------------------------------------+----------------------------------------+
-|`Person::set_random_age`_               |`Person::set_random_hair_colour`_       |
+|`Person::has_alibi_witness`_            |`Person::has_children`_                 |
 +----------------------------------------+----------------------------------------+
-|`Person::set_random_last_name`_         |`Person::set_relative`_                 |
+|`Person::is_married`_                   |`Person::is_servant`_                   |
 +----------------------------------------+----------------------------------------+
-|`Person::__str__`_                      |`RectangleIterator`_                    |
+|`Person::set_alibi`_                    |`Person::set_random_age`_               |
 +----------------------------------------+----------------------------------------+
-|`RectangleIterator::__init__`_          |`Section`_                              |
+|`Person::set_random_hair_colour`_       |`Person::set_random_last_name`_         |
 +----------------------------------------+----------------------------------------+
-|`Section::__init__`_                    |`Shape`_                                |
+|`Person::set_relative`_                 |`Person::__str__`_                      |
 +----------------------------------------+----------------------------------------+
-|`Shape::__init__`_                      |`Shape::column`_                        |
+|`RectangleIterator`_                    |`RectangleIterator::__init__`_          |
 +----------------------------------------+----------------------------------------+
-|`Shape::draw_on`_                       |`Shape::height`_                        |
+|`Section`_                              |`Section::__init__`_                    |
 +----------------------------------------+----------------------------------------+
-|`Shape::normalise`_                     |`Shape::row`_                           |
+|`Shape`_                                |`Shape::__init__`_                      |
 +----------------------------------------+----------------------------------------+
-|`Shape::section`_                       |`Shape::size`_                          |
+|`Shape::column`_                        |`Shape::draw_on`_                       |
 +----------------------------------------+----------------------------------------+
-|`Shape::trim`_                          |`Shape::width`_                         |
+|`Shape::height`_                        |`Shape::normalise`_                     |
 +----------------------------------------+----------------------------------------+
-|`Shape::wipe`_                          |`Shape::__getitem__`_                   |
+|`Shape::row`_                           |`Shape::section`_                       |
 +----------------------------------------+----------------------------------------+
-|`Shape::__iter__`_                      |`Shape::__setitem__`_                   |
+|`Shape::size`_                          |`Shape::trim`_                          |
 +----------------------------------------+----------------------------------------+
-|`Shape::__str__`_                       |`ShapeCollection`_                      |
+|`Shape::width`_                         |`Shape::wipe`_                          |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::__init__`_            |`ShapeCollection::append`_              |
+|`Shape::__getitem__`_                   |`Shape::__iter__`_                      |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::column`_              |`ShapeCollection::combine`_             |
+|`Shape::__setitem__`_                   |`Shape::__str__`_                       |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::copy`_                |`ShapeCollection::draw_on`_             |
+|`ShapeCollection`_                      |`ShapeCollection::__init__`_            |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::extend`_              |`ShapeCollection::height`_              |
+|`ShapeCollection::append`_              |`ShapeCollection::column`_              |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::insert`_              |`ShapeCollection::offset`_              |
+|`ShapeCollection::combine`_             |`ShapeCollection::copy`_                |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::place_on`_            |`ShapeCollection::pop`_                 |
+|`ShapeCollection::draw_on`_             |`ShapeCollection::extend`_              |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::prioritise`_          |`ShapeCollection::reverse`_             |
+|`ShapeCollection::height`_              |`ShapeCollection::insert`_              |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::reversed`_            |`ShapeCollection::row`_                 |
+|`ShapeCollection::offset`_              |`ShapeCollection::place_on`_            |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::size`_                |`ShapeCollection::sort`_                |
+|`ShapeCollection::pop`_                 |`ShapeCollection::prioritise`_          |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::width`_               |`ShapeCollection::__getitem__`_         |
+|`ShapeCollection::reverse`_             |`ShapeCollection::reversed`_            |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::__iter__`_            |`ShapeCollection::__len__`_             |
+|`ShapeCollection::row`_                 |`ShapeCollection::size`_                |
 +----------------------------------------+----------------------------------------+
-|`ShapeCollection::__setitem__`_         |`ShapeColumn`_                          |
+|`ShapeCollection::sort`_                |`ShapeCollection::width`_               |
 +----------------------------------------+----------------------------------------+
-|`ShapeColumn::col`_                     |`ShapeColumn::copy`_                    |
+|`ShapeCollection::__getitem__`_         |`ShapeCollection::__iter__`_            |
 +----------------------------------------+----------------------------------------+
-|`ShapeColumn::parent`_                  |`ShapeColumn::__getitem__`_             |
+|`ShapeCollection::__len__`_             |`ShapeCollection::__setitem__`_         |
 +----------------------------------------+----------------------------------------+
-|`ShapeColumn::__iter__`_                |`ShapeColumn::__repr__`_                |
+|`ShapeColumn`_                          |`ShapeColumn::col`_                     |
 +----------------------------------------+----------------------------------------+
-|`ShapeColumn::__setitem__`_             |`ShapeColumn::__str__`_                 |
+|`ShapeColumn::copy`_                    |`ShapeColumn::parent`_                  |
 +----------------------------------------+----------------------------------------+
-|`ShapeCoord`_                           |`ShapeCoord::height`_                   |
+|`ShapeColumn::__getitem__`_             |`ShapeColumn::__iter__`_                |
 +----------------------------------------+----------------------------------------+
-|`ShapeCoord::size`_                     |`ShapeCoord::width`_                    |
+|`ShapeColumn::__repr__`_                |`ShapeColumn::__setitem__`_             |
 +----------------------------------------+----------------------------------------+
-|`ShapeCoord::__getattribute__`_         |`ShapeError`_                           |
+|`ShapeColumn::__str__`_                 |`ShapeCoord`_                           |
 +----------------------------------------+----------------------------------------+
-|`ShapeRow`_                             |`ShapeRow::copy`_                       |
+|`ShapeCoord::height`_                   |`ShapeCoord::size`_                     |
 +----------------------------------------+----------------------------------------+
-|`ShapeRow::parent`_                     |`ShapeRow::row`_                        |
+|`ShapeCoord::width`_                    |`ShapeCoord::__getattribute__`_         |
 +----------------------------------------+----------------------------------------+
-|`ShapeRow::__getitem__`_                |`ShapeRow::__iter__`_                   |
+|`ShapeError`_                           |`ShapeRow`_                             |
 +----------------------------------------+----------------------------------------+
-|`ShapeRow::__repr__`_                   |`ShapeRow::__setitem__`_                |
+|`ShapeRow::copy`_                       |`ShapeRow::parent`_                     |
 +----------------------------------------+----------------------------------------+
-|`ShapeRow::__str__`_                    |`Size`_                                 |
+|`ShapeRow::row`_                        |`ShapeRow::__getitem__`_                |
 +----------------------------------------+----------------------------------------+
-|`Size::__init__`_                       |`split_escaped_delim`_                  |
+|`ShapeRow::__iter__`_                   |`ShapeRow::__repr__`_                   |
 +----------------------------------------+----------------------------------------+
-|`SuspectList`_                          |`SuspectList::__init__`_                |
+|`ShapeRow::__setitem__`_                |`ShapeRow::__str__`_                    |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::add_child`_               |`SuspectList::add_hair_colours`_        |
+|`Size`_                                 |`Size::__init__`_                       |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::add_honorifics`_          |`SuspectList::add_occupation`_          |
+|`split_escaped_delim`_                  |`SuspectList`_                          |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::add_relatives`_           |`SuspectList::add_spouse`_              |
+|`SuspectList::__init__`_                |`SuspectList::add_child`_               |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::create_alibis`_           |`SuspectList::create_paired_alibi`_     |
+|`SuspectList::add_hair_colours`_        |`SuspectList::add_honorifics`_          |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::ensure_unique_names`_     |`SuspectList::get_cleared_suspects`_    |
+|`SuspectList::add_occupation`_          |`SuspectList::add_relatives`_           |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::get_create_alibis`_       |`SuspectList::get_murderer`_            |
+|`SuspectList::add_spouse`_              |`SuspectList::create_alibis`_           |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::get_suspect`_             |`SuspectList::get_suspect_list`_        |
+|`SuspectList::create_paired_alibi`_     |`SuspectList::ensure_unique_names`_     |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::get_victim`_              |`SuspectList::is_murderer`_             |
+|`SuspectList::get_cleared_suspects`_    |`SuspectList::get_create_alibis`_       |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::is_victim`_               |`SuspectList::no_of_suspects`_          |
+|`SuspectList::get_murderer`_            |`SuspectList::get_suspect`_             |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::pick_murderer`_           |`SuspectList::pick_victim`_             |
+|`SuspectList::get_suspect_list`_        |`SuspectList::get_victim`_              |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::print_alibis`_            |`SuspectList::print_suspects`_          |
+|`SuspectList::is_murderer`_             |`SuspectList::is_victim`_               |
 +----------------------------------------+----------------------------------------+
-|`SuspectList::real_no_of_suspects`_     |`SuspectList::update_child`_            |
+|`SuspectList::no_of_suspects`_          |`SuspectList::pick_murderer`_           |
 +----------------------------------------+----------------------------------------+
-|`underneath`_                           |`WeightedDatabase`_                     |
+|`SuspectList::pick_victim`_             |`SuspectList::print_alibis`_            |
 +----------------------------------------+----------------------------------------+
-|`WeightedDatabase::random`_             |`WeightedDatabase::random_pick`_        |
+|`SuspectList::print_suspects`_          |`SuspectList::real_no_of_suspects`_     |
 +----------------------------------------+----------------------------------------+
-|`WeightedDatabase::random_pop`_         |`WeightedDatabase::total_weight`_       |
+|`SuspectList::update_child`_            |`TextFeature`_                          |
 +----------------------------------------+----------------------------------------+
-|`WeightedString`_                       |`WeightedString::__init__`_             |
+|`TextFeature::__init__`_                |`TextFeature::colour`_                  |
++----------------------------------------+----------------------------------------+
+|`TextFeature::glyph`_                   |`underneath`_                           |
++----------------------------------------+----------------------------------------+
+|`WeightedDatabase`_                     |`WeightedDatabase::random`_             |
++----------------------------------------+----------------------------------------+
+|`WeightedDatabase::random_pick`_        |`WeightedDatabase::random_pop`_         |
++----------------------------------------+----------------------------------------+
+|`WeightedDatabase::total_weight`_       |`WeightedString`_                       |
 +----------------------------------------+----------------------------------------+

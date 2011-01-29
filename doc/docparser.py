@@ -169,7 +169,7 @@ class Document (object):
         """
         Yields a tuple of three values: ``module``, ``section`` and ``object``.
         Some or all of these may be ``None``. Specifically, iteration begins by
-        yielding (``Module``, ``None``, ``None``)``; it then steps into the
+        yielding (``Module``, ``None``, ``None``); it then steps into the
         module and yields (``Module``, ``Section``, ``None``); it then steps
         into the section and yields (``Module``, ``Section``, ``Obj``) for each
         class and method the section defines, if any; finally, once it has
