@@ -6,25 +6,23 @@ class BaseColour (object):
     Urwid.
     """
     _colour = None
-    def __init__ (self, colour_name):
+    _colour_id = None
+    def __init__ (self, colour_name, colour_id):
         """
         Create a new colour.
 
         :``colour_name``: The representation of the colour.
+        :``colour_id``: The specific identifier for this colour.
         """
         self._colour = colour_name
+        self._colour_id = colour_id
 
     def is_base (self):
         """
-        Determines if this colour is a "base colour", that is, one of the 16
-        "allowed" colours that are defined by Urwid. Colours that are not "base"
-        are those that are in hexadecimal notation (#fff, for instance),
-        grey-scale notation (g40, g#cc, for instance), or specific colour
-        numbers (h8, for instance).
+        Determines if this colour is a "base colour", that is, one of the
+        "allowed" colours that are defined for use on the console. Currently,
+        only these colours are supported, so this is always true.
         """
-        if self._colour.startswith("g") or self._colour.startswith("#") or self.colour.startswith("h"):
-            return False
-
         return True
 
     def lighten (self):
@@ -32,13 +30,24 @@ class BaseColour (object):
         Performs an in-place lightening of the current colour. This function can
         only be currently applied to colours that return True for ``is_base()``.
         """
-        if "dark" in self._colour:
-            self._colour = self._colour.replace("dark", "light")
+        if self._colour_id > 8:
+            return
+
+        if self._colour == "brown":
+            self._colour = "yellow"
+            self._colour_id = Colours.YELLOW._colour_id
+        elif self._colour == "lightgray":
+            self._colour = "white"
+            self._colour_id = Colours.WHITE._colour_id
+        elif self._colour == "darkgray":
+            self._colour = "lightgray"
+            self._colour_id = Colours.LIGHTGRAY._colour_id
+        elif self._colour == "black":
+            self._colour = "darkgray"
+            self._colour_id = Colours.DARKGRAY._colour_id
         else:
-            if self._colour == "brown":
-                self._colour = "yellow"
-            elif self._colour == "light gray":
-                self._colour = "white"
+            self._colour = "light" + self._colour
+            self._colour_id += 8
 
     def lightened (self):
         """
@@ -53,13 +62,24 @@ class BaseColour (object):
         Perform an in-place darkening of the current colour. This function can
         only be applied to colours that return True for ``is_base()``.
         """
-        if "light" in self._colour:
-            self._colour = self._colour.replace("light", "dark")
+        if self._colour_id < 8 or self._colour_id > 16:
+            return
+
+        if self._colour == "yellow":
+            self._colour = "brown"
+            self._colour_id = Colours.BROWN._colour_id
+        elif self._colour == "white":
+            self._colour = "lightgray"
+            self._colour_id = Colours.LIGHTGRAY._colour_id
+        elif self._colour == "lightgray":
+            self._colour = "darkgray"
+            self._colour_id = Colours.DARKGRAY._colour_id
+        elif self._colour == "darkgray":
+            self._colour = "black"
+            self._colour_id = Colours.BLACK._colour_id
         else:
-            if self._colour == "yellow":
-                self._colour = "brown"
-            elif self._colour == "white":
-                self._colour = "light gray"
+            self._colour = self._colour.replace("light", "")
+            self._colour_id -= 8
 
     def darkened (self):
         """
@@ -73,11 +93,11 @@ class BaseColour (object):
         """
         Return a copy of the current colour.
         """
-        c = BaseColour(self._colour)
+        c = BaseColour(self._colour, self._colour_id)
         return c
 
-    def __rerp__ (self):
-        return "<Colour: %s>" % self._colour
+    def __repr__ (self):
+        return "<Colour %s: %s>" % (self._colour_id, self._colour)
 
     def __str__ (self):
         return self._colour
@@ -92,10 +112,10 @@ class BaseColour (object):
                     with the Colour's current foreground colour.
         """
         if isinstance(other, BaseColour):
-            return cmp(self._colour, other._colour)
+            return cmp(self._colour_id, other._colour_id)
         elif isinstance(other, Colour):
             if hasattr(other._foreground, "_colour"):
-                return cmp(self._colour, other._foreground._colour)
+                return cmp(self._colour_id, other._foreground._colour_id)
 
         return cmp(self, other)
 
@@ -110,19 +130,14 @@ class ColourLibrary (object):
         """
         self._colours = []
 
-    def add (self, name, colour=None):
+    def add (self, name, id):
         """
         Include a specific colour in the library.
 
         :``name``: The name of the colour.
-        :``colour``: An instance of BaseColour. If ``None``, a new BaseColour
-                     will be initialised using ``name`` as the colour name.
+        :``id``: The identifier for the colour.
         """
-        if colour is None:
-            colour = BaseColour(name)
-
-        if not isinstance(colour, BaseColour):
-            colour = BaseColour(colour)
+        colour = BaseColour(name, id)
 
         self._colours.append(colour)
 
@@ -146,25 +161,22 @@ class ColourLibrary (object):
 
 Colours = ColourLibrary()
 
-Colours.add("black")
-Colours.add("blue", "dark blue")
-Colours.add("green", "dark green")
-Colours.add("cyan", "dark cyan")
-Colours.add("red", "dark red")
-Colours.add("magenta", "dark magenta")
-Colours.add("brown")
-Colours.add("lightgray", "light gray")
-Colours.add("lightgrey", "light gray")
-Colours.add("darkgray", "dark gray")
-Colours.add("darkgrey", "dark gray")
-Colours.add("lightblue", "light blue")
-Colours.add("lightblue", "light green")
-Colours.add("lightcyan", "light cyan")
-Colours.add("lightred", "light red")
-Colours.add("lightmagenta", "light magenta")
-Colours.add("yellow")
-Colours.add("white")
-Colours.add("default")
+Colours.add("black", 0)
+Colours.add("blue", 1)
+Colours.add("green", 2)
+Colours.add("cyan", 3)
+Colours.add("red", 4)
+Colours.add("magenta", 5)
+Colours.add("brown", 6)
+Colours.add("lightgray", 7)
+Colours.add("darkgray", 8)
+Colours.add("lightblue", 9)
+Colours.add("lightgreen", 10)
+Colours.add("lightcyan", 11)
+Colours.add("lightred", 12)
+Colours.add("lightmagenta", 13)
+Colours.add("yellow", 14)
+Colours.add("white", 15)
 
 Colors = Colours
 
