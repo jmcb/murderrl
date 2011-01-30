@@ -63,3 +63,15 @@ current session. In some instances it may actually do nothing.
 import curse, win32
 
 __provides__ = curse, win32
+
+def select (priority="curse"):
+    """
+    Select a supported interface.
+    """
+    if not curse.UNAVAILABLE and (priority == "curse" or win32.UNAVAILABLE):
+        return curse
+
+    if not win32.UNAVAILABLE and (priority == "win32" or curse.UNAVAILABLE):
+        return win32
+
+    return None
