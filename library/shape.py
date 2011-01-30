@@ -567,6 +567,16 @@ class Shape (object):
         for spot, glyph in self:
             self[spot] = None
 
+    def center (self):
+        """
+        Return a coordinate roughly equivalent to the centre of the image. This
+        relies on the assumption that the height and width are both equal;
+        otherwise, there will be a few rows or columsn out on either side.
+        """
+        return coord.Coord(self.height()/2, self.width()/2)
+
+    centre = center
+
     def __iter__ (self):
         """
         Provide an iterator that returns (Coord(x, y), self[x][y]) for each
