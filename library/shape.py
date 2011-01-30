@@ -502,6 +502,42 @@ class Shape (object):
             while len(self._canvas) > height:
                 self._canvas.pop(pop)
 
+    def pad (self, num_cols=0, num_rows=0, fill=None):
+        """
+        Like ``normalise``, this function increases the width and height of the
+        current shape. However, unlike ``normalise``, ``pad`` performs
+        operations to the left and to the top, rather than to the bottom and to
+        the right.
+
+        :``num_cols``: The number of columns to pad the shape to. *Default
+                       0*.
+        :``num_rows``: The number of rows to pad the shape to. *Default 0*.
+        :``fill``: The character to use as fill. *Default None*.
+        """
+        assert fill is None or len(fill) == 1
+
+        if num_cols == 0 and num_rows == 0:
+            return
+
+        if num_cols <= self.width() and num_rows <= self.height():
+            return
+
+        if self._canvas == []:
+            self._canvas = [[]]
+
+        if num_cols:
+            for i in xrange(len(self._canvas)):
+                while len(self._canvas[i]) < num_cols:
+                    self._canvas[i].insert(0, fill)
+        if num_rows:
+            if not num_cols:
+                num_cols = self.width()
+            while len(self._canvas) < num_rows:
+                new_row = []
+                while len(new_row) < num_cols:
+                    new_row.append(fill)
+                self._canvas.insert(0, new_row)
+
     def draw_on (self, shape, offset=coord.Coord(0, 0), check_conflict=True, conflict_error=False):
         """
         Attempt to draw Shape instance ``shape`` on top of self, starting at
