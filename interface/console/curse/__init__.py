@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-_curse = None
-
 try:
-    import _curse
-except ImportError:
-    pass
+    from _curse import *
+except:
+    put, get, clear, init, deinit = [lambda *a: None] * 5

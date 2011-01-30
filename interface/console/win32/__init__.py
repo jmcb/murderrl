@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-_win32 = None
-
 try:
-    import _win32
+    from _win32 import *
 except:
-    pass
+    put, get, clear, init, deinit = [lambda *a: None] * 5
