@@ -1,2 +1,2 @@
 #!/usr/bin/env python
-import features
+import features, console

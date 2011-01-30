@@ -4,7 +4,7 @@ import library.coord as coord
 def put (char, c, colour=None):
     pass
 
-def get (err=False):
+def get (err=False, block=False):
     pass
 
 def clear (char=None, colour=None):
@@ -18,4 +18,7 @@ def init ():
     pass
 
 def deinit ():
+    pass
+
+def size ():
     pass

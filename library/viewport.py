@@ -53,8 +53,6 @@ class ViewPort (object):
         if start < (0, 0):
             actual_start = coord.Coord(0, 0)
         if stop > size:
-            import pdb
-            pdb.set_trace()
             actual_stop = coord.Coord(size)
 
         print actual_start, actual_stop

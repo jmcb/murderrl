@@ -20,17 +20,20 @@ print the character.
         the bounds of the screen will raise an exception.
 :``colour``: An instance of library.colour.Colour. *Default None*.
 
-get (err=False)
+get (err=False, block=False)
 ==================
 
-Attempts to fetch a character from the standard input in a non-blocking manner.
-If ``err`` is True, an exception will be raised if the function returns
-before getting information from the standard input; otherwise, None will be
-returned.
+Attempts to fetch a character from the standard input in a non-blocking manner
+if ``block`` is True, or a blocking manner otherwise.  If ``err`` is True, an
+exception will be raised if the function returns before getting information from
+the standard input; otherwise, None will be returned.
 
 :``err``: If ``True``, the function will raise an InputError exception when
           achieving the end of the non-blocking read. If ``False``, ``None``
-          will be returned instead.
+          will be returned instead. *Default False*.
+:``block``: If ``True``, the function will block input until input is gathered.
+            Otherwise, it will return immediately if no input is available.
+            *Default False*.
 
 clear (char=None, colour=None)
 ==============================
