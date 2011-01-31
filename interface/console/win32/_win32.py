@@ -14,10 +14,6 @@ STD_ERROR_HANDLE = -12
 WAIT_TIMEOUT = 0x102
 WAIT_ABANDONED = 0x80
 
-class DOSCoord(coord.Coord):
-    def as_dos (self):
-        return _COORD(self.x, self.y)
-
 class _COORD(ctypes.Structure):
     _fields_ = [
         ("X", ctypes.c_short),
@@ -131,20 +127,23 @@ def _SetConsoleCursorInfo (size=1, visible=True):
     cursor_info.bVisible = ctypes.c_bool(visible)
     return ctypes.windll.kernel32.SetConsoleCursorInfo(_STDOUT(), cursor_info)
 
-def _SetConsoleSize (size=coord.Size(80, 25)):
-    c = DOSCoord(size).as_dos()
+def _SetConsoleSize (c=None):
+    if c is None:
+        c = _GetConsoleScreenBufferInfo().dwSize
+        c.Y = 25
+
+    if not isinstance(c, _COORD):
+        c = _COORD(c.x, c.y)
+
     return ctypes.windll.kernel32.SetConsoleScreenBufferSize(_STDOUT(), c)
 
 def _goto (c):
-    c = DOSCoord(c).as_dos()
+    if not isinstance(c, _COORD):
+        c = _COORD(c.x, c.y)
     return ctypes.windll.kernel32.SetConsoleCursorPosition(_STDOUT(), c)
 
 def _getxy ():
-    c = DOSCoord()
-    act_coord = _GetConsoleScreenBufferInfo().dwCursorPosition
-    c.x = act_coord.X
-    c.y = act_coord.Y
-    return c
+    return _GetConsoleScreenBufferInfo().dwCursorPosition
 
 def put (char, c, colour=None):
     _goto(c)
@@ -180,6 +179,6 @@ def deinit ():
 def size ():
     info = _GetConsoleScreenBufferInfo().dwSize
     size = coord.Size()
-    size.width = info.x
-    size.height = info.y
+    size.width = info.X
+    size.height = info.Y
     return size
