@@ -39,6 +39,52 @@ class _CONSOLE_CURSOR_INFO (ctypes.Structure):
         ("dwSize", ctypes.c_ushort),
         ("bVisible", ctypes.c_bool)]
 
+class _FOCUS_EVENT_RECORD (ctypes.Structure):
+    _fields_ = [
+        ("bSetFocus", ctypes.c_bool)]
+
+class _UCHAR (ctypes.Union):
+    _fields_ = [
+        ("UnicodeChar", ctypes.c_char),
+        ("AsciiChar", ctypes.c_wchar)]
+
+class _KEY_EVENT_RECORD (ctypes.Structure):
+    _fields_ = [
+        ("bKeyDown", ctypes.c_bool),
+        ("wRepeatCount", ctypes.c_ushort),
+        ("wVirtualKeyCode", ctypes.c_ushort),
+        ("wVirtualScanCode", ctypes.c_ushort),
+        ("uChar", _UCHAR),
+        ("dwControlKeyState", ctypes.c_uint)]
+
+class _MENU_EVENT_RECORD (ctypes.Structure):
+    _fields_ = [
+        ("dwCommandId", ctypes.c_uint)]
+
+class _MOUSE_EVENT_RECORD (ctypes.Structure):
+    _fields_ = [
+        ("dwMousePosition", _COORD),
+        ("dwButtonState", ctypes.c_uint),
+        ("dwControlKeyState", ctypes.c_uint),
+        ("dwEventFlags", ctypes.c_uint)]
+
+class _WINDOW_BUFFER_SIZE_RECORD (ctypes.Structure):
+    _fields_ = [
+        ("dwSize", _COORD)]
+
+class _EVENT (ctypes.Union):
+    _fields_ = [
+        ("KeyEvent", _KEY_EVENT_RECORD),
+        ("MouseEvent", _MOUSE_EVENT_RECORD),
+        ("WindowBufferSizeEvent", _WINDOW_BUFFER_SIZE_RECORD),
+        ("MenuEvent", _MENU_EVENT_RECORD),
+        ("FocusEvent", _FOCUS_EVENT_RECORD)]
+
+class _INPUT_RECORD (ctypes.Structure):
+    _fields_ = [
+        ("EventType", ctypes.c_ushort),
+        ("Event", _EVENT)]
+
 class DOSBaseColour (library.colour.BaseColour):
     def __init__ (self, colour):
         super(DOSBaseColour, self).__init__(colour._colour, colour._colour_id)
