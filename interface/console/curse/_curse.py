@@ -55,7 +55,7 @@ class CursesColour (colour.Colour):
         fg, bold = CursesBaseColour(self._foreground).as_curses()
         bg = CursesBaseColour(self._background).as_curses()[0]
 
-        return curses.color_pair(fg * 8 + bg) | bold
+        return curses.color_pair((fg * 8) + bg) | bold
 
 class InputError (Exception):
     pass
@@ -87,10 +87,6 @@ def put (char, c, col=None):
             attr = _LASTCOLOUR.as_curses()
         else:
             attr = 0
-
-    curses.endwin()
-    import pdb
-    pdb.set_trace()
 
     _goto(c)
 
@@ -132,6 +128,7 @@ def init ():
     global _STDSCREEN
     _STDSCREEN = curses.initscr()
     curses.start_color()
+    _init_colours()
     curses.noecho()
     curses.cbreak()
     curses.curs_set(0)
