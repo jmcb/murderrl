@@ -196,11 +196,11 @@ class Colour (object):
         """
         assert not (foreground is None and background is None and style is None)
 
-        assert background.is_base() and background in (Colours.DEFAULT,
-           Colours.BLACK, Colours.RED, Colours.GREEN, Colours.BROWN, Colours.BLUE,
-            Colours.MAGENTA, Colours.CYAN, Colours.LIGHTGRAY)
+        assert background.is_base() and background in (Colours.BLACK,
+            Colours.RED, Colours.GREEN, Colours.BROWN, Colours.BLUE,
+            Colours.MAGENTA, Colours.CYAN, Colours.LIGHTGRAY, None)
 
-        assert style in ("bold", "underline", "blink", "standout")
+        assert style in ("bold", "underline", "blink", "standout", None)
 
         self._foreground = foreground
         self._background = background
