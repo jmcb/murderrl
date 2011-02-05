@@ -2,10 +2,11 @@
 import library.coord as coord
 import library.colour as colour
 from library.colour import Colours
-import curses
+import curses, _curses
 
 _STDSCREEN = None
 _LASTCOLOUR = None
+_COLOURS = {}
 
 class CursesBaseColour (colour.BaseColour):
     def __init__ (self, colour):
@@ -55,7 +56,7 @@ class CursesColour (colour.Colour):
         fg, bold = CursesBaseColour(self._foreground).as_curses()
         bg = CursesBaseColour(self._background).as_curses()[0]
 
-        return curses.color_pair((fg * 8) + bg) | bold
+        return curses.color_pair(_COLOURS[(fg, bg)]) | bold
 
 class InputError (Exception):
     pass
@@ -64,7 +65,7 @@ def _goto (c):
     _STDSCREEN.move(c.x, c.y)
 
 def put (char, c, col=None):
-    assert(len(char) == 1)
+    assert isinstance(char, int) or len(char) == 1
 
     global _LASTCOLOUR
 
@@ -90,7 +91,10 @@ def put (char, c, col=None):
 
     _goto(c)
 
-    _STDSCREEN.addch(ord(char), attr)
+    try:
+        _STDSCREEN.addch(ord(char), attr)
+    except _curses.error:
+        pass
 
 def get (err=False, block=False):
     if not block:
@@ -110,19 +114,24 @@ def get (err=False, block=False):
 def clear (char=None, colour=None):
     termsize = size()
 
+    if char is None:
+        char = " "
+
     for x in xrange(termsize.width):
         for y in xrange(termsize.height):
             put (char, coord.Coord(x, y), colour)
 
 def _init_colours ():
-    for a in xrange(8):
-        for b in xrange(8):
-            if a == 0 or b == 0:
-                continue
+    pair = 0
+    for bg in xrange(8):
+        for fg in xrange(8):
+            if (fg > 0) or (bg > 0):
+                pair = bg * 8 + fg
+                curses.init_pair(pair, fg, bg);
+                _COLOURS[(fg, bg)] = pair
 
-            curses.init_pair(a * 8 + b, a, b)
-
-    curses.init_pair(63, 0, 0);
+    curses.init_pair(63, 0, 0)
+    _COLOURS[(0, 0)] = 63
 
 def init ():
     global _STDSCREEN
@@ -134,6 +143,8 @@ def init ():
     curses.curs_set(0)
     _STDSCREEN.keypad(1)
 
+    return _STDSCREEN
+
 def deinit ():
     curses.nocbreak()
     _STDSCREEN.keypad(0)
@@ -141,4 +152,13 @@ def deinit ():
     curses.endwin()
 
 def size ():
-    pass
+    return coord.Size(curses.LINES, curses.COLS)
+
+def wrapper (fn):
+    try:
+        fn()
+    except:
+        deinit()
+        raise
+
+    deinit()

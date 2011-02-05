@@ -6,7 +6,7 @@ implementations. For instance, pdcurses differs to curses which differs to
 ncurses, all of which differ to the Windows API-based implementation.
 
 put (char, c, colour=None)
-==============================
+==========================
 
 Puts the contents of ``char`` on the screen at ``c.x/c.y``. It is assumed that
 ``c.x/c.y`` is within the bounds of the current screen. If ``colour`` is
@@ -21,7 +21,7 @@ print the character.
 :``colour``: An instance of library.colour.Colour. *Default None*.
 
 get (err=False, block=False)
-==================
+============================
 
 Attempts to fetch a character from the standard input in a non-blocking manner
 if ``block`` is True, or a blocking manner otherwise.  If ``err`` is True, an
@@ -62,6 +62,13 @@ deinit ()
 
 De-initialise the screen. This function is always called before closing down the
 current session. In some instances it may actually do nothing.
+
+wrapper (func)
+==============
+
+Performs screen initialisation (by calling ``init``), then begins running the
+passed function. If it encounters an error, the screen is de-initialised (via
+``deinit``), and then the error is re-raised.
 """
 import curse, win32
 

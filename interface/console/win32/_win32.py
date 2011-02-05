@@ -228,3 +228,12 @@ def size ():
     size.width = info.X
     size.height = info.Y
     return size
+
+def wrapper (fn):
+    try:
+        fn()
+    except:
+        deinit()
+        raise
+
+    deinit()

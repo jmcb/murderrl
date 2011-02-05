@@ -116,8 +116,8 @@ class BaseColour (object):
         elif isinstance(other, Colour):
             if hasattr(other._foreground, "_colour"):
                 return cmp(self._colour_id, other._foreground._colour_id)
-
-        return cmp(self, other)
+        elif other is None:
+            return cmp(self._colour_id, None)
 
 class ColourLibrary (object):
     """
