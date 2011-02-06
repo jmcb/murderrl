@@ -173,6 +173,11 @@ class Person (object):
         return True
 
     def get_alibi (self, list):
+        """
+        Returns a description of a person's alibi, if known.
+
+        :``list``: An object of type SuspectList. *Required*.
+        """
         if not self.alibi:
             return "unknown"
 
@@ -197,12 +202,19 @@ class Person (object):
         return "%s%s" % (self.title, self.get_name())
 
     def is_family (self):
+        """
+        Returns true if a person's role is ``ROLE_OWNER`` or ``ROLE_FAMILY``.
+        """
         return (self.role == ROLE_OWNER or self.role == ROLE_FAMILY)
 
     def get_relationship (self, other_idx, other = None):
         """
         Return a relationship description of the current person
         to a second person with index other_idx.
+
+        :``other_idx``: The other person's index in the suspect list. *Required*.
+        :``other``: The other person. If not none, more generic relationships
+                    ("extended family", "guest", etc.) are considered. *Default none*.
         """
         rel = self.rel
         num_range = xrange(len(rel))
@@ -480,6 +492,11 @@ class SuspectList (object):
         return self.suspects[idx]
 
     def describe_suspect (self, idx):
+        """
+        Prints a screen describing a person.
+
+        :``idx``: An index of the suspects[] list. *Required*.
+        """
         # self.get_suspect(idx).describe(self)
         p = self.get_suspect(idx)
         print p
@@ -910,7 +927,13 @@ class SuspectList (object):
 ##############################################
 # Global methods
 
-def fill (num):
+def fill (num = 0):
+    """
+    Helper method printing clear lines to fill the screen.
+    Will eventually be replaced by _clear() and _goto(x,y).
+
+    :``num``: The number of lines already printed. *Default 0*.
+    """
     if num > 24:
         return
     for i in range(num, 24):

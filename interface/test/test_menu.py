@@ -27,7 +27,8 @@ def get_rooms (num = 10):
 
 def main (num = 10):
     """
-    Generate a list of suspects and display them.
+    Generate a list of suspects and display them in a menu.
+    Choosing any of the suspects will display further information about them.
 
     :``num``: The number of suspects to be generated. *Default 10*.
     """
@@ -49,9 +50,10 @@ def main (num = 10):
 
 if __name__ == "__main__":
     """
-    Generate a list of suspects and display them.
+    Generate a list of suspects and display them in a menu.
+    Choosing any of the suspects will display further information about them.
 
-    :``max_suspects``: The number of suspects to be generated. *Default 10*.
+    :``num``: The number of suspects to be generated. *Default 10*.
     """
     import sys
 
