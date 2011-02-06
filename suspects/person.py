@@ -210,14 +210,12 @@ class Person (object):
         """
         return (self.role == ROLE_OWNER or self.role == ROLE_FAMILY)
 
-    def get_relationship (self, other_idx, other = None):
+    def get_relationship (self, other_idx):
         """
-        Return a relationship description of the current person
-        to a second person with index other_idx.
+        Return a relationship description of the current person to a second person 
+        with index other_idx. Returns None, if no direct relationship exists.
 
         :``other_idx``: The other person's index in the suspect list. *Required*.
-        :``other``: The other person. If not none, more generic relationships
-                    ("extended family", "guest", etc.) are considered. *Default none*.
         """
         rel = self.rel
         num_range = xrange(len(rel))
@@ -254,21 +252,7 @@ class Person (object):
 
                 return r[1]
 
-        if other != None:
-            if other.is_family():
-                if self.is_family():
-                    return "extended family"
-                if self.role == ROLE_GUEST:
-                    return "guest"
-                if self.role == ROLE_SERVANT:
-                    return "servant"
-            elif other.role == ROLE_GUEST:
-                if self.is_family():
-                    return "host"
-                if self.role == ROLE_GUEST:
-                    return "other guest"
-
-        return "none"
+        return None
 
     def describe_relations (self, list):
         """
@@ -499,6 +483,111 @@ class SuspectList (object):
             raise IndexError, "Index %d exceeds list of size %s." % (idx, self.no_of_suspects())
         return self.suspects[idx]
 
+    def get_extended_relationship (self, idx, other_idx):
+        """
+        Return an indirect relationship description of one person to another.
+        Assumes that a direct relationship doesn't exist and checks for in-laws
+        etc. instead.
+
+        :``idx``: The current person's index in the suspect list. *Required*.
+        :``other_idx``: The other person's index in the suspect list. *Required*.
+        """
+        p = self.get_suspect(idx)
+        rel = p.rel
+        for i in xrange(len(rel)):
+            r = rel[i]
+            p2 = self.get_suspect(r[0])
+            rel2 = p2.rel
+            for k in xrange(len(rel2)):
+                r2 = rel2[k]
+                if r2[0] == other_idx:
+                    if r[1] == REL_SPOUSE:
+                        # The other person is a parent-in-law.
+                        if r2[1] == REL_PARENT:
+                            if p.gender == 'm':
+                                return "son-in-law"
+                            else:
+                                return "daughter-in-law"
+                        elif r2[1] == REL_SIBLING:
+                            if p.gender == 'm':
+                                return "brother-in-law"
+                            else:
+                                return "sister-in-law"
+                    elif r[1] == REL_PARENT:
+                        # The other person is a grandparent.
+                        if r2[1] == REL_PARENT:
+                            if p.gender == 'm':
+                                return "grandson"
+                            else:
+                                return "granddaughter"
+                        # The other person is an aunt or uncle.
+                        elif r2[1] == REL_SIBLING:
+                            if p.gender == 'm':
+                                return "nephew"
+                            else:
+                                return "niece"
+                    elif r[1] == REL_CHILD:
+                        # The other person is a child-in-law.
+                        if r2[1] == REL_SPOUSE:
+                            if p.gender == 'm':
+                                return "father-in-law"
+                            else:
+                                return "mother-in-law"
+                        # The other person is a grandchild.
+                        elif r2[1] == REL_CHILD:
+                            if p.gender == 'm':
+                                return "grandfather"
+                            else:
+                                return "grandmother"
+                    elif r[1] == REL_SIBLING:
+                        if r2[1] == REL_SPOUSE:
+                            if p.gender == 'm':
+                                return "brother-in-law"
+                            else:
+                                return "sister-in-law"
+                        # The other person is a nephew or niece.
+                        elif r2[1] == REL_CHILD:
+                            if p.gender == 'm':
+                                return "uncle"
+                            else:
+                                return "aunt"
+        return None
+
+    def get_relationship (self, idx, other_idx, extended = False):
+        """
+        Return a relationship description of one person to another.
+
+        :``idx``: The current person's index in the suspect list. *Required*.
+        :``other_idx``: The other person's index in the suspect list. *Required*.
+        :``extended``: If true, more generic relationships ("extended family", etc.) 
+                       are considered. *Default false*.
+        """
+        p = self.get_suspect(idx)
+        r = p.get_relationship(other_idx)
+        if r != None:
+            return r
+
+        if extended:
+            r = self.get_extended_relationship(idx, other_idx)
+            if r != None:
+                return r
+
+            other = self.get_suspect(other_idx)
+            if other.is_family():
+                if p.is_family():
+                    return "extended family"
+                if p.role == ROLE_GUEST:
+                    return "guest"
+                if p.role == ROLE_SERVANT:
+                    return "servant"
+            elif other.role == ROLE_GUEST:
+                if p.is_family():
+                    return "host"
+                if p.role == ROLE_GUEST:
+                    return "other guest"
+
+        return "none"
+
     def describe_suspect (self, idx):
         """
         Prints a screen describing a person.
@@ -511,7 +600,7 @@ class SuspectList (object):
         print ""
         lcount = 2
         if idx != self.victim:
-            print "Relationship to victim:", p.get_relationship(self.victim, self.get_victim())
+            print "Relationship to victim:", self.get_relationship(idx, self.victim, True)
             lcount += 1
             desc = "Other relationships   :"
         else:
@@ -523,7 +612,7 @@ class SuspectList (object):
             if r[0] == self.victim:
                 continue
             relative = self.get_suspect(r[0])
-            print "%s %s (%s)" % (desc, relative.get_fullname(), relative.get_relationship(idx))
+            print "%s %s (%s)" % (desc, relative.get_fullname(), self.get_relationship(r[0], idx))
             lcount += 1
             if first:
                 first = False
