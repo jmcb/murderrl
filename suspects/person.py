@@ -70,15 +70,19 @@ class Person (object):
         self.occupation = ''
         self.alibi = None
 
-    def __str__ (self):
+    def __str__ (self, desc_hair = False):
         """
         Prints a single-line description of the person.
         """
         job = ''
         if self.occupation:
             job = "%s, " % self.occupation
-        return "%s (%s), %s%s, aged %s" % (self.get_fullname(),
-               self.gender, job, self.describe_hair(), self.age)
+        hair = ""
+        if desc_hair:
+            hair = "%s, " % self.describe_hair()
+
+        return "%s (%s), %s%s%s" % (self.get_fullname(),
+               self.gender, job, hair, self.age)
 
     def set_random_last_name (self, last = None):
         """
@@ -168,6 +172,18 @@ class Person (object):
 
         return True
 
+    def get_alibi (self, list):
+        if not self.alibi:
+            return "unknown"
+
+        a = self.alibi
+        witness = ""
+        if self.has_alibi_witness():
+            witness = "with %s" % list.get_suspect(a.witness).get_name()
+        else:
+            witness = "alone"
+        return "%s, %s" % (a.room, witness)
+
     def get_name (self):
         """
         Returns a person's full name, excluding titles.
@@ -179,6 +195,60 @@ class Person (object):
         Returns a person's full name, including titles.
         """
         return "%s%s" % (self.title, self.get_name())
+
+    def is_family (self):
+        return (self.role == ROLE_OWNER or self.role == ROLE_FAMILY)
+
+    def get_relationship (self, other_idx, other = None):
+        """
+        Return a relationship description of the current person
+        to a second person with index other_idx.
+        """
+        rel = self.rel
+        num_range = xrange(len(rel))
+        for i in num_range:
+            r = rel[i]
+            if r[0] == other_idx:
+                if r[1] == REL_SPOUSE:
+                    if self.gender == 'm':
+                        return "husband"
+                    else:
+                        return "wife"
+                elif r[1] == REL_ENGAGED:
+                    if self.gender == 'm':
+                        return "fiance"
+                    else:
+                        return "fiancee"
+                # The other person is a parent.
+                elif r[1] == REL_PARENT:
+                    if self.gender == 'm':
+                        return "son"
+                    else:
+                        return "daughter"
+                # The other person is a child.
+                elif r[1] == REL_CHILD:
+                    if self.gender == 'm':
+                        return "father"
+                    else:
+                        return "mother"
+
+                return r[1]
+
+        if other != None:
+            if other.is_family():
+                if self.role == ROLE_FAMILY:
+                    return "extended family"
+                if self.role == ROLE_GUEST:
+                    return "guest"
+                if self.role == ROLE_SERVANT:
+                    return "servant"
+            elif other.role == ROLE_GUEST:
+                if self.is_family():
+                    return "host"
+                if self.role == ROLE_GUEST:
+                    return "other guest"
+
+        return "none"
 
     def describe_relations (self, list):
         """
@@ -409,6 +479,54 @@ class SuspectList (object):
             raise IndexError, "Index %d exceeds list of size %s." % (idx, self.no_of_suspects())
         return self.suspects[idx]
 
+    def describe_suspect (self, idx):
+        # self.get_suspect(idx).describe(self)
+        p = self.get_suspect(idx)
+        print p
+        print ""
+        lcount = 2
+        if idx != self.victim:
+            print "Relationship to victim:", p.get_relationship(self.victim, self.get_victim())
+            lcount += 1
+            desc = "Other relationships   :"
+        else:
+            desc = "Relationships:"
+
+        first = True
+        for i in xrange(len(p.rel)):
+            r = p.rel[i]
+            if r[0] == self.victim:
+                continue
+            relative = self.get_suspect(r[0])
+            print "%s %s (%s)" % (desc, relative.get_fullname(), relative.get_relationship(idx))
+            lcount += 1
+            if first:
+                first = False
+                if idx != self.victim:
+                    desc = "                       "
+                else:
+                    desc = "              "
+
+        if first:
+            if idx != self.victim:
+                print desc, "none"
+                print ""
+                lcount += 2
+        else:
+            print ""
+            lcount += 1
+
+        print "Hair colour:", p.describe_hair()
+        lcount += 1
+        if idx == self.victim:
+            print "\nThe clue: a %s hair!" % self.get_murderer().hair
+            lcount += 2
+        else:
+            print "Alibi      :", p.get_alibi(self)
+            lcount += 1
+
+        fill(lcount)
+
     def pick_victim (self):
         """
         Randomly pick the victim. Staff are excluded.
@@ -622,16 +740,16 @@ class SuspectList (object):
                     s.occupation = random.choice(jobs_staff_female)
                 else:
                     s.occupation = random.choice(jobs_staff_male)
-            elif (s.age >= 25 and
-                    not (s.is_married() or s.has_children())):
+#            elif (s.age >= 25 and
+#                    not (s.is_married() or s.has_children())):
                 # some more exotic guests
-                if s.age < 50 and one_chance_in(10):
-                    if s.gender == 'm':
-                        s.occupation = 'actor'
-                    else:
-                        s.occupation = 'actress'
-                elif s.gender == 'm' and one_chance_in(10):
-                    s.occupation = 'painter'
+#                if s.age < 50 and one_chance_in(10):
+#                    if s.gender == 'm':
+#                        s.occupation = 'actor'
+#                    else:
+#                        s.occupation = 'actress'
+#                elif s.gender == 'm' and one_chance_in(10):
+#                    s.occupation = 'painter'
 
     def create_paired_alibi (self, p1, p2, room):
         """
@@ -717,15 +835,7 @@ class SuspectList (object):
         for i in xrange(len(alibis)):
             idx = alibis[i]
             p = self.get_suspect(idx)
-            if not p.alibi:
-                continue
-
-            a = p.alibi
-            if p.has_alibi_witness():
-                w = ", witness: %s" % self.get_suspect(a.witness).get_name()
-            else:
-                w = ""
-            print "%s: %s%s" % (p.get_name(), a.room, w)
+            print "%s: %s" % (p.get_name(), p.get_alibi(self))
 
     def add_hair_colours (self):
         """
@@ -799,6 +909,12 @@ class SuspectList (object):
 
 ##############################################
 # Global methods
+
+def fill (num):
+    if num > 24:
+        return
+    for i in range(num, 24):
+        print ""
 
 def print_header (str):
     """
