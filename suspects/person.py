@@ -906,29 +906,54 @@ class SuspectList (object):
         suspects.remove(self.victim)
         suspects.remove(self.murderer)
 
-        random.shuffle(suspects)
-        # Re-add murderer at the end of the shuffled list.
-        suspects.append(self.murderer)
-
         # First, create alibis for suspects who were together at the time.
         # For ease of computation, only consider pairs of suspects.
         # The number of pairs depends on the total number of suspects.
         N = len(suspects)
-        PAIRED = 2 * max(1, random.randint((N+1)/5, (N+1)/3))
-        # print "N: %d -> min: %d, max: %d -> pairs: %d" % (N, (N+1)/5, (N+1)/3, PAIRED/2)
-        for i in range(0, PAIRED, 2):
-            if i+1 >= N:
-                break
+        PAIRS = max(1, random.randint((N+1)/5, (N+1)/3))
+        print "N: %d -> min: %d, max: %d -> pairs: %d" % (N, (N+1)/5, (N+1)/3, PAIRS)
+        for i in xrange(0, PAIRS):
             room = rooms.pop()
-            p1   = suspects[i]
-            p2   = suspects[i+1]
-            self.create_paired_alibi(p1, p2, room)
+
+            idx1 = suspects[random.randint(0, len(suspects)-1)]
+            suspects.remove(idx1)
+            p1   = self.get_suspect(idx1)
+            # If this person has relatives, it is highly likely one of them
+            # was the witness.
+            if (coinflip() and len(p1.rel) > 0):
+                r    = p1.rel[random.randint(0, len(p1.rel)-1)]
+                idx2 = r[0]
+                p2   = self.get_suspect(idx2)
+                print "try alibi %s / %s" % (str(p1), str(p2))
+                if (idx2 != self.victim and idx2 != self.murderer
+                    and not p2.alibi):
+                    self.create_paired_alibi(idx1, idx2, room)
+                    suspects.remove(idx2)
+                    continue
+                else:
+                    if idx2 == self.victim:
+                        reason = "victim"
+                    elif idx2 == self.murderer:
+                        reason = "murderer"
+                    else:
+                        reason = "has alibi"
+                    print "not applicable (%s) -> pick random witness" % reason
+            else:
+                print "pick random witness for %s" % p1
+
+            idx2 = suspects[random.randint(0, len(suspects)-1)]
+            self.create_paired_alibi(idx1, idx2, room)
+            suspects.remove(idx2)
+
+        # Shuffle the remaining list.
+        random.shuffle(suspects)
+        # Re-add murderer at the end of the shuffled list.
+        suspects.append(self.murderer)
 
         # The remaining suspects don't have a witness.
         # This includes the murderer.
         # TODO: Sometimes allow the murderer to lie about having a witness.
-        idx_range = range(PAIRED, N)
-        for i in idx_range:
+        for i in xrange(0, len(suspects)):
             p = suspects[i]
             self.get_suspect(p).set_alibi(rooms.pop())
 
