@@ -2,7 +2,7 @@
 
 import database.database as db
 from suspects.person import *
-from menu import *
+from interface.menu import *
 
 def get_rooms (num = 10):
     """

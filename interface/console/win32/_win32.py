@@ -209,6 +209,9 @@ def get (err=False, block=False):
 def clear (char=None, colour=None):
     termsize = size()
 
+    if char is None:
+        char = " "
+
     for x in xrange(termsize.width):
         for y in xrange(termsize.height):
             put (char, coord.Coord(x, y), colour)

@@ -5,6 +5,8 @@ Set up characters, their basic traits and relationships.
 
 import random, math
 from randname import *
+# Only necessary until the OS-independent methods are in
+from interface.menu import *
 
 # Roles, in plural as they're currently only used as header listing.
 ROLE_OWNER   = 'Owners'
@@ -941,18 +943,6 @@ class SuspectList (object):
 
 ##############################################
 # Global methods
-
-def fill (num = 0):
-    """
-    Helper method printing clear lines to fill the screen.
-    Will eventually be replaced by _clear() and _goto(x,y).
-
-    :``num``: The number of lines already printed. *Default 0*.
-    """
-    if num > 24:
-        return
-    for i in range(num, 24):
-        print ""
 
 def print_header (str):
     """
