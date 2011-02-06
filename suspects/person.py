@@ -17,6 +17,7 @@ REL_SPOUSE   = 'spouse'
 REL_ENGAGED  = 'engaged'
 REL_PARENT   = 'parent'
 REL_CHILD    = 'child'
+REL_SIBLING  = 'sibling'
 
 # Hair colours
 HAIR_RED     = 'red'
@@ -243,12 +244,17 @@ class Person (object):
                         return "father"
                     else:
                         return "mother"
+                elif r[1] == REL_SIBLING:
+                    if self.gender == 'm':
+                        return "brother"
+                    else:
+                        return "sister"
 
                 return r[1]
 
         if other != None:
             if other.is_family():
-                if self.role == ROLE_FAMILY:
+                if self.is_family():
                     return "extended family"
                 if self.role == ROLE_GUEST:
                     return "guest"
@@ -525,10 +531,9 @@ class SuspectList (object):
                     desc = "              "
 
         if first:
-            if idx != self.victim:
-                print desc, "none"
-                print ""
-                lcount += 2
+            print desc, "none"
+            print ""
+            lcount += 2
         else:
             print ""
             lcount += 1
@@ -603,7 +608,7 @@ class SuspectList (object):
         curr.set_relative(self.no_of_suspects(), rel)
         self.suspects.append(spouse)
 
-    def add_child (self, parent_idx):
+    def add_child (self, parent_idx, sibling_idx):
         """
         Generates a child for a given person, and sets the necessary
         relationship.
@@ -614,7 +619,15 @@ class SuspectList (object):
         child  = parent.create_child()
         child.set_relative(parent_idx, REL_PARENT)
         parent.set_relative(self.no_of_suspects(), REL_CHILD)
+
+        # If necessary, add sibling relationship.
+        if sibling_idx != None:
+            sibling = self.get_suspect(sibling_idx)
+            child.set_relative(sibling_idx, REL_SIBLING)
+            sibling.set_relative(self.no_of_suspects(), REL_SIBLING)
+
         self.suspects.append(child)
+        return self.no_of_suspects() - 1
 
     def update_child (self, idx_parent, idx_child):
         """
@@ -679,8 +692,10 @@ class SuspectList (object):
                         curr.set_random_last_name()
 
                     children = random.randint(1,2)
+                    sibling = None
                     for k in xrange(children):
-                        self.add_child(count)
+                        sibling = self.add_child(count, sibling)
+
                         if self.no_of_suspects() >= max_persons:
                             break
 
