@@ -62,8 +62,6 @@ class Entry (object):
         """
         clear()
         self.action(self.arg)
-        if getch() == 0:
-            getch()
 
 class Menu (object):
     """

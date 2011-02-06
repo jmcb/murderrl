@@ -542,14 +542,22 @@ class SuspectList (object):
 
         print "Hair colour:", p.describe_hair()
         lcount += 1
+        has_witness = False
         if idx == self.victim:
             print "\nThe clue: a %s hair!" % self.get_murderer().hair
             lcount += 2
         else:
             print "Alibi      :", p.get_alibi(self)
             lcount += 1
+            if p.has_alibi_witness():
+                has_witness = True
+                print "\nPress 'w' to check the witness."
+                lcount += 2
 
         fill(lcount)
+        key = getch()
+        if (has_witness and key == 'w'):
+            self.describe_suspect(p.alibi.witness)
 
     def pick_victim (self):
         """
