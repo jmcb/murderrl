@@ -196,7 +196,7 @@ def get_random_lastname_lowerclass ():
     """
     if one_chance_in(5):
         return get_random_lastname_combo()
-    elif one_chance_in(3):
+    elif coinflip():
         return get_random_lastname_simple()
     else:
         return get_random_lastname_family()
