@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import msvcrt
+import interface.console
 
 def getch ():
     """
@@ -30,7 +31,7 @@ class Entry (object):
     """
     A representation of a menu entry.
     """
-    def __init__ (self, key, desc, action, arg = None):
+    def __init__ (self, key, desc, action, arg = None, key2 = None):
         """
         Initialize the entry.
 
@@ -41,10 +42,13 @@ class Entry (object):
                      that takes a single argument, namely ``arg``. *Required*.
         :``arg``: The argument that is passed to action() when the entry is activated.
                   If none, identical to ``key``. *Default none*.
+        :``key2``: An alternative activation key. *Default none*.
         """
         self.key    = key
         self.desc   = desc
         self.action = action
+        self.key2   = key2
+
         if arg == None:
             self.arg = key
         else:
@@ -55,6 +59,9 @@ class Entry (object):
         Returns the entry in the form "key - desc".
         """
         return "%s - %s" % (self.key, self.desc)
+
+    def key_matches (self, key):
+        return (self.key == key or self.key2 == key)
 
     def activate (self):
         """
@@ -110,7 +117,7 @@ class Menu (object):
 
         mlist = self.mlist
         for i in xrange(len(mlist)):
-            if mlist[i].key == key:
+            if mlist[i].key_matches(key.lower()):
                 mlist[i].activate()
                 return True
 
