@@ -61,8 +61,14 @@ class CursesColour (colour.Colour):
 class InputError (Exception):
     pass
 
+class MoveError (Exception):
+    pass
+
 def _goto (c):
-    _STDSCREEN.move(c.x, c.y)
+    try:
+        _STDSCREEN.move(c.y, c.x)
+    except _curses.error, e:
+        raise MoveError, (e, c.x, c.y)
 
 def put (char, c, col=None):
     assert isinstance(char, int) or len(char) == 1
@@ -91,8 +97,11 @@ def put (char, c, col=None):
 
     _goto(c)
 
+    if not isinstance(char, int):
+        char = ord(char)
+
     try:
-        _STDSCREEN.addch(ord(char), attr)
+        _STDSCREEN.addch(char, attr)
     except _curses.error:
         pass
 
@@ -117,8 +126,8 @@ def clear (char=None, colour=None):
     if char is None:
         char = " "
 
-    for x in xrange(termsize.width):
-        for y in xrange(termsize.height):
+    for y in xrange(termsize.width):
+        for x in xrange(termsize.height):
             put (char, coord.Coord(x, y), colour)
 
 def _init_colours ():

@@ -35,17 +35,15 @@ class ViewPort (object):
         self._left += count
 
     def down (self, count):
-        self._top -= count
-
-    def up (self, count):
         self._top += count
 
-    def __str__ (self):
+    def up (self, count):
+        self._top -= count
+
+    def sect (self):
         start = coord.Coord(self._left, self._top)
         stop = coord.Coord(self._left + self._width, self._top + self._height)
         size = self.buffer.size()
-
-        print start, stop, size
 
         actual_start = start
         actual_stop = stop
@@ -55,10 +53,8 @@ class ViewPort (object):
         if stop > size:
             actual_stop = coord.Coord(size)
 
-        print actual_start, actual_stop
-
         sect = self.buffer.section(actual_start, actual_stop)
 
         sect.pad(self._width, self._height)
 
-        return str(sect)
+        return sect
