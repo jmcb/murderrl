@@ -41,8 +41,15 @@ class ViewPort (object):
         self._top -= count
 
     def sect (self):
-        start = coord.Coord(self._left, self._top)
-        stop = coord.Coord(self._left + self._width, self._top + self._height)
+
+        left_padding = min(0, self._left)
+        top_padding = min(0, self._top)
+
+        left = max(self._left, 0)
+        top = max(self._top, 0)
+
+        start = coord.Coord(left, top)
+        stop = coord.Coord(left + self._width, top + self._height)
         size = self.buffer.size()
 
         actual_start = start
@@ -55,6 +62,14 @@ class ViewPort (object):
 
         sect = self.buffer.section(actual_start, actual_stop)
 
-        sect.pad(self._width, self._height)
+        if left_padding != 0:
+            sect.pad(num_cols=-self._width)
+        elif sect.width() < self._width:
+            sect.normalise(width=self._width)
+
+        if top_padding != 0:
+            sect.pad(num_rows=-self._height)
+        elif sect.height() < self._height:
+            sect.normalise(height=self._height)
 
         return sect
