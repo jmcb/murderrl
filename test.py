@@ -12,7 +12,7 @@ def main ():
 
     manor = builder.manor.build_U().combine()
 
-    vp = library.viewport.ViewPort(buffer=manor, width=20, height=20)
+    vp = library.viewport.ViewPort(buffer=manor, width=60, height=20)
 
     while True:
         screen.clear()

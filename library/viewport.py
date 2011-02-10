@@ -22,9 +22,8 @@ class ViewPort (object):
         self.buffer = buffer
 
         # Centre the buffer on the screen.
-        center = buffer.center()
-        self._left = center.x - (width / 2)
-        self._top = center.y - (height / 2)
+        self._left = 0 #center.x - (width / 2)
+        self._top = 0 #center.y - (height / 2)
         self._width = width
         self._height = height
 
@@ -58,7 +57,7 @@ class ViewPort (object):
         if start < (0, 0):
             actual_start = coord.Coord(0, 0)
         if stop > size:
-            actual_stop = coord.Coord(size)
+            actual_stop = size
 
         sect = self.buffer.section(actual_start, actual_stop)
 
