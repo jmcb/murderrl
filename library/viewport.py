@@ -21,23 +21,25 @@ class ViewPort (object):
 
         self.buffer = buffer
 
+        center = self.buffer.center()
+
         # Centre the buffer on the screen.
-        self._left = 0 #center.x - (width / 2)
-        self._top = 0 #center.y - (height / 2)
+        self._left = (center.x - width) / 2
+        self._top = (center.y - height) / 2
         self._width = width
         self._height = height
 
     def left (self, count):
-        self._left -= count
+        self._left = max(self._left - count, 0)
 
     def right (self, count):
-        self._left += count
+        self._left = max(self._left + count, 0)
 
     def down (self, count):
-        self._top += count
+        self._top = max(self._top + count, 0)
 
     def up (self, count):
-        self._top -= count
+        self._top = max(self._top - count, 0)
 
     def sect (self):
 
@@ -47,28 +49,29 @@ class ViewPort (object):
         left = max(self._left, 0)
         top = max(self._top, 0)
 
-        start = coord.Coord(left, top)
-        stop = coord.Coord(left + self._width, top + self._height)
-        size = self.buffer.size()
+        width = self._width
+        height = self._height
 
-        actual_start = start
-        actual_stop = stop
+        start = coord.Coord(left, top)
+        stop = coord.Coord(left + width, top + height)
 
         if start < (0, 0):
-            actual_start = coord.Coord(0, 0)
-        if stop > size:
-            actual_stop = size
+            start = coord.Coord(0, 0)
+        if stop.x > width:
+            stop.x = width
+        if stop.y > height:
+            stop.y = height
 
-        sect = self.buffer.section(actual_start, actual_stop)
+        sect = self.buffer.section(start, stop)
 
         if left_padding != 0:
-            sect.pad(num_cols=-self._width)
-        elif sect.width() < self._width:
-            sect.normalise(width=self._width)
+            sect.pad(num_cols=-width)
+        elif sect.width() < width:
+            sect.normalise(width=width)
 
         if top_padding != 0:
-            sect.pad(num_rows=-self._height)
-        elif sect.height() < self._height:
-            sect.normalise(height=self._height)
+            sect.pad(num_rows=-height)
+        elif sect.height() < height:
+            sect.normalise(height=height)
 
         return sect
