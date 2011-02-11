@@ -24,8 +24,8 @@ class ViewPort (object):
         center = self.buffer.center()
 
         # Centre the buffer on the screen.
-        self._left = (center.x - width) / 2
-        self._top = (center.y - height) / 2
+        self._left = 0 #(center.x - width) / 2
+        self._top = 0 #(center.y - height) / 2
         self._width = width
         self._height = height
 
@@ -41,16 +41,19 @@ class ViewPort (object):
     def up (self, count):
         self._top = max(self._top - count, 0)
 
+    def size (self):
+        return coord.Coord(self._width, self._height)
+
     def sect (self):
-
-        left_padding = min(0, self._left)
-        top_padding = min(0, self._top)
-
-        left = max(self._left, 0)
-        top = max(self._top, 0)
 
         width = self._width
         height = self._height
+
+        left_padding = width - min(0, self._left)
+        top_padding = height - min(0, self._top)
+
+        left = max(self._left, 0)
+        top = max(self._top, 0)
 
         start = coord.Coord(left, top)
         stop = coord.Coord(left + width, top + height)
