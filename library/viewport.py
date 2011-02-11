@@ -55,12 +55,14 @@ class ViewPort (object):
         start = coord.Coord(left, top)
         stop = coord.Coord(left + width, top + height)
 
+        bwidth, bheight = self.buffer.size()
+
         if start < (0, 0):
             start = coord.Coord(0, 0)
-        if stop.x > width:
-            stop.x = width
-        if stop.y > height:
-            stop.y = height
+        if stop.x > bwidth:
+            stop.x = bwidth
+        if stop.y > bheight:
+            stop.y = bheight
 
         sect = self.buffer.section(start, stop)
 
