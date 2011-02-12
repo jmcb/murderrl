@@ -45,12 +45,11 @@ class ViewPort (object):
         return coord.Coord(self._width, self._height)
 
     def sect (self):
-
         width = self._width
         height = self._height
 
-        left_padding = width - min(0, self._left)
-        top_padding = height - min(0, self._top)
+        left_padding = 0
+        top_padding = 0
 
         left = max(self._left, 0)
         top = max(self._top, 0)
@@ -63,8 +62,10 @@ class ViewPort (object):
         if start < (0, 0):
             start = coord.Coord(0, 0)
         if stop.x > bwidth:
+            left_padding = stop.x - bwidth
             stop.x = bwidth
         if stop.y > bheight:
+            top_padding = stop.y - bheight
             stop.y = bheight
 
         sect = self.buffer.section(start, stop)
