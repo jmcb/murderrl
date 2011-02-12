@@ -30,16 +30,16 @@ class ViewPort (object):
         self._height = height
 
     def left (self, count):
-        self._left = max(self._left - count, 0)
+        self._left -= count
 
     def right (self, count):
-        self._left = max(self._left + count, 0)
+        self._left += count
 
     def down (self, count):
-        self._top = max(self._top + count, 0)
+        self._top += count
 
     def up (self, count):
-        self._top = max(self._top - count, 0)
+        self._top -= count
 
     def size (self):
         return coord.Coord(self._width, self._height)
