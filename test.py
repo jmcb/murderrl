@@ -28,7 +28,7 @@ def main ():
             for ind, char in enumerate(text):
                 screen.put(char, library.coord.Coord(spot.x+ind, spot.y))
 
-        put_text("Sect size: %s, Start coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top)), library.coord.Coord(0, 23))
+        put_text("Sect size: %s, Start coord: %s, Stop coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top), library.coord.Coord(vp._left + vp._width, vp._top + vp._height)), library.coord.Coord(0, 23))
 
         ch = screen.get(block=True)
 

@@ -48,31 +48,39 @@ class ViewPort (object):
         width = self._width
         height = self._height
 
-        left_padding = 0
-        top_padding = 0
+        left_padding = False
+        top_padding = False
 
-        left = max(self._left, 0)
-        top = max(self._top, 0)
+        left = self._left
+        top = self._top
 
         start = coord.Coord(left, top)
         stop = coord.Coord(left + width, top + height)
 
         bwidth, bheight = self.buffer.size()
 
-        if start < (0, 0):
-            start = coord.Coord(0, 0)
+        if start.x < 0:
+            left_padding = True
+            start.x = 0
+        if start.y < 0:
+            top_padding = True
+            start.y = 0
         if stop.x > bwidth:
-            left_padding = stop.x - bwidth
             stop.x = bwidth
         if stop.y > bheight:
-            top_padding = stop.y - bheight
             stop.y = bheight
 
         sect = self.buffer.section(start, stop)
 
         if sect.width() < width:
-            sect.normalise(width=width)
+            if left_padding:
+                sect.pad(num_cols=width)
+            else:
+                sect.normalise(width=width)
         if sect.height() < height:
-            sect.normalise(height=height)
+            if top_padding:
+                sect.pad(num_rows=height)
+            else:
+                sect.normalise(height=height)
 
         return sect
