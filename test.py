@@ -12,22 +12,23 @@ def main ():
 
     manor = builder.manor.build_U().combine()
 
-    vp = library.viewport.ViewPort(buffer=manor, width=60, height=20)
+    vp = library.viewport.ViewPort(buffer=manor, width=60, height=15)
 
     while True:
-        screen.clear()
+        screen.clear("-")
 
         sect = vp.sect()
+
         for coord, char in sect:
             if char == None:
                 char = " "
-            screen.put(char, coord)
+            screen.put(char, coord+1)
 
         def put_text (text, spot):
             for ind, char in enumerate(text):
                 screen.put(char, library.coord.Coord(spot.x+ind, spot.y))
 
-        put_text("Sect size: %s" % sect.size(), library.coord.Coord(0, 23))
+        put_text("Sect size: %s, Start coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top)), library.coord.Coord(0, 23))
 
         ch = screen.get(block=True)
 
