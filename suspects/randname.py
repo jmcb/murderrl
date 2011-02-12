@@ -6,20 +6,7 @@ Generate random first, last and full names from various building blocks.
 import random, sys
 
 import database.database as db
-
-##################################################
-# Utility methods
-def coinflip ():
-    """
-    Returns True with a 50% chance, else False.
-    """
-    return (random.randint(1,2) == 1)
-
-def one_chance_in (n):
-    """
-    Returns True with a 1/n chance.
-    """
-    return (random.randint(1,n) == 1)
+from library.random_util import *
 
 class DatabaseException (Exception):
     """
@@ -77,7 +64,7 @@ def db_random_pop_default (db_name, value = None):
     name = db.get_database(db_name).random_pop()
     if not name:
         if not value:
-            return get_random_lastname_simple ()
+            return get_random_lastname_simple()
         else:
             return value
     return name

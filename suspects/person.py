@@ -7,6 +7,8 @@ import random, math
 from randname import *
 # Only necessary until the OS-independent methods are in
 from interface.menu import *
+from library.random_util import *
+from alibi import *
 
 # Roles, in plural as they're currently only used as header listing.
 ROLE_OWNER   = 'Owners'
@@ -26,20 +28,6 @@ HAIR_RED     = 'red'
 HAIR_BLOND   = 'blond'
 HAIR_BROWN   = 'brown'
 HAIR_BLACK   = 'black'
-
-class Alibi (object):
-    """
-    Alibi class. Where was a suspect at the time of the murder, and with whom?
-    """
-    def __init__ (self, place, witness = -1):
-        """
-        Initialize a suspect's alibi.
-
-        :``place``: A room name. *Required*.
-        :``witness``: Index of a suspect who can confirm the alibi, or -1 if none. *Default -1*.
-        """
-        self.room = place
-        self.witness = witness
 
 class Person (object):
     """
@@ -191,6 +179,22 @@ class Person (object):
         else:
             witness = "alone"
         return "%s, %s" % (a.room, witness)
+
+    def get_alibi_statement (self, list):
+        """
+        Returns the reply to the question, "Where were you yesterday at 8 pm?"
+
+        :``list``: An object of type SuspectList. *Required*.
+        """
+        if not self.alibi:
+            return "\"I'm sorry. I don't remember.\""
+
+        a = self.alibi
+        witness = None
+        if self.has_alibi_witness():
+            witness = list.get_suspect(a.witness).get_name()
+
+        return "\"%s\"" % db_get_alibi_statement(a.room, witness)
 
     def get_name (self):
         """
@@ -636,7 +640,8 @@ class SuspectList (object):
             print "\nThe clue: a %s hair!" % self.get_murderer().hair
             lcount += 2
         else:
-            print "Alibi      :", p.get_alibi(self)
+            print "\nAlibi:", p.get_alibi_statement(self)
+            # print "Alibi      :", p.get_alibi(self)
             lcount += 1
             if p.has_alibi_witness():
                 has_witness = True
