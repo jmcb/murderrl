@@ -70,14 +70,9 @@ class ViewPort (object):
 
         sect = self.buffer.section(start, stop)
 
-        if left_padding != 0:
-            sect.pad(num_cols=-width)
-        elif sect.width() < width:
+        if sect.width() < width:
             sect.normalise(width=width)
-
-        if top_padding != 0:
-            sect.pad(num_rows=-height)
-        elif sect.height() < height:
+        if sect.height() < height:
             sect.normalise(height=height)
 
         return sect
