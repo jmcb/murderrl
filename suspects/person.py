@@ -75,6 +75,18 @@ class Person (object):
         return "%s (%s), %s%s%s" % (self.get_fullname(),
                self.gender, job, hair, self.age)
 
+    def get_index (self, list):
+        """
+        Returns the current person's index in the suspects[] list.
+
+        :``list``: An object of type SuspectList. *Required*.
+        """
+        s = list.suspects
+        for i in xrange(list.no_of_suspects()):
+            if s[i] == self:
+                return i
+        return -1
+
     def set_random_last_name (self, last = None):
         """
         Sets a person's appropriate last name (upperclass, middleclass,
@@ -192,7 +204,8 @@ class Person (object):
         a = self.alibi
         witness = None
         if self.has_alibi_witness():
-            witness = list.get_suspect(a.witness).get_name()
+            witness = self.call_relative(list, a.witness)
+            # witness = list.get_suspect(a.witness).get_name()
 
         return "\"%s\"" % db_get_alibi_statement(a.room, witness)
 
@@ -336,6 +349,51 @@ class Person (object):
             if r[1] == type:
                return r[0]
         return -1
+
+    def is_relative (self, other_idx, type):
+        """
+        Returns whether other_idx matches a relative of a given relationship type.
+
+        :``other_idx``: The suspects[] index of the supposed relative. *Required*
+        :``type``: The type of the relationship: e.g. ``REL_SPOUSE``,
+                   ``REL_PARENT``, ``REL_SIBLING``. *Required*.
+        """
+        for r in self.rel:
+            if r[0] == other_idx:
+                return r[1] == type
+
+        return False
+
+    def call_relative (self, list, other_idx):
+        """
+        Returns a string depicting how the current person would refer to
+        another person, depending on the degree of relationship.
+
+        :``list``: An object of type SuspectList. *Required*.
+        :``other_idx``: The suspects[] index of the supposed relative. *Required*
+        """
+        idx = self.get_index(list)
+        o = list.get_suspect(other_idx)
+
+        r = o.get_relationship(idx)
+        if r != None:
+            if self.is_relative(other_idx, REL_PARENT):
+                return "my %s, %s," % (r, o.get_fullname())
+            if (self.is_relative(other_idx, REL_SPOUSE)
+                or self.is_relative(other_idx, REL_ENGAGED)
+                or coinflip()):
+                return "%s, my %s," % (o.first, r)
+            else:
+                return "my %s %s" % (r, o.first)
+
+        r = list.get_extended_relationship(idx, other_idx)
+        if r != None:
+            if coinflip():
+                return "%s, my %s," % (o.get_fullname(), r)
+
+            return "my %s, %s," % (r, o.get_fullname())
+
+        return o.get_fullname()
 
     def chance_of_spouse (self):
         """
@@ -642,7 +700,7 @@ class SuspectList (object):
         else:
             print "\nAlibi:", p.get_alibi_statement(self)
             # print "Alibi      :", p.get_alibi(self)
-            lcount += 1
+            lcount += 3
             if p.has_alibi_witness():
                 has_witness = True
                 print "\nPress 'w' to check the witness."
