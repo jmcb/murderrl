@@ -34,6 +34,8 @@ DB_LAST_COMBO1  = 'names.last_combo1'
 DB_LAST_COMBO2  = 'names.last_combo2'
 DB_LAST_UPPER1  = 'names.last_upperclass1'
 DB_LAST_UPPER2  = 'names.last_upperclass2'
+DB_LAST_UPPER3  = 'names.last_upperclass3'
+DB_LAST_UPPER4  = 'names.last_upperclass4'
 
 def check_name_db ():
     """
@@ -210,19 +212,14 @@ def get_random_lastname_upperclass ():
 
     **Examples**:: Adderley, Hartlethorpe, Islington, Thistleby, Windermere.
     """
-    first = db.get_database(DB_LAST_UPPER1).random_pop()
-    if not first:
+    first  = db.get_database(DB_LAST_UPPER1).random_pop()
+    second = db.get_database(DB_LAST_UPPER2).random_pop()
+    third  = db.get_database(DB_LAST_UPPER3).random()
+    fourth = db.get_database(DB_LAST_UPPER4).random_pop()
+    if not (first and second and third and fourth):
         return get_random_lastname_middleclass()
 
-    if not one_chance_in(4):
-        second = random.choice(('er', 'le', 'lings'))
-        third  = db.get_database(DB_LAST_UPPER2).random_pop()
-        if not third:
-            return get_random_lastname_middleclass()
-        return "%s%s%s" % (first, second, third)
-
-    second = random.choice(('lington', 'erly', 'erley'))
-    return "%s%s" % (first, second)
+    return "%s%s%s%s" % (first, second, third, fourth)
 
 def get_random_last_name (style = None):
     """
