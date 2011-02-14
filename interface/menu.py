@@ -1,31 +1,9 @@
 #!/usr/bin/env python
-import msvcrt
+import library.viewport, library.coord
 import interface.console
 
-def getch ():
-    """
-    Windows specific method. Gets a key and returns it.
-    """
-    return msvcrt.getch()
-
-def fill (num = 0):
-    """
-    Helper method printing clear lines to fill the screen.
-    Will eventually be replaced by _clear() and _goto(x,y).
-
-    :``num``: The number of lines already printed. *Default 0*.
-    """
-    if num > 24:
-        return
-    for i in range(num, 24):
-        print ""
-
-def clear ():
-    """
-    Helper method clearing the screen.
-    Will eventually be replaced by _clear().
-    """
-    fill(0)
+screen = interface.console.select()
+coord  = library.coord.Coord
 
 class Entry (object):
     """
@@ -61,14 +39,18 @@ class Entry (object):
         return "%s - %s" % (self.key, self.desc)
 
     def key_matches (self, key):
+        """
+        Returns true if a given character matches the entry key.
+
+        :``key``: The character to compare against the entry key. *Required*.
+        """
         return (self.key == key or self.key2 == key)
 
     def activate (self):
         """
-        Triggers the entry's action method, i.e. action(arg).
+        Triggers and returns the entry's action method, i.e. action(arg).
         """
-        clear()
-        self.action(self.arg)
+        return self.action(self.arg)
 
 class Menu (object):
     """
@@ -92,33 +74,71 @@ class Menu (object):
         """
         self.mlist.append(entry)
 
+    def print_line (self, text, pos):
+        """
+        Prints a line of text beginning at the coordinate pos.
+
+        :``text``: The text to be printed. *Required*.
+        :``pos``: The starting coord (of type ``Coord``) for printing. *Required*.
+        """
+        for ind, char in enumerate(text):
+            screen.put(char, coord(pos.x+ind, pos.y))
+
+    def print_text (self, text, pos, max_columns = 70):
+        """
+        Chops a text into several lines and prints it to the screen, beginning
+        at coordinate pos. Chopping happens at position max_columns; no attempt
+        is made to look for a better cutting position.
+
+        :``text``: The text to be printed. *Required*.
+        :``pos``: The starting coord (of type ``Coord``) for printing. *Required*.
+        :``max_columns``: After this column, the text is wrapped onto the next line. 
+                          *Default 70*.
+        """
+        line = pos.y
+        col  = 0
+        for char in text:
+            if (char == "\n" or col > max_columns):
+                col   = 0
+                line += 1
+                if char == "\n":
+                    continue
+            screen.put(char, coord(col, pos.y + line))
+            col += 1
+
     def draw_menu (self):
         """
         Prints the entire menu on an otherwise empty screen.
         """
-        mlist = self.mlist
-        lcount = 0
+        screen.clear(" ")
+        line = 0
         if self.title:
-            print self.title
-            lcount += 1
+            self.print_line(self.title, coord(0, 0))
+            line = 1
+
+        mlist = self.mlist
         for i in xrange(len(mlist)):
-            print mlist[i]
-            lcount += 1
-        fill(lcount)
+            self.print_line(mlist[i].__str__(), coord(0, line + i))
 
     def process_key (self, key = None):
         """
         Compares the input with the entry keys and triggers the corresponding action.
+        This action is currently assumed to return a string that is subsequently
+        printed to the screen.
 
-        :``key``: The entered key. If none, call getch(). *Default none*.
+        :``key``: The entered key. If none, call get(). *Default none*.
         """
         if key == None:
-            key = getch()
+            key = screen.get(block=True)
 
         mlist = self.mlist
         for i in xrange(len(mlist)):
-            if mlist[i].key_matches(key.lower()):
-                mlist[i].activate()
+            if mlist[i].key_matches(chr(key)):
+                fulldesc = mlist[i].activate()
+                if fulldesc:
+                    screen.clear(" ")
+                    self.print_text(fulldesc, coord(0,0))
+                    screen.get(block=True)
                 return True
 
         return False
@@ -129,7 +149,6 @@ class Menu (object):
         player presses a key that does not match any of the entries.
         """
         while True:
-            clear()
             self.draw_menu()
             if not self.process_key():
                 break

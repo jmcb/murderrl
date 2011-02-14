@@ -650,23 +650,21 @@ class SuspectList (object):
 
         return "none"
 
-    def describe_suspect (self, idx):
+    def get_suspect_description (self, idx):
         """
         Prints a screen describing a person.
 
         :``idx``: An index of the suspects[] list. *Required*.
         """
-        # self.get_suspect(idx).describe(self)
+        desc = ""
+
         p = self.get_suspect(idx)
-        print p
-        print ""
-        lcount = 2
+        desc = p.__str__() + "\n\n"
         if idx != self.victim:
-            print "Relationship to victim:", self.get_relationship(idx, self.victim, True)
-            lcount += 1
-            desc = "Other relationships   :"
+            desc += "Relationship to victim: %s\n" % self.get_relationship(idx, self.victim, True)
+            tmp   = "Other relationships   :"
         else:
-            desc = "Relationships:"
+            tmp = "Relationships:"
 
         first = True
         for i in xrange(len(p.rel)):
@@ -674,41 +672,44 @@ class SuspectList (object):
             if r[0] == self.victim:
                 continue
             relative = self.get_suspect(r[0])
-            print "%s %s (%s)" % (desc, relative.get_fullname(), self.get_relationship(r[0], idx))
-            lcount += 1
+            desc += "%s %s (%s)\n" % (tmp, relative.get_fullname(), self.get_relationship(r[0], idx))
             if first:
                 first = False
                 if idx != self.victim:
-                    desc = "                       "
+                    tmp = "                       "
                 else:
-                    desc = "              "
+                    tmp = "              "
 
         if first:
-            print desc, "none"
-            print ""
-            lcount += 2
-        else:
-            print ""
-            lcount += 1
+            desc += "%s none\n" % tmp
 
-        print "Hair colour:", p.describe_hair()
-        lcount += 1
-        has_witness = False
+        desc += "\nHair colour: %s\n" % p.hair
         if idx == self.victim:
-            print "\nThe clue: a %s hair!" % self.get_murderer().hair
-            lcount += 2
+            desc += "\nThe clue: a %s hair!\n" % self.get_murderer().hair
         else:
-            print "\nAlibi:", p.get_alibi_statement(self)
-            # print "Alibi      :", p.get_alibi(self)
-            lcount += 3
+            desc += "\nAlibi: %s\n" % p.get_alibi_statement(self)
             if p.has_alibi_witness():
                 has_witness = True
-                print "\nPress 'w' to check the witness."
-                lcount += 2
 
-        fill(lcount)
-        key = getch()
-        if (has_witness and key == 'w'):
+        return desc
+
+    def describe_suspect (self, idx):
+        """
+        Prints a screen describing a person.
+
+        :``idx``: An index of the suspects[] list. *Required*.
+        """
+        desc = self.get_suspect_description(idx)
+
+        p = self.get_suspect(idx)
+        has_witness = False
+        if p.has_alibi_witness():
+            desc += "\nPress 'w' to check the witness."
+            has_witness = True
+        print desc
+
+        key = screen.get(block=True)
+        if (has_witness and chr(key) == 'w'):
             self.describe_suspect(p.alibi.witness)
 
     def pick_victim (self):

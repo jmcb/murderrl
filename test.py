@@ -7,6 +7,10 @@ import interface.console
 
 screen = interface.console.select()
 
+def put_text (text, spot):
+    for ind, char in enumerate(text):
+        screen.put(char, library.coord.Coord(spot.x+ind, spot.y))
+
 def main ():
     screen.init()
 
@@ -23,10 +27,6 @@ def main ():
             if char == None:
                 char = " "
             screen.put(char, coord+1)
-
-        def put_text (text, spot):
-            for ind, char in enumerate(text):
-                screen.put(char, library.coord.Coord(spot.x+ind, spot.y))
 
         put_text("Sect size: %s, Start coord: %s, Stop coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top), library.coord.Coord(vp._left + vp._width, vp._top + vp._height)), library.coord.Coord(0, 23))
 
