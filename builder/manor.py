@@ -29,6 +29,7 @@ Z_LAYOUT = "Z-corridors"
 N_LAYOUT = "N-corridors"
 H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
+U_LAYOUT = "U-corridors"
 
 class Room (object):
     """
@@ -185,13 +186,6 @@ def base_builder ():
 
     return manor
 
-BASE_SHAPE = "single-corridor"
-L_LAYOUT = "L-corridors"
-Z_LAYOUT = "Z-corridors"
-N_LAYOUT = "N-corridors"
-H_LAYOUT = "H-corridors"
-O_LAYOUT = "O-corridors"
-
 class Placement (object):
     def __init__ (self, side1, side2, this_side):
         self.sides = [side1, side2]
@@ -207,9 +201,9 @@ class Placement (object):
     def __cmp__ (self, other):
         return cmp(str(self), str(other))
 
-SIDE_LEFT = Placement("left", "right", 0)
-SIDE_RIGHT = Placement("left", "right", 1)
-PLACE_TOP = Placement("top", "bottom", 0)
+SIDE_LEFT    = Placement("left", "right", 0)
+SIDE_RIGHT   = Placement("left", "right", 1)
+PLACE_TOP    = Placement("top", "bottom", 0)
 PLACE_BOTTOM = Placement("top", "bottom", 1)
 
 class Leg (object):
@@ -472,3 +466,22 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None):
     base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
     base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement)
     return base
+
+def build_random (base=None):
+	l_list = [L_LAYOUT, Z_LAYOUT, N_LAYOUT, H_LAYOUT, O_LAYOUT, U_LAYOUT]
+	layout = random.choice(l_list)
+
+	if layout == L_LAYOUT:
+		return build_L(base)
+	elif layout == Z_LAYOUT:
+		return build_Z(base)
+	elif layout == N_LAYOUT:
+		return build_N(base)
+	elif layout == H_LAYOUT:
+		return build_H(base)
+	elif layout == O_LAYOUT:
+		return build_O(base)
+	elif layout == U_LAYOUT:
+		return build_U(base)
+	else:
+		return base_builder()

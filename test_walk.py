@@ -18,9 +18,11 @@ def put_text (text, spot):
 def main ():
     screen.init()
 
-    manor = builder.manor.build_U().combine()
+    manor = builder.manor.build_random().combine()
 
-    vp = library.viewport.ViewPort(buffer=manor, width=70, height=20)
+    vp = library.viewport.ViewPort(buffer=manor,
+                                   width =min(manor.size().width, 70),
+                                   height=min(manor.size().width, 20))
 
     # player (@) position in the viewport
     ppos      = library.coord.Coord(35, 10)
