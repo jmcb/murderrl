@@ -21,6 +21,7 @@ Attempt to create a "manor" akin to:
 
 import random, copy
 from library import shape, coord, collection
+from library.random_util import *
 
 # Specific build styles:
 BASE_SHAPE = "single-corridor"
@@ -45,15 +46,17 @@ class Room (object):
         :``stop``: A coord denoting the bottom-right point of the room. *Default None*.
 
         """
-        self.width = width
+        self.width  = width
         self.height = height
-        self.start = start
-        self.stop = stop
+        self.start  = start
+        self.stop   = stop
+
     def as_shape (self):
         """
         Converts the room into a Shape object, by way of a Box.
         """
         return shape.Box(width=self.width, height=self.height, border=1, fill=".", border_fill="#")
+
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
@@ -81,7 +84,7 @@ def base_builder ():
     # until we have a minimum of six and a maximum of ten
     entrance_hall = Room()
 
-    left = 0
+    left  = 0
     right = 0
 
     row2.append(entrance_hall)
@@ -89,7 +92,7 @@ def base_builder ():
     while len(row2) <= 5:
         # If we have six rooms, one in three chance of not adding any more
         # rooms.
-        if len(row2) > 4 and random.randint(1, 4) == 1:
+        if len(row2) > 4 and one_chance_in(3):
             break
 
         new_room = Room()
@@ -124,39 +127,39 @@ def base_builder ():
     overlap = 3
     if adjust_bottom == 2:
         overlap = 1
-        row2[0].height += 2
+        row2[0].height  += 2
         row2[-1].height += 2
-        row1[0].width += 2
-        row1[-1].width += 2
-        row2[1].width += 2
-        row2[-2].width += 2
+        row1[0].width   += 2
+        row1[-1].width  += 2
+        row2[1].width   += 2
+        row2[-2].width  += 2
     elif adjust_bottom == 1:
         side_adjusted = random.randint(-1, 0)
         side_not_adjusted = -side_adjusted-1
-        row2[side_adjusted].height += 2
+        row2[side_adjusted].height     += 2
         row1[side_not_adjusted].height += 2
-        row2[side_not_adjusted].width += 2
-        row1[side_adjusted].width += 2
+        row2[side_not_adjusted].width  += 2
+        row1[side_adjusted].width      += 2
     elif adjust_bottom == 0:
         overlap = 3
-        row1[0].height += 2
+        row1[0].height  += 2
         row1[-1].height += 2
-        row2[0].width += 2
-        row2[-1].width += 2
-        row1[1].width += 2
-        row1[-2].width += 2
+        row2[0].width   += 2
+        row2[-1].width  += 2
+        row1[1].width   += 2
+        row1[-2].width  += 2
 
     # Now, start drawing it! YAY!
 
     # First row
-    first_room = row1[0].as_shape()
+    first_room  = row1[0].as_shape()
     second_room = row1[1].as_shape()
     row1_collection = shape.adjoin(first_room, second_room, overlap=1, collect=True)
     for room in row1[2:]:
         row1_collection = shape.adjoin(row1_collection, room.as_shape(), overlap=1, collect=True)
 
     # second row
-    first_room = row2[0].as_shape()
+    first_room  = row2[0].as_shape()
     second_room = row2[1].as_shape()
 
     # Does some weird stuff to offset everything
@@ -173,7 +176,7 @@ def base_builder ():
         row2_collection = shape.adjoin(row2_collection, room_shape, top_offset=to, overlap=1, collect=True)
 
     # Finally, make a corridor!
-    room_width = Room().width
+    room_width  = Room().width
     room_height = Room().height
 
     my_collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collect=True)
@@ -226,12 +229,11 @@ class Leg (object):
 
 class ManorCollection (collection.ShapeCollection):
     corridors = None
-    rooms = None
-    legs = None
+    rooms     = None
+    legs      = None
     main_corridor = None
 
     def __init__ (self, c=[]):
-
         if c != [] and isinstance(c, ManorCollection):
             self.legs = c.legs
 
@@ -334,7 +336,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     assert corridor is not None
 
     # Find the corridor's starting point
-    stop = coord.Coord(start)
+    stop   = coord.Coord(start)
     stop.x = corridor.width()
 
     if side == SIDE_LEFT:

@@ -5,8 +5,6 @@ Set up characters, their basic traits and relationships.
 
 import random, math
 from randname import *
-# Only necessary until the OS-independent methods are in
-from interface.menu import *
 from library.random_util import *
 from alibi import *
 

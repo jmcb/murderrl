@@ -8,9 +8,9 @@ class ViewPort (object):
     """
     A way of viewing 
     """
-    _left = 0
-    _top = 0
-    _width = 0
+    _left   = 0
+    _top    = 0
+    _width  = 0
     _height = 0
     buffer = None
     def __init__ (self, width=10, height=10, buffer=None):
@@ -24,9 +24,9 @@ class ViewPort (object):
         center = self.buffer.center()
 
         # Centre the buffer on the screen.
-        self._left = 0 #(center.x - width) / 2
-        self._top = 0 #(center.y - height) / 2
-        self._width = width
+        self._left   = 0 #(center.x - width) / 2
+        self._top    = 0 #(center.y - height) / 2
+        self._width  = width
         self._height = height
 
     def left (self, count):
@@ -45,17 +45,17 @@ class ViewPort (object):
         return coord.Coord(self._width, self._height)
 
     def sect (self):
-        width = self._width
+        width  = self._width
         height = self._height
 
         left_padding = False
-        top_padding = False
+        top_padding  = False
 
         left = self._left
-        top = self._top
+        top  = self._top
 
         start = coord.Coord(left, top)
-        stop = coord.Coord(left + width, top + height)
+        stop  = coord.Coord(left + width, top + height)
 
         bwidth, bheight = self.buffer.size()
 
