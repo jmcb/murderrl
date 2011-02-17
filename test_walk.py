@@ -18,7 +18,13 @@ def put_text (text, spot):
 def main ():
     screen.init()
 
-    manor = builder.manor.build_random().combine()
+    base_manor = builder.manor.build_random()
+    manor = base_manor.combine()
+
+    print "Rooms:"
+    base_manor.print_rooms()
+    print "#Legs: ", base_manor.count_legs()
+    print "Corridors: ", base_manor.get_corridors()
 
     vp = library.viewport.ViewPort(buffer=manor,
                                    width =min(manor.size().width, 70),
@@ -53,9 +59,10 @@ def main ():
 
         placement = False
         screen.put("@", ppos + 1)
-        # A couple of debugging positions.
+
+        # Debugging information.
         put_text("Sect size : %s, Start coord: %s, Stop coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top), library.coord.Coord(vp._left + vp._width, vp._top + vp._height)), library.coord.Coord(0, 23))
-        put_text("Manor size: %s, Player coord: %s, last_move: %s" % (manor.size(), real_pos, last_move), library.coord.Coord(0, 24))
+        put_text("Manor size: %s, Player coord: %s, last_move: %s, room id: %s" % (manor.size(), real_pos, last_move, base_manor.get_room_index(real_pos)), library.coord.Coord(0, 24))
 
         # Get a key.
         ch = screen.get(block=True)

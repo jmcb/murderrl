@@ -57,7 +57,7 @@ class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
         return self.shape.size()
     def width (self):
         """
-        Wraper over self.shape.width.
+        Wrapper over self.shape.width.
         """
         return self.shape.width()
     def height (self):
@@ -65,6 +65,8 @@ class ShapeCoord (namedtuple("ShapeCoord", "shape coord")):
         Wrapper over self.shape.height.
         """
         return self.shape.height()
+    def pos (self):
+        return self.coord
     def __getattribute__ (self, attr):
         if attr == "shape":
             return tuple.__getitem__(self, 0)

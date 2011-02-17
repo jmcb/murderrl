@@ -262,15 +262,46 @@ class ManorCollection (collection.ShapeCollection):
         assert index in self.corridors
         return self[index]
 
-    def corridors (self):
+    def get_corridors (self):
         return self.corridors
 
     def room (self, index):
         assert index in self.rooms
         return self[index]
 
-    def rooms (self):
+    def get_rooms (self):
+        if not self.rooms:
+            return None
         return self.rooms
+
+    def print_rooms (self):
+        """
+        Debugging method. Iterates over all rooms and prints the location
+        and size of each room within the manor.
+        """
+        for idx in self.rooms:
+            room = self.room(idx)
+            r = room.size()
+            c = room.pos()
+            print "Room %s: top-left corner: (%s, %s), right-bottom corner: (%s, %s), size: %sx%s" % (idx, 
+                                                                  c.x, c.y, c.x + r.x, c.y + r.y, r.x, r.y)
+
+    def get_room_index (self, pos):
+        """
+        Returns the index of the room a coordinate belongs to, or None if
+        it's outside the manor.
+        If it's part of the overlap region, the first index is returned.
+
+        :``pos``: A coord. *Required*
+        """
+        for idx in self.rooms:
+            room = self.room(idx)
+            r = room.size()
+            c = room.pos()
+            if (pos.x >= c.x and pos.x <= c.x + r.x
+                and pos.y >= c.y and pos.y <= c.y + r.y):
+                return idx
+        return None
 
     def mark_leg (self, leg):
         self.legs.append(leg)
