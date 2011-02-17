@@ -42,7 +42,7 @@ def main ():
                 char = " "
                 # Don't place the player outside the manor.
                 # Initially place him elsewhere, later disallow such movements.
-                if (coord.x == ppos.x and coord.y == ppos.y):
+                if (coord == ppos):
                     if placement:
                         ppos.x += 2
                     else:

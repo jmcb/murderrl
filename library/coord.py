@@ -139,7 +139,7 @@ class Coord (object):
             other = self.__class__(other[0], other[1])
         elif not isinstance(other, self.__class__):
             other = self.__class__(other, other)
-        return (self.x==other.x or self.y==other.y)
+        return (self.x==other.x and self.y==other.y)
     def __ne__ (self, other):
         if isinstance(other, tuple):
             other = self.__class__(other[0], other[1])
