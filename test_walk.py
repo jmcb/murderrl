@@ -24,7 +24,10 @@ def main ():
     print "Rooms:"
     base_manor.print_rooms()
     print "#Legs: ", base_manor.count_legs()
-    print "Corridors: ", base_manor.get_corridors()
+    for i in base_manor.legs:
+        print i
+    print "Corridors:"
+    base_manor.print_corridors()
 
     vp = library.viewport.ViewPort(buffer=manor,
                                    width =min(manor.size().width, 70),
@@ -59,10 +62,15 @@ def main ():
 
         placement = False
         screen.put("@", ppos + 1)
-
         # Debugging information.
         put_text("Sect size : %s, Start coord: %s, Stop coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top), library.coord.Coord(vp._left + vp._width, vp._top + vp._height)), library.coord.Coord(0, 23))
-        put_text("Manor size: %s, Player coord: %s, last_move: %s, room id: %s" % (manor.size(), real_pos, last_move, base_manor.get_room_index(real_pos)), library.coord.Coord(0, 24))
+
+        id = base_manor.get_corridor_index(real_pos)
+        type = "corridor"
+        if id == None:
+            id   = base_manor.get_room_index(real_pos)
+            type = "room"
+        put_text("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (manor.size(), real_pos, last_move, type, id), library.coord.Coord(0, 24))
 
         # Get a key.
         ch = screen.get(block=True)

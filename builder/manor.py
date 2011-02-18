@@ -217,7 +217,7 @@ class Leg (object):
             width, height = leg.size()
 
         self.placement = (h_placement, v_placement)
-        self.width = width
+        self.width  = width
         self.height = height
     def __repr__ (self):
         return "<Leg h:%s w:%s %s>" % (self.height, self.width, self.placement)
@@ -248,7 +248,8 @@ class ManorCollection (collection.ShapeCollection):
     def rebuild (self):
         self.corridors = []
         self.rooms = []
-        self.legs = []
+        if not self.legs:
+            self.legs = []
         for index, sh in enumerate(self):
             if isinstance(sh.shape, MainCorridor):
                 self.main_corridor = index
@@ -264,6 +265,34 @@ class ManorCollection (collection.ShapeCollection):
 
     def get_corridors (self):
         return self.corridors
+
+    def print_corridors (self):
+        """
+        Debugging method. Iterates over all corridors and prints the location
+        and size of each corridor within the manor.
+        """
+        for idx in self.corridors:
+            corr = self.corridor(idx)
+            r = corr.size()
+            c = corr.pos() +1 # shifted by 1, for whatever reason
+            print "Corridor %s: top-left corner: (%s, %s), width: %s, height: %s" % (idx, 
+                                                                  c.x, c.y, r.x, r.y)
+    def get_corridor_index (self, pos):
+        """
+        Returns the index of the corridor a coordinate belongs to, or None
+        if it doesn't lie in any corridor.
+        If it's part of the overlap region, the first index is returned.
+
+        :``pos``: A coord. *Required*
+        """
+        for idx in self.corridors:
+            corr = self.corridor(idx)
+            r = corr.size()
+            c = corr.pos() + 1 # shifted by 1, for whatever reason
+            if (pos.x >= c.x and pos.x <= c.x + r.x
+                and pos.y >= c.y and pos.y <= c.y + r.y):
+                return idx
+        return None
 
     def room (self, index):
         assert index in self.rooms
@@ -376,7 +405,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     elif side == SIDE_RIGHT:
         y_offset = start.x
 
-    new_corridor = shape.Column(height=leg.height() + Room().height, fill=".")
+    new_corridor = Corridor(shape.Column(height=leg.height() + Room().height, fill="."))
 
     corridor_offset = None
 
