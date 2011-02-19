@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-from library import shape, coord
-
-class Buffer (shape.Shape):
-    pass
+from library import coord
 
 class ViewPort (object):
     """
