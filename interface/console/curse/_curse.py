@@ -64,11 +64,12 @@ class InputError (Exception):
 class MoveError (Exception):
     pass
 
-def _goto (c):
+def _goto (c, no_error=True):
     try:
         _STDSCREEN.move(c.y, c.x)
     except _curses.error, e:
-        raise MoveError, (e, c.x, c.y)
+        if not no_error:
+            raise MoveError, (e, c.x, c.y)
 
 def put (char, c, col=None):
     assert isinstance(char, int) or len(char) == 1
