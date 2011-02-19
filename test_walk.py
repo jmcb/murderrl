@@ -19,8 +19,14 @@ def main ():
     screen.init()
 
     base_manor = builder.manor.build_random()
+    base_manor.add_doors()
     manor = base_manor.combine()
-
+    print "Doors:", base_manor.doors
+    for c in base_manor.doors:
+        if c.x < 1 or c.x >= manor.size().x or c.y < 1 or c.y >= manor.size().y:
+            print "Coord %s out of bounds %s" % (c, manor.size())
+            continue
+        manor.__setitem__(c - 1, '+')
     print "Rooms:"
     base_manor.print_rooms()
     print "#Legs: ", base_manor.count_legs()

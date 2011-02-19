@@ -277,22 +277,32 @@ class ManorCollection (collection.ShapeCollection):
             c = corr.pos() +1 # shifted by 1, for whatever reason
             print "Corridor %s: top-left corner: (%s, %s), width: %s, height: %s" % (idx, 
                                                                   c.x, c.y, r.x, r.y)
-    def get_corridor_index (self, pos):
+    def get_corridor_index (self, pos, single = True):
         """
         Returns the index of the corridor a coordinate belongs to, or None
         if it doesn't lie in any corridor.
         If it's part of the overlap region, the first index is returned.
 
         :``pos``: A coord. *Required*
+        :``single``: If true, returns the first index encountered.
+                     Otherwise, a list containing all matching indices. *Default true*.
         """
+        list = []
         for idx in self.corridors:
             corr = self.corridor(idx)
             r = corr.size()
             c = corr.pos() + 1 # shifted by 1, for whatever reason
             if (pos.x >= c.x and pos.x <= c.x + r.x
                 and pos.y >= c.y and pos.y <= c.y + r.y):
-                return idx
-        return None
+                if single:
+                    return idx
+                list.append(idx)
+        if single:
+            return None
+        return list
+
+    def get_corridor_indices(self, pos):
+        return self.get_corridor_index(pos, False)
 
     def room (self, index):
         assert index in self.rooms
@@ -315,22 +325,98 @@ class ManorCollection (collection.ShapeCollection):
             print "Room %s: top-left corner: (%s, %s), right-bottom corner: (%s, %s), size: %sx%s" % (idx, 
                                                                   c.x, c.y, c.x + r.x, c.y + r.y, r.x, r.y)
 
-    def get_room_index (self, pos):
+    def get_room_index (self, pos, single = True):
         """
         Returns the index of the room a coordinate belongs to, or None if
         it's outside the manor.
         If it's part of the overlap region, the first index is returned.
 
         :``pos``: A coord. *Required*
+        :``single``: If true, returns the first index encountered.
+                     Otherwise, a list containing all matching indices. *Default true*.
         """
+        list = []
         for idx in self.rooms:
             room = self.room(idx)
             r = room.size()
             c = room.pos()
             if (pos.x >= c.x and pos.x <= c.x + r.x
                 and pos.y >= c.y and pos.y <= c.y + r.y):
-                return idx
-        return None
+                if single:
+                    return idx
+                list.append(idx)
+        if single:
+            return None
+        return list
+
+    def get_room_indices(self, pos):
+        return self.get_room_index(pos, False)
+
+    def count_shared_indices (self, pos, range_x = 0, range_y = 0, plus_x = 0, plus_y = 0):
+        print "count_shared_indices(pos=%s, range_x=%s, range_y=%s, plus_x=%s, plus_y=%s)" % (pos, range_x, range_y, plus_x, plus_y)
+        assert range_x > 0 or range_y > 0
+
+        if range_x == 0:
+            limit = range_y
+            if pos.x < 2 or pos.x >= self.size().x:
+                return
+        else:
+            limit = range_x
+            if pos.y < 2 or pos.y >= self.size().y:
+                return
+
+        if limit < 2:
+            return
+
+        candidates = []
+        old_room   = -1
+        for i in range(0,limit):
+            if range_y == 0:
+                x = pos.x + i
+                if x + plus_x < 2 or x >= self.size().x:
+                    continue
+                y = pos.y
+            else:
+                x = pos.x
+                y = pos.y + i
+                if y + plus_y < 2 or y >= self.size().y:
+                    continue
+
+            c_pos = coord.Coord(x, y)
+            rooms = self.get_room_indices(c_pos)
+            corrs = self.get_corridor_indices(c_pos)
+            if len(rooms) == 1 and len(corrs) == 1:
+                print "(%s, %s) -> %s" % (c_pos.x, c_pos.y, rooms)
+                curr_room = rooms[0]
+                if old_room != curr_room:
+                    if len(candidates):
+                        rand_coord = random.choice(candidates) + coord.Coord(plus_x, plus_y)
+                        print "==> pick %s" % rand_coord
+                        self.doors.append(rand_coord)
+                        candidates = []
+                    print "curr. room: %s" % curr_room
+                old_room = curr_room
+                candidates.append(c_pos)
+
+        if len(candidates):
+            rand_coord = random.choice(candidates) + coord.Coord(plus_x, plus_y)
+            print "==> pick %s" % rand_coord
+            self.doors.append(rand_coord)
+
+    def add_doors (self):
+        print "Adding doors..."
+        self.doors = []
+        corr = self.corridors
+        for c in corr:
+            candidates = []
+            w   = self.corridor(c).width()
+            h   = self.corridor(c).height()
+            pos = self.corridor(c).pos() + 1
+            print "Corridor %s: (%s, %s), width: %s, height: %s" % (c, pos.x, pos.y, w, h)
+            self.count_shared_indices(coord.Coord(pos.x, pos.y), w, 0, 0, -1)
+            self.count_shared_indices(coord.Coord(pos.x, pos.y + h), w, 0)
+            self.count_shared_indices(coord.Coord(pos.x, pos.y), 0, h, -1, 0)
+            self.count_shared_indices(coord.Coord(pos.x + w, pos.y), 0, h)
 
     def mark_leg (self, leg):
         self.legs.append(leg)
