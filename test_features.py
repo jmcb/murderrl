@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 A demo of a ghostly @ walking through walls in an unfurnished manor. :P
-Toggle canvas vs. feature view with 't'.
+Toggle canvas vs. feature view with 't'. (Should be identical.)
 """
 
 import curses
@@ -48,7 +48,7 @@ def main ():
     # Initialise the view port.
     vp = library.viewport.ViewPort(buffer=manor,
                                    width =min(manor.size().width, 70),
-                                   height=min(manor.size().width, 20))
+                                   height=min(manor.size().height, 20))
 
     # Initialise a couple of variables.
     ppos      = library.coord.Coord(35, 10) # player (@) position in the viewport

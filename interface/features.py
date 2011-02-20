@@ -12,7 +12,9 @@ COBBLES = TextFeature(",", Colours.BROWN, "cobbles", "Cobblestones.", True)
 
 # Wall-related glyphs.
 WALL = TextFeature("#", Colours.WHITE, "wall", "A wall.", False)
-CLOSED_DOOR = TextFeature("+", Colours.WHITE, "closed door", "A closed door.", False)
+# For simplicity's sake, doors are currently considered traversable even
+# when closed. Opening doors is implied, okay? (jpeg)
+CLOSED_DOOR = TextFeature("+", Colours.WHITE, "closed door", "A closed door.", True)
 OPEN_DOOR = TextFeature("'", Colours.WHITE, "open door", "An open door.", True)
 WINDOW_V = TextFeature("|", Colours.WHITE, "window", "A window.", False)
 WINDOW_H = TextFeature("-", Colours.WHITE, "window", "A window.", False)
