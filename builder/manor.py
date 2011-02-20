@@ -411,7 +411,7 @@ class ManorCollection (collection.ShapeCollection):
                 elif self.features.__getitem__(pos) != WALL:
                     self.features.__setitem__(pos, FLOOR)
 
-    def count_shared_indices (self, pos, range_x = 0, range_y = 0, plus_x = 0, plus_y = 0):
+    def add_doors_along_corridor (self, pos, range_x = 0, range_y = 0, plus_x = 0, plus_y = 0):
         print "count_shared_indices(pos=%s, range_x=%s, range_y=%s, plus_x=%s, plus_y=%s)" % (pos, range_x, range_y, plus_x, plus_y)
         assert range_x > 0 or range_y > 0
 
@@ -424,7 +424,7 @@ class ManorCollection (collection.ShapeCollection):
             if pos.y < 2 or pos.y >= self.size().y:
                 return
 
-        if limit < 2:
+        if limit < 1:
             return
 
         candidates = []
@@ -451,6 +451,7 @@ class ManorCollection (collection.ShapeCollection):
                     if len(candidates):
                         rand_coord = random.choice(candidates) + coord.Coord(plus_x, plus_y)
                         print "==> pick %s" % rand_coord
+                        self.features.__setitem__(rand_coord, CLOSED_DOOR)
                         self.doors.append(rand_coord)
                         candidates = []
                     print "curr. room: %s" % curr_room
@@ -460,6 +461,7 @@ class ManorCollection (collection.ShapeCollection):
         if len(candidates):
             rand_coord = random.choice(candidates) + coord.Coord(plus_x, plus_y)
             print "==> pick %s" % rand_coord
+            self.features.__setitem__(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
 
     def add_doors (self):
@@ -473,11 +475,11 @@ class ManorCollection (collection.ShapeCollection):
             pos = self.corridor(c).pos()
             print "Corridor %s: (%s, %s), width: %s, height: %s" % (c, pos.x, pos.y, w, h)
             if w > 1:
-                self.count_shared_indices(coord.Coord(pos.x, pos.y), w, 0, 0, -1)
-                self.count_shared_indices(coord.Coord(pos.x, pos.y + h), w, 0)
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), w, 0, 0, -1)
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y + h), w, 0)
             else:
-                self.count_shared_indices(coord.Coord(pos.x, pos.y), 0, h, -1, 0)
-                self.count_shared_indices(coord.Coord(pos.x + w, pos.y), 0, h)
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), 0, h, -1, 0)
+                self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), 0, h)
 
     def mark_leg (self, leg):
         self.legs.append(leg)
