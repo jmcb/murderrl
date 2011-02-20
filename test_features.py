@@ -21,7 +21,8 @@ def main ():
 
     # First, build the manor.
     # base_manor = builder.manor.base_builder()
-    base_manor = builder.manor.build_random()
+    base_manor = builder.manor.build_L()
+    # base_manor = builder.manor.build_random()
 
     # Translate rooms and corridors into wall and floor features.
     base_manor.init_features()
@@ -77,7 +78,7 @@ def main ():
                 if (coord == ppos):
                     if placement:
                         ppos.x += 2
-                    elif move_was_blocked:
+                    elif char == " " or move_was_blocked:
                         ppos = ppos - last_move
                         char = "X"
                 screen.put(char, coord+1)
@@ -92,7 +93,7 @@ def main ():
                         #        rid of this hack.
                         if placement:
                             ppos.x += 2
-                        elif move_was_blocked:
+                        elif char == " " or move_was_blocked:
                             ppos = ppos - last_move
                             char = "X"
                 screen.put(char, coord+1)

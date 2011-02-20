@@ -321,11 +321,7 @@ class ManorCollection (collection.ShapeCollection):
         and size of each room within the manor.
         """
         for idx in self.rooms:
-            room = self.room(idx)
-            r = room.size()
-            c = room.pos()
-            print "Room %s: top-left corner: (%s, %s), right-bottom corner: (%s, %s), size: %sx%s" % (idx, 
-                                                                  c.x, c.y, c.x + r.x, c.y + r.y, r.x, r.y)
+            print "Room %s: %s" % (idx, self.room(idx))
 
     def get_room_index (self, pos, single = True):
         """
@@ -377,29 +373,19 @@ class ManorCollection (collection.ShapeCollection):
             start = room.pos() + coord.Coord(0,0)
             stop  = room.pos() + room.size()
             if is_corridor:
-                # if room.height() == 1:
-                    # start.y += 1
-                    # # stop.y  -= 1
-                # else:
-                    # start.x += 1
-                    # # stop.x  -= 1
                 print "Corridor %s: start=%s, stop=%s" % (r, start, stop)
 
             for pos in coord.RectangleIterator(start, stop):
-                if is_corridor:
+                if (pos.x == 0 or pos.x == self.size().x -1
+                    or pos.y == 0 or pos.y == self.size().y - 1):
+                    self.features.__setitem__(pos, WALL)
+                elif is_corridor:
                     self.features.__setitem__(pos, FLOOR)
                 elif (pos.x == start.x or pos.x == stop.x - 1
                     or pos.y == start.y or pos.y == stop.y - 1):
                     self.features.__setitem__(pos, WALL)
                 elif self.features.__getitem__(pos) != WALL:
                     self.features.__setitem__(pos, FLOOR)
-
-        for y in xrange(0, self.features.size().y):
-            line = ""
-            for x in xrange(0, self.features.size().x):
-                c_pos = coord.Coord(x,y)
-                line += self.features.__getitem__(c_pos).glyph()
-            print line
 
     def count_shared_indices (self, pos, range_x = 0, range_y = 0, plus_x = 0, plus_y = 0):
         print "count_shared_indices(pos=%s, range_x=%s, range_y=%s, plus_x=%s, plus_y=%s)" % (pos, range_x, range_y, plus_x, plus_y)
