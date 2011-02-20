@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from library import coord
+
 class Feature (object):
     """
     A way of representing a specific feature in an agnostic manner. This should
@@ -62,3 +64,32 @@ class TextFeature (Feature):
 
     def colour (self):
         return self._colour
+
+NOTHING = TextFeature(" ")
+
+class FeatureGrid (object):
+    def __init__ (self, width, height):
+        self.grid = []
+        self._width  = width
+        self._height = height
+        for row in xrange(height):
+            row = []
+            for column in xrange(width):
+                row.append(NOTHING)
+            self.grid.append(row)
+
+    def size (self):
+        return coord.Coord(self._width, self._height)
+
+    def __getitem__ (self, pos):
+        # assert isinstance(pos, coord.Coord)
+        assert (pos.y < self._height)
+        assert (pos.x < self._width)
+        return self.grid[pos.y][pos.x]
+
+    def __setitem__ (self, pos, feat):
+        # assert isinstance(pos, coord.Coord)
+        assert (pos.y < self._height)
+        assert (pos.x < self._width)
+        self.grid[pos.y][pos.x] = feat
+

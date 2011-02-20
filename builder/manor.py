@@ -22,6 +22,8 @@ Attempt to create a "manor" akin to:
 import random, copy
 from library import shape, coord, collection
 from library.random_util import *
+from library.feature import *
+from interface.features import *
 
 # Specific build styles:
 BASE_SHAPE = "single-corridor"
@@ -301,7 +303,7 @@ class ManorCollection (collection.ShapeCollection):
             return None
         return list
 
-    def get_corridor_indices(self, pos):
+    def get_corridor_indices (self, pos):
         return self.get_corridor_index(pos, False)
 
     def room (self, index):
@@ -349,8 +351,55 @@ class ManorCollection (collection.ShapeCollection):
             return None
         return list
 
-    def get_room_indices(self, pos):
+    def get_room_indices (self, pos):
         return self.get_room_index(pos, False)
+
+    def init_features (self):
+        self.features = FeatureGrid(self.size().x, self.size().y)
+
+        print "Manor size: %s" % self.size()
+        print "Feature size: %s" % self.features.size()
+
+        boxes = []
+        for r in self.rooms:
+            boxes.append(r)
+        for r in self.corridors:
+            boxes.append(r)
+        print boxes
+        for r in boxes:
+            is_corridor = False
+            if r in self.rooms:
+                room = self.room(r)
+            else:
+                is_corridor = True
+                room = self.corridor(r)
+
+            start = room.pos() + coord.Coord(0,0)
+            stop  = room.pos() + room.size()
+            if is_corridor:
+                # if room.height() == 1:
+                    # start.y += 1
+                    # # stop.y  -= 1
+                # else:
+                    # start.x += 1
+                    # # stop.x  -= 1
+                print "Corridor %s: start=%s, stop=%s" % (r, start, stop)
+
+            for pos in coord.RectangleIterator(start, stop):
+                if is_corridor:
+                    self.features.__setitem__(pos, FLOOR)
+                elif (pos.x == start.x or pos.x == stop.x - 1
+                    or pos.y == start.y or pos.y == stop.y - 1):
+                    self.features.__setitem__(pos, WALL)
+                elif self.features.__getitem__(pos) != WALL:
+                    self.features.__setitem__(pos, FLOOR)
+
+        for y in xrange(0, self.features.size().y):
+            line = ""
+            for x in xrange(0, self.features.size().x):
+                c_pos = coord.Coord(x,y)
+                line += self.features.__getitem__(c_pos).glyph()
+            print line
 
     def count_shared_indices (self, pos, range_x = 0, range_y = 0, plus_x = 0, plus_y = 0):
         print "count_shared_indices(pos=%s, range_x=%s, range_y=%s, plus_x=%s, plus_y=%s)" % (pos, range_x, range_y, plus_x, plus_y)
