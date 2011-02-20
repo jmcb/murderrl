@@ -21,8 +21,7 @@ def main ():
 
     # First, build the manor.
     # base_manor = builder.manor.base_builder()
-    base_manor = builder.manor.build_L()
-    # base_manor = builder.manor.build_random()
+    base_manor = builder.manor.build_random()
 
     # Translate rooms and corridors into wall and floor features.
     base_manor.init_features()
@@ -37,7 +36,7 @@ def main ():
         if c.x < 1 or c.x >= manor.size().x or c.y < 1 or c.y >= manor.size().y:
             print "Coord %s out of bounds %s" % (c, manor.size())
             continue
-        manor.__setitem__(c - 1, '+')
+        manor.__setitem__(c, '+')
     print "Rooms:"
     base_manor.print_rooms()
     print "#Legs: ", base_manor.count_legs()

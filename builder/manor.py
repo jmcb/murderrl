@@ -274,11 +274,8 @@ class ManorCollection (collection.ShapeCollection):
         and size of each corridor within the manor.
         """
         for idx in self.corridors:
-            corr = self.corridor(idx)
-            r = corr.size()
-            c = corr.pos() +1 # shifted by 1, for whatever reason
-            print "Corridor %s: top-left corner: (%s, %s), width: %s, height: %s" % (idx, 
-                                                                  c.x, c.y, r.x, r.y)
+            print "Corridor %s: %s" % (idx, self.corridor(idx))
+
     def get_corridor_index (self, pos, single = True):
         """
         Returns the index of the corridor a coordinate belongs to, or None
@@ -293,7 +290,7 @@ class ManorCollection (collection.ShapeCollection):
         for idx in self.corridors:
             corr = self.corridor(idx)
             r = corr.size()
-            c = corr.pos() + 1 # shifted by 1, for whatever reason
+            c = corr.pos()
             if (pos.x >= c.x and pos.x <= c.x + r.x
                 and pos.y >= c.y and pos.y <= c.y + r.y):
                 if single:
@@ -370,10 +367,16 @@ class ManorCollection (collection.ShapeCollection):
                 is_corridor = True
                 room = self.corridor(r)
 
-            start = room.pos() + coord.Coord(0,0)
+            start = room.pos()
             stop  = room.pos() + room.size()
+            horizontal = False
             if is_corridor:
-                print "Corridor %s: start=%s, stop=%s" % (r, start, stop)
+                if room.height() == 1:
+                    horizontal = True
+                    direction = "horizontal"
+                else:
+                    direction = "vertical"
+                print "Corridor %s: start=%s, stop=%s (%s)" % (r, start, stop, direction)
 
             for pos in coord.RectangleIterator(start, stop):
                 if (pos.x == 0 or pos.x == self.size().x -1
@@ -381,6 +384,27 @@ class ManorCollection (collection.ShapeCollection):
                     self.features.__setitem__(pos, WALL)
                 elif is_corridor:
                     self.features.__setitem__(pos, FLOOR)
+                    print pos
+
+                    adjacent = []
+                    if horizontal:
+                        adjacent = (coord.Coord(0,-1), coord.Coord(0,+1))
+                    else:
+                        adjacent = (coord.Coord(-1,0), coord.Coord(1,0))
+                    for dir in adjacent:
+                        pos2 = pos + dir
+                        # self.features.__setitem__(pos2, WALL)
+                        if pos2 <= 0 or pos2 >= self.size():
+                            continue
+                        corridx = self.get_corridor_indices(pos2)
+                        print "pos2: %s -> corridors=%s" % (pos2, corridx),
+                        if r in corridx:
+                            corridx.remove(r)
+                            print corridx
+                        else:
+                            print
+                        if len(corridx) == 0:
+                            self.features.__setitem__(pos2, WALL)
                 elif (pos.x == start.x or pos.x == stop.x - 1
                     or pos.y == start.y or pos.y == stop.y - 1):
                     self.features.__setitem__(pos, WALL)
@@ -446,12 +470,14 @@ class ManorCollection (collection.ShapeCollection):
             candidates = []
             w   = self.corridor(c).width()
             h   = self.corridor(c).height()
-            pos = self.corridor(c).pos() + 1
+            pos = self.corridor(c).pos()
             print "Corridor %s: (%s, %s), width: %s, height: %s" % (c, pos.x, pos.y, w, h)
-            self.count_shared_indices(coord.Coord(pos.x, pos.y), w, 0, 0, -1)
-            self.count_shared_indices(coord.Coord(pos.x, pos.y + h), w, 0)
-            self.count_shared_indices(coord.Coord(pos.x, pos.y), 0, h, -1, 0)
-            self.count_shared_indices(coord.Coord(pos.x + w, pos.y), 0, h)
+            if w > 1:
+                self.count_shared_indices(coord.Coord(pos.x, pos.y), w, 0, 0, -1)
+                self.count_shared_indices(coord.Coord(pos.x, pos.y + h), w, 0)
+            else:
+                self.count_shared_indices(coord.Coord(pos.x, pos.y), 0, h, -1, 0)
+                self.count_shared_indices(coord.Coord(pos.x + w, pos.y), 0, h)
 
     def mark_leg (self, leg):
         self.legs.append(leg)
