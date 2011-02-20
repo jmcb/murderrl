@@ -301,6 +301,12 @@ class ManorCollection (collection.ShapeCollection):
         return list
 
     def get_corridor_indices (self, pos):
+        """
+        Returns a list of indices of all corridors a coordinate belongs to,
+        or None if it's outside the manor.
+
+        :``pos``: A coord. *Required*
+        """
         return self.get_corridor_index(pos, False)
 
     def room (self, index):
@@ -345,22 +351,37 @@ class ManorCollection (collection.ShapeCollection):
         return list
 
     def get_room_indices (self, pos):
+        """
+        Returns a list of indices of all rooms a coordinate belongs to,
+        or None if it's outside the manor.
+
+        :``pos``: A coord. *Required*
+        """
         return self.get_room_index(pos, False)
 
     def init_features (self):
+        """
+        Initialise the manor's feature grid, placing floor and walls as
+        defined by the rooms/corridor layout.
+        """
         self.features = FeatureGrid(self.size().x, self.size().y)
 
         print "Manor size: %s" % self.size()
         print "Feature size: %s" % self.features.size()
 
+        # Get a combined list including both room and corridor indices.
+        # I might be overly cautious here, but it's so easy to overwrite
+        # existing lists by setting references without meaning to. (jpeg)
         boxes = []
         for r in self.rooms:
             boxes.append(r)
         for r in self.corridors:
             boxes.append(r)
-        print boxes
+
+        # Iterate over all rooms and corridors, and mark positions within
+        # them as floor, and their boundaries as walls.
         for r in boxes:
-            is_corridor = False
+            is_corridor = False # The "room" is actually a corridor.
             if r in self.rooms:
                 room = self.room(r)
             else:
@@ -369,7 +390,11 @@ class ManorCollection (collection.ShapeCollection):
 
             start = room.pos()
             stop  = room.pos() + room.size()
-            horizontal = False
+            # Note: Currently, only the main corridor is ever horizontal
+            # but that might change in the future.
+            horizontal = False # If a corridor, it's a horizontal one.
+
+            # Debugging output, and setting horizontal.
             if is_corridor:
                 if room.height() == 1:
                     horizontal = True
@@ -378,14 +403,18 @@ class ManorCollection (collection.ShapeCollection):
                     direction = "vertical"
                 print "Corridor %s: start=%s, stop=%s (%s)" % (r, start, stop, direction)
 
+            # Iterate over all coordinates within the room.
             for pos in coord.RectangleIterator(start, stop):
+                # If we've reached the manor boundary, this is a wall.
                 if (pos.x == 0 or pos.x == self.size().x -1
                     or pos.y == 0 or pos.y == self.size().y - 1):
                     self.features.__setitem__(pos, WALL)
+                # Corridors overwrite walls previously set by rooms.
                 elif is_corridor:
                     self.features.__setitem__(pos, FLOOR)
                     print pos
-
+                    # Depending on the corridor orientation, mark the
+                    # adjacent non-corridor squares as walls.
                     adjacent = []
                     if horizontal:
                         adjacent = (coord.Coord(0,-1), coord.Coord(0,+1))
@@ -405,66 +434,67 @@ class ManorCollection (collection.ShapeCollection):
                             print
                         if len(corridx) == 0:
                             self.features.__setitem__(pos2, WALL)
+                # The room boundary is always a wall.
                 elif (pos.x == start.x or pos.x == stop.x - 1
                     or pos.y == start.y or pos.y == stop.y - 1):
                     self.features.__setitem__(pos, WALL)
+                # Otherwise, we are inside the room.
+                # Mark as floor but don't overwrite previously placed walls.
                 elif self.features.__getitem__(pos) != WALL:
                     self.features.__setitem__(pos, FLOOR)
 
-    def add_doors_along_corridor (self, pos, range_x = 0, range_y = 0, plus_x = 0, plus_y = 0):
-        print "count_shared_indices(pos=%s, range_x=%s, range_y=%s, plus_x=%s, plus_y=%s)" % (pos, range_x, range_y, plus_x, plus_y)
-        assert range_x > 0 or range_y > 0
+    def add_doors_along_corridor (self, start, stop, offset = coord.Coord(0,0)):
+        """
+        Walks along a corridor, and for each adjacent room picks a random
+        wall spot to turn into a door.
 
-        if range_x == 0:
-            limit = range_y
-            if pos.x < 2 or pos.x >= self.size().x:
-                return
-        else:
-            limit = range_x
-            if pos.y < 2 or pos.y >= self.size().y:
-                return
+        :``start``: The corridor's starting position. *Required*
+        :``stop`: The corridor's end position. *Required*.
+        :``offset``: A coordinate specifying how the door position needs to be shifted. *Default (0,0)*.
+        """
+        print "add_doors_along_corridor(start=%s, stop=%s, offset=%s)" % (start, stop, offset)
+        assert stop > start
 
-        if limit < 1:
-            return
+        candidates = [] # All valid door spots for the current room.
+        old_room   = -1 # The index of the most recent room seen.
 
-        candidates = []
-        old_room   = -1
-        for i in range(0,limit):
-            if range_y == 0:
-                x = pos.x + i
-                if x + plus_x < 2 or x >= self.size().x:
-                    continue
-                y = pos.y
-            else:
-                x = pos.x
-                y = pos.y + i
-                if y + plus_y < 2 or y >= self.size().y:
-                    continue
+        for pos in coord.RectangleIterator(start, stop + 1):
+            if (pos.x + offset.x < 2 or pos.x + offset.x >= self.size().x - 1
+            or pos.y + offset.y < 2 or pos.y + offset.y >= self.size().y - 1):
+                continue
 
-            c_pos = coord.Coord(x, y)
-            rooms = self.get_room_indices(c_pos)
-            corrs = self.get_corridor_indices(c_pos)
+            if self.features.__getitem__(pos + offset) != WALL:
+                continue
+            rooms = self.get_room_indices(pos)
+            corrs = self.get_corridor_indices(pos)
+            # Make sure there's only exactly room for this wall.
+            # There also may be no other corridor except this one.
             if len(rooms) == 1 and len(corrs) == 1:
-                print "(%s, %s) -> %s" % (c_pos.x, c_pos.y, rooms)
+                print "(%s, %s) -> %s" % (pos.x, pos.y, rooms)
                 curr_room = rooms[0]
                 if old_room != curr_room:
+                    # We've reached another room. Time to pick a door spot for the old room.
                     if len(candidates):
-                        rand_coord = random.choice(candidates) + coord.Coord(plus_x, plus_y)
+                        rand_coord = random.choice(candidates) + offset
                         print "==> pick %s" % rand_coord
                         self.features.__setitem__(rand_coord, CLOSED_DOOR)
                         self.doors.append(rand_coord)
                         candidates = []
                     print "curr. room: %s" % curr_room
                 old_room = curr_room
-                candidates.append(c_pos)
+                candidates.append(pos)
 
+        # The corridor has reached an end. Pick a door spot for the last room seen.
         if len(candidates):
-            rand_coord = random.choice(candidates) + coord.Coord(plus_x, plus_y)
+            rand_coord = random.choice(candidates) + offset
             print "==> pick %s" % rand_coord
             self.features.__setitem__(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
 
     def add_doors (self):
+        """
+        For each corridor, adds doors to adjacent rooms.
+        """
         print "Adding doors..."
         self.doors = []
         corr = self.corridors
@@ -473,13 +503,18 @@ class ManorCollection (collection.ShapeCollection):
             w   = self.corridor(c).width()
             h   = self.corridor(c).height()
             pos = self.corridor(c).pos()
-            print "Corridor %s: (%s, %s), width: %s, height: %s" % (c, pos.x, pos.y, w, h)
-            if w > 1:
-                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), w, 0, 0, -1)
-                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y + h), w, 0)
-            else:
-                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), 0, h, -1, 0)
-                self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), 0, h)
+            print "Corridor %s: %s" % (c, self.corridor(c))
+            # Depending on the corridor's orientation, check the parallel runs
+            # to the left and right, or above and below the corridor.
+            # Walls to the left and top of a corridor position are not
+            # considered part of the corridor, so we need to use a shim
+            # to add doors on those sides as well.
+            if w > 1: # vertical corridor
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y), coord.Coord(0, -1))
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y + h), coord.Coord(pos.x + w, pos.y + h))
+            else: # horizontal corridor
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), coord.Coord(-1, 0))
+                self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), coord.Coord(pos.x + w, pos.y + h))
 
     def mark_leg (self, leg):
         self.legs.append(leg)
