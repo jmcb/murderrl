@@ -27,6 +27,7 @@ def main ():
     base_manor.init_features()
     # Add doors along corridors.
     base_manor.add_doors()
+    base_manor.add_windows()
     # Combine the room shapes into a canvas
     manor = base_manor.combine()
 
@@ -155,7 +156,7 @@ def main ():
                 ppos.x += 1
             else:
                 move_was_blocked = True
-        elif chr(ch) == 't':
+        elif (ch in range(256) and chr(ch) == 't'):
             # Toggle between feature grid (true) and canvas view (false).
             print_features = not print_features
             did_move = False

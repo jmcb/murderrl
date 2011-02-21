@@ -449,7 +449,7 @@ class ManorCollection (collection.ShapeCollection):
         wall spot to turn into a door.
 
         :``start``: The corridor's starting position. *Required*
-        :``stop`: The corridor's end position. *Required*.
+        :``stop``: The corridor's end position. *Required*.
         :``offset``: A coordinate specifying how the door position needs to be shifted. *Default (0,0)*.
         """
         print "add_doors_along_corridor(start=%s, stop=%s, offset=%s)" % (start, stop, offset)
@@ -515,6 +515,70 @@ class ManorCollection (collection.ShapeCollection):
             else: # horizontal corridor
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), coord.Coord(-1, 0))
                 self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), coord.Coord(pos.x + w, pos.y + h))
+
+    def add_window (self, start, stop):
+        """
+        Adds windows to the wall specified by two coordinates.
+
+        :``start``: The wall's starting position. *Required*
+        :``stop``: The wall's end position. *Required*.
+        """
+        full_window = False
+        if start.x == stop.x:
+            window = WINDOW_V
+            length = stop.y - start.y + 1
+        elif start.y == stop.y:
+            window = WINDOW_H
+            length = stop.x - start.x + 1
+        else:
+            return
+
+        if length < 5 or (length < 7 and one_chance_in(3)):
+            full_window = True
+        elif length >= 6 and one_chance_in(3):
+            # For really large windows, make them a bit smaller and
+            # move them into the centre.
+            full_window = True
+            if window == WINDOW_V:
+                start.y += 1
+                stop.y  -= 1
+            else:
+                start.x += 1
+                stop.x  -= 1
+        else:
+            # Split larger windows into two smaller ones.
+            midpost = length/2
+            width   = 1
+            if length == 5:
+                midpost += 1
+                width = 0
+            elif length%2 == 1:
+                midpost -= 1
+                width    = 2
+
+        count = 0
+        for pos in coord.RectangleIterator(start, stop + 1):
+            count += 1
+            if full_window or count < midpost or count > midpost + width:
+                self.features.__setitem__(pos, window)
+
+    def add_windows (self):
+        """
+        Adds windows to the outer walls of the manor.
+        Currently, walls defined by one or more legs do not get windows.
+        """
+        for r in self.rooms:
+            room  = self.room(r)
+            start = room.pos()
+            stop  = start + room.size()
+            if start.x == 0:
+                self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3))
+            elif stop.x == self.size().x:
+                self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3))
+            if start.y == 0:
+                self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y))
+            elif stop.y == self.size().y:
+                self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1))
 
     def mark_leg (self, leg):
         self.legs.append(leg)
