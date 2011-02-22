@@ -440,8 +440,20 @@ class ManorCollection (collection.ShapeCollection):
                     self.features.__setitem__(pos, WALL)
                 # Otherwise, we are inside the room.
                 # Mark as floor but don't overwrite previously placed walls.
-                elif self.features.__getitem__(pos) != WALL:
+                elif self.get_feature(pos) != WALL:
                     self.features.__setitem__(pos, FLOOR)
+
+    def get_feature (self, pos):
+        """
+        Returns the feature for the given position.
+
+        :``pos``: A coordinate within the manor. *Required*
+        """
+        if pos < coord.Coord(0,0) or pos >= self.size():
+            print "Invalid coord %s in manor of size %s" % (pos, self.size())
+            return NOTHING
+
+        return self.features.__getitem__(pos)
 
     def add_doors_along_corridor (self, start, stop, offset = coord.Coord(0,0)):
         """
@@ -463,7 +475,7 @@ class ManorCollection (collection.ShapeCollection):
             or pos.y + offset.y < 2 or pos.y + offset.y >= self.size().y - 1):
                 continue
 
-            if self.features.__getitem__(pos + offset) != WALL:
+            if self.get_feature(pos + offset) != WALL:
                 continue
             rooms = self.get_room_indices(pos)
             corrs = self.get_corridor_indices(pos)
@@ -516,23 +528,57 @@ class ManorCollection (collection.ShapeCollection):
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), coord.Coord(-1, 0))
                 self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), coord.Coord(pos.x + w, pos.y + h))
 
-    def add_window (self, start, stop):
+    def add_window (self, start, stop, offset_check = coord.Coord(0,0)):
         """
         Adds windows to the wall specified by two coordinates.
 
         :``start``: The wall's starting position. *Required*
         :``stop``: The wall's end position. *Required*.
+        :``offset_check``: A Coord offset to check for empty space. *Default (0,0)*.
         """
-        full_window = False
         if start.x == stop.x:
             window = WINDOW_V
-            length = stop.y - start.y + 1
         elif start.y == stop.y:
             window = WINDOW_H
-            length = stop.x - start.x + 1
         else:
             return
 
+        # If we got an offset passed in, we need to check whether adjacent
+        # positions are really empty, so the window doesn't look out on
+        # a wall or something.
+        # NOTE: Naturally, should we decide to fill the nothingness with
+        #       a garden of some sort, the whole routine will have to be
+        #       changed. (jpeg)
+        if offset_check != coord.Coord(0,0):
+            print "offset: %s, start=%s, stop=%s" % (offset_check, start, stop)
+            seen_nothing = False
+            for pos in coord.RectangleIterator(start, stop + 1):
+                adj_pos = pos + offset_check
+                if self.get_feature(adj_pos) == NOTHING:
+                    seen_nothing = True
+                else:
+                    if seen_nothing: # start already handled
+                        if window == WINDOW_H:
+                            stop.x = pos.x - 1
+                        else:
+                            stop.y = pos.y - 1
+                        break
+                    else:
+                        if window == WINDOW_H:
+                            start.x = pos.x + 1
+                        else:
+                            start.y = pos.y + 1
+            print "new start=%s, stop=%s" % (start, stop)
+
+        full_window = False
+        if start.x == stop.x:
+            length = stop.y - start.y + 1
+        elif start.y == stop.y:
+            length = stop.x - start.x + 1
+        # else:
+            # return
+
+        print "draw window for wall of length %s at (%s, %s)" % (length, start, stop)
         if length < 5 or (length < 7 and one_chance_in(3)):
             full_window = True
         elif length >= 6 and one_chance_in(3):
@@ -553,8 +599,23 @@ class ManorCollection (collection.ShapeCollection):
                 midpost += 1
                 width = 0
             elif length%2 == 1:
-                midpost -= 1
+                # midpost -= 1
                 width    = 2
+
+        # For full windows, there's a chance of making them smaller
+        # and placing them slightly off-center.
+        if full_window and one_chance_in(3):
+            shift = random.randint(1, max(1,length/3))
+            if window == WINDOW_H:
+                if coinflip():
+                    start.x += shift
+                else:
+                    stop.x  -= shift
+            else:
+                if coinflip():
+                    start.y += shift
+                else:
+                    stop.y  -= shift
 
         count = 0
         for pos in coord.RectangleIterator(start, stop + 1):
@@ -571,14 +632,29 @@ class ManorCollection (collection.ShapeCollection):
             room  = self.room(r)
             start = room.pos()
             stop  = start + room.size()
+            print "Room %s: %s" % (r, room)
+            # vertical windows
             if start.x == 0:
                 self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3))
+            elif (self.get_feature(coord.Coord(start.x-1, start.y+1)) == NOTHING
+            or self.get_feature(coord.Coord(start.x-1, stop.y-1)) == NOTHING):
+                self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3), coord.Coord(-1,0))
             elif stop.x == self.size().x:
                 self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3))
+            elif (self.get_feature(coord.Coord(stop.x+1, start.y+1)) == NOTHING
+            or self.get_feature(coord.Coord(stop.x+1, stop.y-1)) == NOTHING):
+                self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3), coord.Coord(+1, 0))
+            # horizontal windows
             if start.y == 0:
                 self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y))
+            elif (self.get_feature(coord.Coord(start.x+1, start.y-1)) == NOTHING
+            or self.get_feature(coord.Coord(stop.x-1, start.y-1)) == NOTHING):
+                self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y), coord.Coord(0,-1))
             elif stop.y == self.size().y:
                 self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1))
+            elif (self.get_feature(coord.Coord(start.x+1, stop.y+1)) == NOTHING
+            or self.get_feature(coord.Coord(stop.x-1, stop.y+1)) == NOTHING):
+                self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1), coord.Coord(0,+1))
 
     def mark_leg (self, leg):
         self.legs.append(leg)

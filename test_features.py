@@ -9,6 +9,8 @@ import curses
 import builder.manor
 import library.viewport, library.coord
 import interface.console
+from library.feature import *
+from interface.features import *
 
 screen = interface.console.select()
 
@@ -25,7 +27,7 @@ def main ():
 
     # Translate rooms and corridors into wall and floor features.
     base_manor.init_features()
-    # Add doors along corridors.
+    # Add doors along corridors, and windows.
     base_manor.add_doors()
     base_manor.add_windows()
     # Combine the room shapes into a canvas
@@ -33,11 +35,6 @@ def main ():
 
     # Debugging output
     print "Doors:", base_manor.doors
-    for c in base_manor.doors:
-        if c.x < 1 or c.x >= manor.size().x or c.y < 1 or c.y >= manor.size().y:
-            print "Coord %s out of bounds %s" % (c, manor.size())
-            continue
-        manor.__setitem__(c, '+')
     print "Rooms:"
     base_manor.print_rooms()
     print "#Legs: ", base_manor.count_legs()
@@ -45,6 +42,12 @@ def main ():
         print i
     print "Corridors:"
     base_manor.print_corridors()
+
+    # Draw features on canvas.
+    for pos in library.coord.RectangleIterator(manor.size()):
+        feat = base_manor.get_feature(pos)
+        if feat != NOTHING and feat != WALL and feat != FLOOR:
+            manor.__setitem__(pos, feat.glyph())
 
     # Initialise the view port.
     vp = library.viewport.ViewPort(buffer=manor,
