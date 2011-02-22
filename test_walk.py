@@ -10,6 +10,7 @@ import builder.manor
 import library.viewport, library.coord
 import interface.console
 from interface.features import *
+from library.feature import *
 
 screen = interface.console.select()
 
@@ -31,15 +32,16 @@ def main ():
     base_manor.init_features()
     # Add doors along corridors.
     base_manor.add_doors()
+    # Add doors along corridors, and windows.
+    base_manor.add_windows()
     # Combine the room shapes into a canvas.
     manor = base_manor.combine()
 
-    # Draw doors onto the canvas.
-    for c in base_manor.doors:
-        if c.x < 1 or c.x >= manor.size().x or c.y < 1 or c.y >= manor.size().y:
-            print "Coord %s out of bounds %s" % (c, manor.size())
-            continue
-        manor.__setitem__(c, '+')
+    # Draw features on canvas.
+    for pos in library.coord.RectangleIterator(manor.size()):
+        feat = base_manor.get_feature(pos)
+        if feat != NOTHING and feat != WALL and feat != FLOOR:
+            manor.__setitem__(pos, feat.glyph())
 
     # Initialise the view port.
     vp = library.viewport.ViewPort(buffer=manor,
@@ -55,9 +57,10 @@ def main ():
 
     # Initialise a couple of other variables.
     last_move = library.coord.Coord(0, 0) # the last step taken by the player
-    move_was_blocked = False # bumped into a wall
-    did_move         = True  # actually took a step
-    print_features   = False # draw manor via the feature grid
+    move_was_blocked = False   # bumped into a wall
+    did_move         = True    # actually took a step
+    print_features   = False   # draw manor via the feature grid
+    tried_move_feat  = NOTHING # The feature the player tried to move on.
     while True:
         screen.clear(" ")
 
@@ -88,7 +91,7 @@ def main ():
         screen.put("@", ppos + 1)
 
         if move_was_blocked:
-            put_text("Ouch! You bump into a wall!", library.coord.Coord(0, 22))
+            put_text("Ouch! You bump into a %s!" % tried_move_feat.name(), library.coord.Coord(0, 22))
         elif not did_move:
             mode = "canvas view"
             if print_features:
@@ -119,10 +122,15 @@ def main ():
         last_move        = library.coord.Coord(0, 0)
         move_was_blocked = False
         did_move         = True
+        tried_move_feat  = NOTHING
         if ch == curses.KEY_UP:
             last_move.y = -1
             next_pos = real_pos + last_move
-            if next_pos.y < 1 or not is_traversable(base_manor.features, next_pos):
+            if next_pos.y < 0:
+                move_was_blocked = True
+                continue
+            tried_move_feat = base_manor.get_feature(next_pos)
+            if not tried_move_feat.traversable():
                 move_was_blocked = True
             elif vp._top > 0:
                 vp.up(1)
@@ -131,8 +139,11 @@ def main ():
         elif ch == curses.KEY_DOWN:
             last_move.y = 1
             next_pos = real_pos + last_move
-            if (next_pos.y >= manor.size().y - 1
-            or not is_traversable(base_manor.features, next_pos)):
+            if next_pos.y >= manor.size().y:
+                move_was_blocked = True
+                continue
+            tried_move_feat = base_manor.get_feature(next_pos)
+            if not tried_move_feat.traversable():
                 move_was_blocked = True
             elif vp._top + vp._height < manor.size().y:
                 vp.down(1)
@@ -141,7 +152,11 @@ def main ():
         elif ch == curses.KEY_LEFT:
             last_move.x = -1
             next_pos = real_pos + last_move
-            if next_pos.x < 1 or not is_traversable(base_manor.features, next_pos):
+            if next_pos.x < 0:
+                move_was_blocked = True
+                continue
+            tried_move_feat = base_manor.get_feature(next_pos)
+            if not tried_move_feat.traversable():
                 move_was_blocked = True
             elif vp._left > 0:
                 vp.left(1)
@@ -150,8 +165,11 @@ def main ():
         elif ch == curses.KEY_RIGHT:
             last_move.x = 1
             next_pos = real_pos + last_move
-            if (next_pos.x >= manor.size().x - 1
-            or not is_traversable(base_manor.features, next_pos)):
+            if next_pos.x >= manor.size().x:
+                move_was_blocked = True
+                continue
+            tried_move_feat = base_manor.get_feature(next_pos)
+            if not tried_move_feat.traversable():
                 move_was_blocked = True
             elif vp._left + vp._width < manor.size().x:
                 vp.right(1)

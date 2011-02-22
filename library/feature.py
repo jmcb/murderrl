@@ -31,10 +31,10 @@ class Feature (object):
     passable = property(lambda self: self.traversable)
 
     def name (self):
-        return self.name
+        return self._name
 
     def description (self):
-        return self.description
+        return self._description
 
 class TextFeature (Feature):
     """
@@ -65,7 +65,7 @@ class TextFeature (Feature):
     def colour (self):
         return self._colour
 
-NOTHING = TextFeature(" ")
+NOTHING = TextFeature(" ", None, "nothingness", "Empty space.", False)
 
 class FeatureGrid (object):
     def __init__ (self, width, height):
