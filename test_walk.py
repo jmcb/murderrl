@@ -100,8 +100,7 @@ def main ():
         elif base_manor.features.__getitem__(real_pos) == CLOSED_DOOR:
             put_text("You see here a door.", library.coord.Coord(0, 22))
 
-        # Debugging information.
-        put_text("Sect size : %s, Start coord: %s, Stop coord: %s" % (sect.size(), library.coord.Coord(vp._left, vp._top), library.coord.Coord(vp._left + vp._width, vp._top + vp._height)), library.coord.Coord(0, 23))
+        ## Debugging information.
 
         # Get the current room/corridor id.
         id = base_manor.get_corridor_index(real_pos + 1)
@@ -109,6 +108,9 @@ def main ():
         if id == None:
             id   = base_manor.get_room_index(real_pos +  1)
             type = "room"
+        room_desc = base_manor.get_roomprop(id)
+        put_text("Sect size : %s, Start coord: %s, Stop coord: %s, %s" % (sect.size(), library.coord.Coord(vp._left, vp._top), library.coord.Coord(vp._left + vp._width, vp._top + vp._height), room_desc), library.coord.Coord(0, 23))
+
         put_text("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (manor.size(), real_pos + 1, last_move, type, id), library.coord.Coord(0, 24))
 
         # Get a key.

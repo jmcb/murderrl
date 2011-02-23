@@ -34,11 +34,14 @@ H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
 U_LAYOUT = "U-corridors"
 
+ROOM_WIDTH  = 12
+ROOM_HEIGHT = 7
+
 class Room (object):
     """
     Currently a builder-only representation of a room.
     """
-    def __init__ (self, width=12, height=7, start=None, stop=None):
+    def __init__ (self, width=ROOM_WIDTH, height=ROOM_HEIGHT, start=None, stop=None):
         """
         Create a room.
 
@@ -61,6 +64,24 @@ class Room (object):
 
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
+
+class RoomProps (Room):
+    def __init__ (self, name=None, start=None, width=ROOM_WIDTH, height=ROOM_HEIGHT):
+        self.name = name
+        Room.__init__(self, width, height, start)
+
+    def __repr__ (self):
+        if self.name:
+            return self.name
+        return "buggy crawl space"
+
+    def mark_as_corridor (self, is_corridor = True):
+        self.is_corridor = is_corridor
+
+    def is_corridor (self):
+        if self.is_corridor:
+            return self.is_corridor
+        return False
 
 class Corridor (shape.Shape):
     pass
@@ -355,32 +376,76 @@ class ManorCollection (collection.ShapeCollection):
         Returns a list of indices of all rooms a coordinate belongs to,
         or None if it's outside the manor.
 
-        :``pos``: A coord. *Required*
+        :``pos``: A coord. *Required*.
         """
         return self.get_room_index(pos, False)
+
+    def get_room_corridors (self):
+        """
+        Get a combined list including both room and corridor indices.
+        """
+        # I might be overly cautious here, but it's so easy to overwrite
+        # existing lists by setting references without meaning to. (jpeg)
+        room_corridors = []
+        for r in self.rooms:
+            room_corridors.append(r)
+        for c in self.corridors:
+            room_corridors.append(c)
+        room_corridors.sort()
+        return room_corridors
+
+    def init_room_properties (self):
+        """
+        Initialises a list of RoomProp objects for each room and corridor
+        in the manor.
+        """
+        self.room_props = []
+        for r in self.get_room_corridors():
+            if r in self.rooms:
+                room   = self.room(r)
+                start  = room.pos()
+                size   = room.size()
+                width  = size.x
+                height = size.y
+                room_prop = RoomProps("room %s" % r, start, width, height)
+            else:
+                corr   = self.corridor(r)
+                start  = corr.pos()
+                width  = corr.width()
+                height = corr.height()
+                name   = "corridor %s" % r
+                if r == self.main_corridor:
+                    name = "main corridor"
+                room_prop = RoomProps(name, start, width, height)
+                room_prop.mark_as_corridor()
+
+            self.room_props.append(room_prop)
+
+    def get_roomprop (self, idx):
+        """
+        Returns a RoomProp object for a given room index.
+
+        :``idx``: A room or corridor index. *Required*.
+        """
+        if not self.room_props:
+            return None
+        assert(idx < len(self.room_props))
+        return self.room_props[idx]
 
     def init_features (self):
         """
         Initialise the manor's feature grid, placing floor and walls as
         defined by the rooms/corridor layout.
         """
+        self.init_room_properties()
         self.features = FeatureGrid(self.size().x, self.size().y)
 
         print "Manor size: %s" % self.size()
         print "Feature size: %s" % self.features.size()
 
-        # Get a combined list including both room and corridor indices.
-        # I might be overly cautious here, but it's so easy to overwrite
-        # existing lists by setting references without meaning to. (jpeg)
-        boxes = []
-        for r in self.rooms:
-            boxes.append(r)
-        for r in self.corridors:
-            boxes.append(r)
-
         # Iterate over all rooms and corridors, and mark positions within
         # them as floor, and their boundaries as walls.
-        for r in boxes:
+        for r in self.get_room_corridors():
             is_corridor = False # The "room" is actually a corridor.
             if r in self.rooms:
                 room = self.room(r)
