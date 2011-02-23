@@ -528,6 +528,23 @@ class ManorCollection (collection.ShapeCollection):
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), coord.Coord(-1, 0))
                 self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), coord.Coord(pos.x + w, pos.y + h))
 
+    def pick_door_along_wall (self, start, stop, offset):
+        """
+        Picks a door spot for a wall specified by two coordinates.
+
+        :``start``: The wall's starting position. *Required*
+        :``stop``: The wall's end position. *Required*.
+        :``offset_check``: A Coord offset to check for adjacent non-walls. *Required*.
+        """
+        candidates = []
+        for pos in coord.RectangleIterator(start, stop + 1):
+            if (self.get_feature(pos) == WALL
+            and self.get_feature(pos + offset) != WALL):
+                candidates.append(pos)
+
+        assert(len(candidates) > 0)
+        return random.choice(candidates)
+
     def add_window (self, start, stop, offset_check = coord.Coord(0,0)):
         """
         Adds windows to the wall specified by two coordinates.
@@ -626,35 +643,81 @@ class ManorCollection (collection.ShapeCollection):
     def add_windows (self):
         """
         Adds windows to the outer walls of the manor.
-        Currently, walls defined by one or more legs do not get windows.
+        Also adds doors to rooms that still lack them.
         """
+        door_rooms = []
+        for d in self.doors:
+            rooms = self.get_room_index(d, False)
+            if len(rooms) > 0:
+                for r in rooms:
+                    if r not in door_rooms:
+                        door_rooms.append(r)
+
         for r in self.rooms:
             room  = self.room(r)
             start = room.pos()
             stop  = start + room.size()
             print "Room %s: %s" % (r, room)
-            # vertical windows
+
+            needs_door = (r not in door_rooms)
+            if needs_door:
+                print "-> room needs a door!"
+
+            door_candidates = []
+            # left-side vertical windows
             if start.x == 0:
                 self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3))
             elif (self.get_feature(coord.Coord(start.x-1, start.y+1)) == NOTHING
             or self.get_feature(coord.Coord(start.x-1, stop.y-1)) == NOTHING):
                 self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3), coord.Coord(-1,0))
-            elif stop.x == self.size().x:
+            elif needs_door: # place a door
+                d = self.pick_door_along_wall(coord.Coord(start.x, start.y + 1), coord.Coord(start.x, stop.y - 2), coord.Coord(-1,0))
+                door_candidates.append(d)
+
+            # right-side vertical windows
+            if stop.x == self.size().x:
                 self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3))
             elif (self.get_feature(coord.Coord(stop.x+1, start.y+1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x+1, stop.y-1)) == NOTHING):
                 self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3), coord.Coord(+1, 0))
-            # horizontal windows
+            elif needs_door: # place a door
+                d = self.pick_door_along_wall(coord.Coord(stop.x - 1, start.y + 1), coord.Coord(stop.x - 1, stop.y - 2), coord.Coord(+1, 0))
+                door_candidates.append(d)
+
+            # top horizontal windows
             if start.y == 0:
                 self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y))
             elif (self.get_feature(coord.Coord(start.x+1, start.y-1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x-1, start.y-1)) == NOTHING):
                 self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y), coord.Coord(0,-1))
-            elif stop.y == self.size().y:
+            elif needs_door: # place a door
+                d = self.pick_door_along_wall(coord.Coord(start.x + 1, start.y), coord.Coord(stop.x - 2, start.y), coord.Coord(0,-1))
+                door_candidates.append(d)
+
+            # bottom horizontal windows
+            if stop.y == self.size().y:
                 self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1))
             elif (self.get_feature(coord.Coord(start.x+1, stop.y+1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x-1, stop.y+1)) == NOTHING):
                 self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1), coord.Coord(0,+1))
+            elif needs_door: # place a door
+                d = self.pick_door_along_wall(coord.Coord(start.x + 1, stop.y - 1), coord.Coord(stop.x - 2, stop.y - 1), coord.Coord(0,+1))
+                door_candidates.append(d)
+
+            if needs_door:
+                # Adding doors to all applicable walls guarantees that
+                # all rooms are fully connected, but does mean that some
+                # rooms get 2-3 doors.
+                for d in door_candidates:
+                    print "==> add door at pos %s" % d
+                    self.features.__setitem__(d, OPEN_DOOR)
+                    self.doors.append(d)
+
+                    # Update door-less rooms.
+                    rooms = self.get_room_indices(d)
+                    for r in rooms:
+                        if r not in door_rooms:
+                            door_rooms.append(r)
 
     def mark_leg (self, leg):
         self.legs.append(leg)
