@@ -394,6 +394,47 @@ class ManorCollection (collection.ShapeCollection):
         room_corridors.sort()
         return room_corridors
 
+    def get_corridor_name (self, idx):
+        assert(idx in self.corridors)
+        if idx == self.main_corridor:
+            return "main corridor"
+
+        corr  = self.corridor(idx)
+        start = corr.pos()
+        stop  = start + coord.Coord(corr.width(), corr.height())
+
+        dir_horizontal = ""
+        if start.y < self.size().y/4:
+            dir_horizontal += "north"
+        elif stop.y > 3*self.size().y/4:
+            dir_horizontal += "south"
+        dir_vertical = ""
+        if start.x < self.size().x/4:
+            dir_vertical += "west"
+        elif stop.x > 3*self.size().x/4:
+            dir_vertical += "east"
+
+        # only one other corridor
+        if len(self.corridors) == 2:
+            if dir_horizontal != "" and dir_vertical != "":
+                if coinflip():
+                    dir_horizontal = ""
+                else:
+                    dir_vertical = ""
+        # two other corridors
+        elif len(self.corridors) == 3:
+            if corr.width() == 1: # vertical
+                dir_horizontal = ""
+            else:
+                dir_vertical = ""
+
+        # else just combine both values
+        if dir_horizontal != "" or dir_vertical != "":
+            return "%s%s corridor" % (dir_horizontal, dir_vertical)
+
+        # If none of these match, just return the number.
+        return "corridor %s" % idx
+
     def init_room_properties (self):
         """
         Initialises a list of RoomProp objects for each room and corridor
@@ -413,9 +454,8 @@ class ManorCollection (collection.ShapeCollection):
                 start  = corr.pos()
                 width  = corr.width()
                 height = corr.height()
-                name   = "corridor %s" % r
-                if r == self.main_corridor:
-                    name = "main corridor"
+                name   = self.get_corridor_name(r)
+
                 room_prop = RoomProps(name, start, width, height)
                 room_prop.mark_as_corridor()
 

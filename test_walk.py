@@ -26,6 +26,7 @@ def main ():
 
     # First, build the manor.
     # base_manor = builder.manor.base_builder()
+    # base_manor = builder.manor.build_L()
     base_manor = builder.manor.build_random()
 
     # Translate rooms and corridors into wall and floor features.
