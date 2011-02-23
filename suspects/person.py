@@ -73,18 +73,6 @@ class Person (object):
         return "%s (%s), %s%s%s" % (self.get_fullname(),
                self.gender, job, hair, self.age)
 
-    def get_index (self, list):
-        """
-        Returns the current person's index in the suspects[] list.
-
-        :``list``: An object of type SuspectList. *Required*.
-        """
-        s = list.suspects
-        for i in xrange(list.no_of_suspects()):
-            if s[i] == self:
-                return i
-        return -1
-
     def set_random_last_name (self, last = None):
         """
         Sets a person's appropriate last name (upperclass, middleclass,
@@ -143,8 +131,6 @@ class Person (object):
     def set_relative (self, idx, type):
         """
         Add a relative to this person's relationship list.
-        Requires suspects[] index and relationship type
-        ('spouse', 'parent', 'child', 'engaged').
 
         :``idx``: The current person's index in the suspect list. *Required*.
         :``type``: The type of the relationship: ``REL_SPOUSE``,
@@ -172,40 +158,6 @@ class Person (object):
             return False
 
         return True
-
-    def get_alibi (self, list):
-        """
-        Returns a description of a person's alibi, if known.
-
-        :``list``: An object of type SuspectList. *Required*.
-        """
-        if not self.alibi:
-            return "unknown"
-
-        a = self.alibi
-        witness = ""
-        if self.has_alibi_witness():
-            witness = "with %s" % list.get_suspect(a.witness).get_name()
-        else:
-            witness = "alone"
-        return "%s, %s" % (a.room, witness)
-
-    def get_alibi_statement (self, list):
-        """
-        Returns the reply to the question, "Where were you yesterday at 8 pm?"
-
-        :``list``: An object of type SuspectList. *Required*.
-        """
-        if not self.alibi:
-            return "\"I'm sorry. I don't remember.\""
-
-        a = self.alibi
-        witness = None
-        if self.has_alibi_witness():
-            witness = self.call_relative(list, a.witness)
-            # witness = list.get_suspect(a.witness).get_name()
-
-        return "\"%s\"" % db_get_alibi_statement(a.room, witness)
 
     def get_name (self):
         """
@@ -268,30 +220,6 @@ class Person (object):
                 return r[1]
 
         return None
-
-    def describe_relations (self, list):
-        """
-        Prints a listing of this person's relatives.
-
-        :``list``: An object of type SuspectList. *Required*.
-        """
-        if self.rel:
-            print "    related to:",
-            num_range = xrange(len(self.rel))
-            for i in num_range:
-                r = self.rel[i]
-                if i:
-                    print "               ",
-                print "%d. %s (%s)" % (r[0]+1, list.get_suspect(r[0]).get_name(), r[1])
-
-    def describe (self, list):
-        """
-        Prints the person's description and lists their relationships.
-
-        :``list``: An object of type SuspectList. *Required*.
-        """
-        print self
-        self.describe_relations(list)
 
     def get_mirrored_gender (self):
         """
@@ -361,37 +289,6 @@ class Person (object):
                 return r[1] == type
 
         return False
-
-    def call_relative (self, list, other_idx):
-        """
-        Returns a string depicting how the current person would refer to
-        another person, depending on the degree of relationship.
-
-        :``list``: An object of type SuspectList. *Required*.
-        :``other_idx``: The suspects[] index of the supposed relative. *Required*
-        """
-        idx = self.get_index(list)
-        o = list.get_suspect(other_idx)
-
-        r = o.get_relationship(idx)
-        if r != None:
-            if self.is_relative(other_idx, REL_PARENT):
-                return "my %s, %s," % (r, o.get_fullname())
-            if (self.is_relative(other_idx, REL_SPOUSE)
-                or self.is_relative(other_idx, REL_ENGAGED)
-                or coinflip()):
-                return "%s, my %s," % (o.first, r)
-            else:
-                return "my %s %s" % (r, o.first)
-
-        r = list.get_extended_relationship(idx, other_idx)
-        if r != None:
-            if coinflip():
-                return "%s, my %s," % (o.get_fullname(), r)
-
-            return "my %s, %s," % (r, o.get_fullname())
-
-        return o.get_fullname()
 
     def chance_of_spouse (self):
         """
@@ -532,6 +429,18 @@ class SuspectList (object):
         """
         return self.no_of_suspects() - 1
 
+    def get_suspect_index (self, p):
+        """
+        Returns the given person's index in the suspects[] list.
+
+        :``p``: A object of type Person. *Required*.
+        """
+        s = self.suspects
+        for i in xrange(self.no_of_suspects()):
+            if s[i] == p:
+                return i
+        return -1
+
     def get_suspect (self, idx):
         """
         Returns a Person object matching the given index in the
@@ -648,6 +557,36 @@ class SuspectList (object):
 
         return "none"
 
+    def call_relative (self, idx, other_idx):
+        """
+        Returns a string depicting how one person would refer to another,
+        depending on their degree of relationship.
+
+        :``idx``: The suspects[] index of the first person. *Required*.
+        :``other_idx``: The suspects[] index of the supposed relative. *Required*
+        """
+        p = self.get_suspect(idx)
+        o = self.get_suspect(other_idx)
+        r = o.get_relationship(idx)
+        if r != None:
+            if p.is_relative(other_idx, REL_PARENT):
+                return "my %s, %s," % (r, o.get_fullname())
+            if (p.is_relative(other_idx, REL_SPOUSE)
+                or p.is_relative(other_idx, REL_ENGAGED)
+                or coinflip()):
+                return "%s, my %s," % (o.first, r)
+            else:
+                return "my %s %s" % (r, o.first)
+
+        r = self.get_extended_relationship(idx, other_idx)
+        if r != None:
+            if coinflip():
+                return "%s, my %s," % (o.get_fullname(), r)
+
+            return "my %s, %s," % (r, o.get_fullname())
+
+        return o.get_fullname()
+
     def get_suspect_description (self, idx):
         """
         Prints a screen describing a person.
@@ -685,11 +624,36 @@ class SuspectList (object):
         if idx == self.victim:
             desc += "\nThe clue: a %s hair!\n" % self.get_murderer().hair
         else:
-            desc += "\nAlibi: %s\n" % p.get_alibi_statement(self)
+            desc += "\nAlibi: %s\n" % self.get_alibi_statement(idx)
             if p.has_alibi_witness():
                 has_witness = True
 
         return desc
+
+    def describe_relations (self, idx):
+        """
+        Prints a listing of this person's relatives.
+
+        :``idx``: An index in the suspects list. *Required*.
+        """
+        p = self.get_suspect(idx)
+        if p.rel:
+            print "    related to:",
+            num_range = xrange(len(p.rel))
+            for i in num_range:
+                r = p.rel[i]
+                if i:
+                    print "               ",
+                print "%d. %s (%s)" % (r[0]+1, self.get_suspect(r[0]).get_name(), r[1])
+
+    def describe_suspect_relationships (self, idx):
+        """
+        Prints the person's description and lists their relationships.
+
+        :``idx``: An index in the suspects list. *Required*.
+        """
+        print self.get_suspect(idx)
+        self.describe_relations(idx)
 
     def describe_suspect (self, idx):
         """
@@ -709,6 +673,41 @@ class SuspectList (object):
         key = screen.get(block=True)
         if (has_witness and chr(key) == 'w'):
             self.describe_suspect(p.alibi.witness)
+
+    def get_short_alibi_description (self, idx):
+        """
+        Returns a description of a person's alibi, if known.
+
+        :``idx``: An index in the suspects list. *Required*.
+        """
+        p = self.get_suspect(idx)
+        if not p.alibi:
+            return "unknown"
+
+        a = p.alibi
+        witness = ""
+        if p.has_alibi_witness():
+            witness = "with %s" % self.get_suspect(a.witness).get_name()
+        else:
+            witness = "alone"
+        return "%s, %s" % (a.room, witness)
+
+    def get_alibi_statement (self, idx):
+        """
+        Returns the reply to the question, "Where were you yesterday at 8 pm?"
+
+        :``idx``: The index in the suspects list. *Required*.
+        """
+        p = self.get_suspect(idx)
+        if not p.alibi:
+            return "\"I'm sorry. I don't remember.\""
+
+        a = p.alibi
+        witness = None
+        if p.has_alibi_witness():
+            witness = self.call_relative(idx, a.witness)
+
+        return "\"%s\"" % db_get_alibi_statement(a.room, witness)
 
     def pick_victim (self):
         """
@@ -933,16 +932,6 @@ class SuspectList (object):
                     s.occupation = random.choice(jobs_staff_female)
                 else:
                     s.occupation = random.choice(jobs_staff_male)
-#            elif (s.age >= 25 and
-#                    not (s.is_married() or s.has_children())):
-                # some more exotic guests
-#                if s.age < 50 and one_chance_in(10):
-#                    if s.gender == 'm':
-#                        s.occupation = 'actor'
-#                    else:
-#                        s.occupation = 'actress'
-#                elif s.gender == 'm' and one_chance_in(10):
-#                    s.occupation = 'painter'
 
     def create_paired_alibi (self, p1, p2, room):
         """
@@ -1053,7 +1042,7 @@ class SuspectList (object):
         for i in xrange(len(alibis)):
             idx = alibis[i]
             p = self.get_suspect(idx)
-            print "%s: %s" % (p.get_name(), p.get_alibi(self))
+            print "%s: %s" % (p.get_name(), self.get_short_alibi_description(idx))
 
     def add_hair_colours (self):
         """
@@ -1123,7 +1112,7 @@ class SuspectList (object):
             elif self.is_murderer(i):
                 print "***MURDERER***"
             print "Suspect %s:" % (i+1),
-            s.describe(self)
+            self.describe_suspect_relationships(i)
 
 ##############################################
 # Global methods

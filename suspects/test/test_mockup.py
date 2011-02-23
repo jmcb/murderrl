@@ -40,12 +40,12 @@ def print_mystery (num = 10):
     print "The victim: %s, %s" % (sl.get_victim().get_name(),
                                   sl.get_victim().describe_hair())
 
-    total_suspects = xrange(len(sl.suspects))
+    total_suspects = range(len(sl.suspects))
+    total_suspects.remove(sl.victim)
     print_header("All suspects");
     for i in total_suspects:
-        if not sl.is_victim(i):
-            p = sl.get_suspect(i)
-            print "%s, %s" % (p.get_name(), p.describe_hair())
+        p = sl.get_suspect(i)
+        print "%s, %s" % (p.get_name(), p.describe_hair())
 
     print "\nThe clue: a %s hair!" % sl.get_murderer().hair
 
