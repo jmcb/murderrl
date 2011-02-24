@@ -399,8 +399,12 @@ class ManorCollection (collection.ShapeCollection):
                 size   = curr.size()
                 width  = size.x
                 height = size.y
-                room_prop = room.RoomProps("room %s" % r, start, width, height)
-                room_prop.fill_from_database()
+                if r == 0:
+                    room_prop = room.RoomProps("entrance hall", start, width, height)
+                    self.entrance_hall = 0
+                else:
+                    room_prop = room.RoomProps("room %s" % r, start, width, height)
+                    room_prop.fill_from_database()
             else:
                 corr   = self.corridor(r)
                 start  = corr.pos()

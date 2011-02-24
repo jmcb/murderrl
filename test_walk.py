@@ -49,12 +49,9 @@ def main ():
                                    width =min(manor.size().width, 70),
                                    height=min(manor.size().height, 20))
 
-    # Place the player on the first door we see.
-    size = vp.sect().size()
-    for coord in library.coord.RectangleIterator(size - 1):
-        if base_manor.features.__getitem__(coord) == CLOSED_DOOR:
-            real_pos = coord # player (@) position in the viewport
-            break
+    # Initially place the player in the centre of the entrance hall.
+    ehall = base_manor.get_room(base_manor.entrance_hall)
+    real_pos = library.coord.Coord(ehall.pos().x + ehall.size().x/2, ehall.pos().y + ehall.size().y/2)
 
     # Initialise a couple of other variables.
     last_move = library.coord.Coord(0, 0) # the last step taken by the player
