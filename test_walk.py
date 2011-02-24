@@ -53,7 +53,7 @@ def main ():
     size = vp.sect().size()
     for coord in library.coord.RectangleIterator(size - 1):
         if base_manor.features.__getitem__(coord) == CLOSED_DOOR:
-            ppos = coord # player (@) position in the viewport
+            real_pos = coord # player (@) position in the viewport
             break
 
     # Initialise a couple of other variables.
@@ -65,11 +65,9 @@ def main ():
     while True:
         screen.clear(" ")
 
-        # The currently visible section of the viewport.
+        # The currently visible section of the viewport, centered on the player.
+        vp.centre(real_pos, manor.size())
         sect = vp.sect()
-
-        # The real player position in the manor.
-        real_pos = library.coord.Coord(vp._left + ppos.x + 1, vp._top + ppos.y + 1)
 
         # Depending on the current toggle state (toggle key 't'), either draw
         # the manor via the feature grid, or via the shape canvas.
@@ -86,10 +84,9 @@ def main ():
                     char = " "
                 screen.put(char, coord+1)
 
-        real_pos = library.coord.Coord(vp._left + ppos.x, vp._top + ppos.y)
-
+        canvas_pos = library.coord.Coord(real_pos.x - vp._left, real_pos.y - vp._top)
         # Draw the player.
-        screen.put("@", ppos + 1)
+        screen.put("@", canvas_pos + 1)
 
         if move_was_blocked:
             put_text("Ouch! You bump into a %s!" % tried_move_feat.name(), library.coord.Coord(0, 22))
@@ -135,10 +132,8 @@ def main ():
             tried_move_feat = base_manor.get_feature(next_pos)
             if not tried_move_feat.traversable():
                 move_was_blocked = True
-            elif vp._top > 0:
-                vp.up(1)
             else:
-                ppos.y -= 1
+                real_pos.y -= 1
         elif ch == curses.KEY_DOWN:
             last_move.y = 1
             next_pos = real_pos + last_move
@@ -148,10 +143,8 @@ def main ():
             tried_move_feat = base_manor.get_feature(next_pos)
             if not tried_move_feat.traversable():
                 move_was_blocked = True
-            elif vp._top + vp._height < manor.size().y:
-                vp.down(1)
             else:
-                ppos.y += 1
+                real_pos.y += 1
         elif ch == curses.KEY_LEFT:
             last_move.x = -1
             next_pos = real_pos + last_move
@@ -161,10 +154,8 @@ def main ():
             tried_move_feat = base_manor.get_feature(next_pos)
             if not tried_move_feat.traversable():
                 move_was_blocked = True
-            elif vp._left > 0:
-                vp.left(1)
             else:
-                ppos.x -= 1
+                real_pos.x -= 1
         elif ch == curses.KEY_RIGHT:
             last_move.x = 1
             next_pos = real_pos + last_move
@@ -174,10 +165,8 @@ def main ():
             tried_move_feat = base_manor.get_feature(next_pos)
             if not tried_move_feat.traversable():
                 move_was_blocked = True
-            elif vp._left + vp._width < manor.size().x:
-                vp.right(1)
             else:
-                ppos.x += 1
+                real_pos.x += 1
         elif chr(ch) == 't':
             # Toggle between feature grid (true) and canvas view (false).
             print_features = not print_features

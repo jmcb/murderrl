@@ -41,6 +41,15 @@ class ViewPort (object):
     def size (self):
         return coord.Coord(self._width, self._height)
 
+    def centre (self, pos, stop):
+        # Centre the buffer on the screen.
+        self._left = max(0, pos.x - self._width/2)
+        self._top  = max(0, pos.y - self._height/2)
+        if self._left + self._width > stop.x:
+            self._left = stop.x - self._width
+        if self._top + self._height > stop.y:
+            self._top = stop.y - self._height
+
     def sect (self):
         width  = self._width
         height = self._height
