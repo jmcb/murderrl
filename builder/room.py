@@ -4,6 +4,7 @@
 import random
 from library import shape, coord
 import database.database as db
+from interface.output import *
 
 ROOM_WIDTH  = 12
 ROOM_HEIGHT = 7
@@ -41,7 +42,7 @@ class RoomProps (Room):
         self.name = name
         Room.__init__(self, width, height, start)
 
-    def __repr__ (self):
+    def __str__ (self):
         if self.name:
             return self.name
         return "buggy crawl space"
@@ -62,5 +63,20 @@ class RoomProps (Room):
         new_room = dbr.random_pop()
         if (new_room):
             self.name = new_room.name
+            # FIXME: Doesn't work. The value is not getting read in from the db.
             if new_room.section == "utility":
                 self.utility = True
+
+    def get_room_description (self):
+        """
+        Returns a room's description.
+        """
+        # Very basic right now, but will eventually include adjoining rooms
+        # and furniture.
+        return "You are standing in the %s." % self.name
+
+    def describe (self):
+        """
+        Print a room description.
+        """
+        print_screen(self.get_room_description())

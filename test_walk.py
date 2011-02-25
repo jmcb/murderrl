@@ -164,6 +164,10 @@ def main ():
                 move_was_blocked = True
             else:
                 real_pos.x += 1
+        elif chr(ch) == 'd':
+            # Describe current room.
+            room = base_manor.get_roomprop(id)
+            room.describe()
         elif chr(ch) == 't':
             # Toggle between feature grid (true) and canvas view (false).
             print_features = not print_features
