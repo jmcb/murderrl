@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import library.viewport, library.coord
-import interface.console
+from library import coord
+from interface import console
+from output import *
 
-screen = interface.console.select()
-coord  = library.coord.Coord
+screen = console.select()
 
 class Entry (object):
     """
@@ -74,38 +74,6 @@ class Menu (object):
         """
         self.mlist.append(entry)
 
-    def print_line (self, text, pos):
-        """
-        Prints a line of text beginning at the coordinate pos.
-
-        :``text``: The text to be printed. *Required*.
-        :``pos``: The starting coord (of type ``Coord``) for printing. *Required*.
-        """
-        for ind, char in enumerate(text):
-            screen.put(char, coord(pos.x+ind, pos.y))
-
-    def print_text (self, text, pos, max_columns = 70):
-        """
-        Chops a text into several lines and prints it to the screen, beginning
-        at coordinate pos. Chopping happens at position max_columns; no attempt
-        is made to look for a better cutting position.
-
-        :``text``: The text to be printed. *Required*.
-        :``pos``: The starting coord (of type ``Coord``) for printing. *Required*.
-        :``max_columns``: After this column, the text is wrapped onto the next line. 
-                          *Default 70*.
-        """
-        line = pos.y
-        col  = 0
-        for char in text:
-            if (char == "\n" or col > max_columns):
-                col   = 0
-                line += 1
-                if char == "\n":
-                    continue
-            screen.put(char, coord(col, pos.y + line))
-            col += 1
-
     def draw_menu (self):
         """
         Prints the entire menu on an otherwise empty screen.
@@ -113,12 +81,12 @@ class Menu (object):
         screen.clear(" ")
         line = 0
         if self.title:
-            self.print_line(self.title, coord(0, 0))
+            print_line(self.title)
             line = 1
 
         mlist = self.mlist
         for i in xrange(len(mlist)):
-            self.print_line(mlist[i].__str__(), coord(0, line + i))
+            print_line(mlist[i].__str__(), coord.Coord(0, line + i))
 
     def process_key (self, key = None):
         """
@@ -136,9 +104,7 @@ class Menu (object):
             if mlist[i].key_matches(chr(key)):
                 fulldesc = mlist[i].activate()
                 if fulldesc:
-                    screen.clear(" ")
-                    self.print_text(fulldesc, coord(0,0))
-                    screen.get(block=True)
+                    print_screen(fulldesc)
                 return True
 
         return False
