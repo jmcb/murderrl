@@ -18,6 +18,15 @@ screen = interface.console.select()
 def is_traversable (feature_grid, pos):
     return feature_grid.__getitem__(pos).traversable()
 
+def get_command_help ():
+    help  = "Command help\n\n"
+    help += "Use the arrow keys for movement.\n\n"
+    help += "d: describe current room\n"
+    help += "h: display this screen\n"
+    help += "t: toggle between canvas view (default) and feature grid\n\n"
+    help += "Any other key exits the program."
+    return help
+
 def main ():
     screen.init()
 
@@ -165,6 +174,9 @@ def main ():
             # Describe current room.
             room = base_manor.get_roomprop(id)
             room.describe()
+        elif chr(ch) == 'h':
+            # Print command help.
+            print_screen(get_command_help())
         elif chr(ch) == 't':
             # Toggle between feature grid (true) and canvas view (false).
             print_features = not print_features
