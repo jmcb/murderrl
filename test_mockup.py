@@ -60,19 +60,14 @@ class Game (object):
         ehall = self.base_manor.get_room(self.base_manor.entrance_hall)
         self.player_pos = coord.Coord(ehall.pos().x + ehall.size().x/2, ehall.pos().y + ehall.size().y/2)
 
-        self.last_move        = DIR_NOWHERE # the last step taken by the player
         self.game_start       = True    # Game just started.
+        self.debugging        = False   # debugging mode
+        self.last_move        = DIR_NOWHERE # the last step taken by the player
         self.move_was_blocked = False   # bumped into a wall
         self.did_move         = True    # actually took a step
-        self.debugging        = False   # debugging mode
         self.tried_move_feat  = NOTHING # The feature the player tried to move on.
         self.dir_running      = DIR_NOWHERE # Direction we are running (if any).
-
-    def reinit_movement_parameters (self):
-        self.last_move        = DIR_NOWHERE
-        self.move_was_blocked = False
-        self.did_move         = True
-        self.tried_move_feat  = NOTHING
+        self.was_running      = False   # Running just stopped.
 
     def get_welcome_message (self):
         return "Welcome to %s! To view the list of commands, press 'h'." % get_random_manor_name()
@@ -135,7 +130,7 @@ class Game (object):
             self.game_start = False
         elif self.move_was_blocked:
             print_line("Ouch! You bump into a %s!" % self.tried_move_feat.name(), MSG_START)
-        elif not self.did_move:
+        elif not self.did_move and not self.was_running:
             mode = "canvas view"
             if self.debugging:
                 mode = "debug mode"
@@ -175,6 +170,13 @@ class Game (object):
         help += "Any other key exits the program."
         return help
 
+    def reinit_movement_parameters (self):
+        self.last_move        = DIR_NOWHERE
+        self.move_was_blocked = False
+        self.did_move         = True
+        self.tried_move_feat  = NOTHING
+        self.was_running      = (self.dir_running != DIR_NOWHERE)
+
     def handle_movement_keys (self, ch):
         if ch == curses.KEY_UP:
             return DIR_NORTH
@@ -191,6 +193,7 @@ class Game (object):
         # Start running into a given direction.
         ch = screen.get(block=True)
         self.dir_running = self.handle_movement_keys(ch)
+        self.was_running = True
         if self.dir_running != DIR_NOWHERE:
             self.last_move = self.dir_running
             self.did_move  = True
@@ -226,7 +229,10 @@ class Game (object):
             # Reset last_move.
             self.last_move = DIR_NOWHERE
             self.did_move  = False
-            self.dir_running = DIR_NOWHERE
+            if self.was_running:
+                # No running into wall messages.
+                self.move_was_blocked = False
+                self.dir_running      = DIR_NOWHERE
 
     def handle_commands (self):
         curr_pos = self.player_pos
