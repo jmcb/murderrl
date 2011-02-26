@@ -7,11 +7,12 @@ Toggle canvas vs. feature view with 't'. (Should be identical.)
 import curses
 
 import builder.manor
-from library import viewport, coord
+from library import viewport
+from library.coord import *
+from library.feature import *
 import interface.console
 from interface.features import *
 from interface.output import *
-from library.feature import *
 from suspects.randname import *
 
 screen = interface.console.select()
@@ -28,13 +29,6 @@ def get_command_help ():
     help += "t: toggle between canvas view (default) and feature grid\n\n"
     help += "Any other key exits the program."
     return help
-
-# Define directions.
-DIR_NORTH   = coord.Coord(0, -1)
-DIR_SOUTH   = coord.Coord(0, +1)
-DIR_WEST    = coord.Coord(-1, 0)
-DIR_EAST    = coord.Coord(+1, 0)
-DIR_NOWHERE = coord.Coord(0, 0)
 
 def handle_movement_keys (ch):
     if ch == curses.KEY_UP:

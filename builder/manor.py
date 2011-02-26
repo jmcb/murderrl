@@ -20,10 +20,11 @@ Attempt to create a "manor" akin to:
 """
 
 import random, copy, room
-from library import shape, coord, collection
+from interface.features import *
+from library import shape, collection
+from library.coord import *
 from library.random_util import *
 from library.feature import *
-from interface.features import *
 
 # Specific build styles:
 BASE_SHAPE = "single-corridor"
@@ -478,9 +479,9 @@ class ManorCollection (collection.ShapeCollection):
                     # adjacent non-corridor squares as walls.
                     adjacent = []
                     if horizontal:
-                        adjacent = (coord.Coord(0,-1), coord.Coord(0,+1))
+                        adjacent = (DIR_NORTH, DIR_SOUTH)
                     else:
-                        adjacent = (coord.Coord(-1,0), coord.Coord(1,0))
+                        adjacent = (DIR_WEST, DIR_EAST)
                     for dir in adjacent:
                         pos2 = pos + dir
                         # self.features.__setitem__(pos2, WALL)
@@ -510,13 +511,13 @@ class ManorCollection (collection.ShapeCollection):
 
         :``pos``: A coordinate within the manor. *Required*
         """
-        if pos < coord.Coord(0,0) or pos >= self.size():
+        if pos < DIR_NOWHERE or pos >= self.size():
             print "Invalid coord %s in manor of size %s" % (pos, self.size())
             return NOTHING
 
         return self.features.__getitem__(pos)
 
-    def add_doors_along_corridor (self, start, stop, offset = coord.Coord(0,0)):
+    def add_doors_along_corridor (self, start, stop, offset = DIR_NOWHERE):
         """
         Walks along a corridor, and for each adjacent room picks a random
         wall spot to turn into a door.
@@ -583,10 +584,10 @@ class ManorCollection (collection.ShapeCollection):
             # considered part of the corridor, so we need to use a shim
             # to add doors on those sides as well.
             if w > 1: # vertical corridor
-                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y), coord.Coord(0, -1))
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y), DIR_NORTH)
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y + h), coord.Coord(pos.x + w, pos.y + h))
             else: # horizontal corridor
-                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), coord.Coord(-1, 0))
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), DIR_WEST)
                 self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), coord.Coord(pos.x + w, pos.y + h))
 
     def pick_door_along_wall (self, start, stop, offset):
@@ -606,7 +607,7 @@ class ManorCollection (collection.ShapeCollection):
         assert(len(candidates) > 0)
         return random.choice(candidates)
 
-    def add_window (self, start, stop, offset_check = coord.Coord(0,0)):
+    def add_window (self, start, stop, offset_check = DIR_NOWHERE):
         """
         Adds windows to the wall specified by two coordinates.
 
@@ -627,7 +628,7 @@ class ManorCollection (collection.ShapeCollection):
         # NOTE: Naturally, should we decide to fill the nothingness with
         #       a garden of some sort, the whole routine will have to be
         #       changed. (jpeg)
-        if offset_check != coord.Coord(0,0):
+        if offset_check != DIR_NOWHERE:
             print "offset: %s, start=%s, stop=%s" % (offset_check, start, stop)
             seen_nothing = False
             for pos in coord.RectangleIterator(start, stop + 1):
@@ -730,9 +731,9 @@ class ManorCollection (collection.ShapeCollection):
                 self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3))
             elif (self.get_feature(coord.Coord(start.x-1, start.y+1)) == NOTHING
             or self.get_feature(coord.Coord(start.x-1, stop.y-1)) == NOTHING):
-                self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3), coord.Coord(-1,0))
+                self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3), DIR_WEST)
             elif needs_door: # place a door
-                d = self.pick_door_along_wall(coord.Coord(start.x, start.y + 1), coord.Coord(start.x, stop.y - 2), coord.Coord(-1,0))
+                d = self.pick_door_along_wall(coord.Coord(start.x, start.y + 1), coord.Coord(start.x, stop.y - 2), DIR_WEST)
                 door_candidates.append(d)
 
             # right-side vertical windows
@@ -740,9 +741,9 @@ class ManorCollection (collection.ShapeCollection):
                 self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3))
             elif (self.get_feature(coord.Coord(stop.x+1, start.y+1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x+1, stop.y-1)) == NOTHING):
-                self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3), coord.Coord(+1, 0))
+                self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3), DIR_EAST)
             elif needs_door: # place a door
-                d = self.pick_door_along_wall(coord.Coord(stop.x - 1, start.y + 1), coord.Coord(stop.x - 1, stop.y - 2), coord.Coord(+1, 0))
+                d = self.pick_door_along_wall(coord.Coord(stop.x - 1, start.y + 1), coord.Coord(stop.x - 1, stop.y - 2), DIR_EAST)
                 door_candidates.append(d)
 
             # top horizontal windows
@@ -750,9 +751,9 @@ class ManorCollection (collection.ShapeCollection):
                 self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y))
             elif (self.get_feature(coord.Coord(start.x+1, start.y-1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x-1, start.y-1)) == NOTHING):
-                self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y), coord.Coord(0,-1))
+                self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y), DIR_NORTH)
             elif needs_door: # place a door
-                d = self.pick_door_along_wall(coord.Coord(start.x + 1, start.y), coord.Coord(stop.x - 2, start.y), coord.Coord(0,-1))
+                d = self.pick_door_along_wall(coord.Coord(start.x + 1, start.y), coord.Coord(stop.x - 2, start.y), DIR_NORTH)
                 door_candidates.append(d)
 
             # bottom horizontal windows
@@ -760,9 +761,9 @@ class ManorCollection (collection.ShapeCollection):
                 self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1))
             elif (self.get_feature(coord.Coord(start.x+1, stop.y+1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x-1, stop.y+1)) == NOTHING):
-                self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1), coord.Coord(0,+1))
+                self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1), DIR_SOUTH)
             elif needs_door: # place a door
-                d = self.pick_door_along_wall(coord.Coord(start.x + 1, stop.y - 1), coord.Coord(stop.x - 2, stop.y - 1), coord.Coord(0,+1))
+                d = self.pick_door_along_wall(coord.Coord(start.x + 1, stop.y - 1), coord.Coord(stop.x - 2, stop.y - 1), DIR_SOUTH)
                 door_candidates.append(d)
 
             if needs_door:
@@ -870,7 +871,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
             base.place_on(leg)
         else:
             base = shape.underneath(leg, base, overlap=1, collect=True)
-        new_corridor[coord.Coord(0, 0)] = "#"
+        new_corridor[POS_ORIGIN] = "#"
         corridor_offset = coord.Coord(y_offset, 0)
         base.append(new_corridor, corridor_offset)
 
@@ -880,7 +881,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
         start = coord.Coord(corridor_offset.x - 1, vert_offset - room.Room().height + 1)
 
     new_shape = shape.Shape(width=3, height=room.Room().height, fill="#")
-    new_shape.draw_on(shape.Shape(width=1, height=room.Room().height, fill="."), offset=coord.Coord(1, 0), check_conflict=False)
+    new_shape.draw_on(shape.Shape(width=1, height=room.Room().height, fill="."), offset=DIR_EAST, check_conflict=False)
 
     base = ManorCollection(base)
 

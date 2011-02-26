@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from library import coord
+from library.coord import *
 from interface import console
 
 screen = console.select()
 
-def print_line (text, pos = coord.Coord(0,0)):
+def print_line (text, pos = POS_ORIGIN):
     """
     Prints a line of text beginning at the coordinate pos.
 
@@ -12,9 +12,9 @@ def print_line (text, pos = coord.Coord(0,0)):
     :``pos``: The starting coord (of type ``Coord``) for printing. *Default (0,0)*.
     """
     for ind, char in enumerate(text):
-        screen.put(char, coord.Coord(pos.x+ind, pos.y))
+        screen.put(char, Coord(pos.x+ind, pos.y))
 
-def print_text (text, pos = coord.Coord(0, 0), max_columns = 70):
+def print_text (text, pos = POS_ORIGIN, max_columns = 70):
     """
     Chops a text into several lines and prints it to the screen, beginning
     at coordinate pos. Chopping happens at position max_columns; no attempt
@@ -33,10 +33,10 @@ def print_text (text, pos = coord.Coord(0, 0), max_columns = 70):
             line += 1
             if char == "\n":
                continue
-        screen.put(char, coord.Coord(col, pos.y + line))
+        screen.put(char, Coord(col, pos.y + line))
         col += 1
 
-def print_screen (text, pos = coord.Coord(0,0), max_columns = 70):
+def print_screen (text, pos = POS_ORIGIN, max_columns = 70):
     """
     Prints some text onto a cleared screen and waits for the player to press
     a key to leave the screen.

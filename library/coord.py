@@ -248,3 +248,12 @@ class AutoSize (Size):
     __floordiv__ = property(lambda self, other: self)
     __idiv__ = property(lambda self, other: self)
     __ifloordiv__ = property(lambda self, other: self)
+
+# Define directions.
+DIR_NORTH   = Coord(0, -1)
+DIR_SOUTH   = Coord(0, +1)
+DIR_WEST    = Coord(-1, 0)
+DIR_EAST    = Coord(+1, 0)
+DIR_NOWHERE = Coord(0, 0)
+# for convenience, this time meaning the top left corner of screen or shape
+POS_ORIGIN  = Coord(0, 0)
