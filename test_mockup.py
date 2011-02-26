@@ -26,7 +26,13 @@ MSG_LINE  = 22
 MSG_START = coord.Coord(0, MSG_LINE)
 
 class Game (object):
+    """
+    The module to handle the main game loop.
+    """
     def __init__ (self):
+        """
+        Initialise the manor, viewport and other objects and parameters.
+        """
         # First, build the manor.
         # self.base_manor = builder.manor.base_builder()
         # self.base_manor = builder.manor.build_L()
@@ -56,6 +62,9 @@ class Game (object):
         self.initialise_parameters()
 
     def initialise_parameters (self):
+        """
+        Initialise the simple parameters.
+        """
         # Initially place the player in the centre of the entrance hall.
         ehall = self.base_manor.get_room(self.base_manor.entrance_hall)
         self.player_pos = coord.Coord(ehall.pos().x + ehall.size().x/2, ehall.pos().y + ehall.size().y/2)
@@ -70,9 +79,15 @@ class Game (object):
         self.was_running      = False   # Running just stopped.
 
     def get_welcome_message (self):
+        """
+        Returns the message that is printed at game start.
+        """
         return "Welcome to %s! To view the list of commands, press 'h'." % get_random_manor_name()
 
     def draw_feature_grid (self):
+        """
+        Draws the feature grid onto the screen. (Only in debug mode.)
+        """
         for pos in coord.RectangleIterator(self.sect.size()):
             if pos >= self.base_manor.features.size():
                 continue
@@ -81,12 +96,18 @@ class Game (object):
             screen.put(char,pos+1)
 
     def draw_canvas (self):
+        """
+        Draws the section of the viewport that's currently visible onto the screen.
+        """
         for pos, char in self.sect:
             if char == None:
                 char = " "
             screen.put(char, pos+1)
 
     def draw_viewport (self):
+        """
+        Draws the game map, including the player glyph, onto the screen.
+        """
         # The currently visible section of the viewport, centered on the player.
         self.vp.centre(self.player_pos, self.canvas.size())
         self.sect = self.vp.sect()
@@ -103,6 +124,9 @@ class Game (object):
         screen.put("@", canvas_pos + 1)
 
     def get_current_room (self):
+        """
+        Returns the RoomProps object matching the player's current position.
+        """
         # Get the current room/corridor id.
         id = self.base_manor.get_corridor_index(self.player_pos + 1)
         type = "corridor"
@@ -112,6 +136,9 @@ class Game (object):
         return self.base_manor.get_roomprop(id)
 
     def print_debugging_messages (self):
+        """
+        Prints a variety of parameters in the message area. (Only in debug mode.)
+        """
         # Get the current room/corridor id.
         id = self.base_manor.get_corridor_index(self.player_pos + 1)
         type = "corridor"
@@ -125,6 +152,9 @@ class Game (object):
         print_line("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (self.canvas.size(), self.player_pos + 1, self.last_move, type, id), coord.Coord(0, MSG_LINE+2))
 
     def draw_messages (self):
+        """
+        Writes game messages into the message area.
+        """
         if self.game_start:
             print_line(self.get_welcome_message(), MSG_START)
             self.game_start = False
@@ -145,11 +175,22 @@ class Game (object):
             print_line("You are currently in the %s." % self.get_current_room(), coord.Coord(0, MSG_LINE+1))
 
     def update_screen (self):
+        """
+        Updates game map and message area.
+        """
+        # Note: Currently the screen gets cleared completely. Splitting that
+        #       for map/message area could be useful. (jpeg)
         screen.clear(" ")
         self.draw_viewport()
         self.draw_messages()
 
     def cmd_describe_room (self, pos = None):
+        """
+        Describes the room a given position belongs to.
+
+        :``pos``: A coordinate in the manor. If none, the player position is used. 
+                  *Default: none*.
+        """
         if pos == None:
             pos = self.player_pos
 
@@ -161,6 +202,9 @@ class Game (object):
         room.describe()
 
     def get_command_help (self):
+        """
+        Returns a string of command keys and their explanation.
+        """
         help  = "Command help\n\n"
         help += "Use the arrow keys for movement.\n\n"
         help += "r followed by a direction: start running in that direction\n\n"
@@ -171,6 +215,9 @@ class Game (object):
         return help
 
     def reinit_movement_parameters (self):
+        """
+        Reinitialises parameters pertaining to movement to their default values.
+        """
         self.last_move        = DIR_NOWHERE
         self.move_was_blocked = False
         self.did_move         = True
@@ -178,6 +225,12 @@ class Game (object):
         self.was_running      = (self.dir_running != DIR_NOWHERE)
 
     def handle_movement_keys (self, ch):
+        """
+        Checks whether a given keypress matches any of the movement keys
+        and, if so, returns the matching directional coordinate.
+
+        :``ch``: The key pressed by the player. *Required*.
+        """
         if ch == curses.KEY_UP:
             return DIR_NORTH
         if ch == curses.KEY_DOWN:
@@ -190,7 +243,10 @@ class Game (object):
         return DIR_NOWHERE
 
     def cmd_start_running (self):
-        # Start running into a given direction.
+        """
+        Prompts for a direction key and starts moving the player in that
+        direction until we run into an obstacle or reach an adjacent door.
+        """
         ch = screen.get(block=True)
         self.dir_running = self.handle_movement_keys(ch)
         self.was_running = True
@@ -199,6 +255,10 @@ class Game (object):
             self.did_move  = True
 
     def handle_movement_commands (self):
+        """
+        Check whether the planned move is valid. If so, actually move the
+        player. Otherwise, change a few parameters.
+        """
         curr_pos = self.player_pos
         next_pos = curr_pos + self.last_move
         if (next_pos.x < 0 or next_pos.y < 0
@@ -235,6 +295,11 @@ class Game (object):
                 self.dir_running      = DIR_NOWHERE
 
     def handle_commands (self):
+        """
+        Wait for a keypress and execute the corresponding action.
+        Returns true if the game loop should continue, and false if we
+        want to exit the loop.
+        """
         curr_pos = self.player_pos
 
         # Get a key.
@@ -263,12 +328,16 @@ class Game (object):
         else:
             self.last_move = self.dir_running
 
+        # Actually move the player, if the new position is valid.
         if self.last_move != DIR_NOWHERE:
             self.handle_movement_commands()
 
         return True
 
     def do_loop (self):
+        """
+        Run the actual game loop. Returns if we encounter an invalid keypress.
+        """
         while True:
             if self.dir_running == DIR_NOWHERE:
                 self.update_screen()
