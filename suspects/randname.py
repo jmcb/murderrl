@@ -258,3 +258,16 @@ def get_random_fullname(gender = None, style = None):
     firstname = get_random_first_name(gender)
     lastname  = get_random_last_name(style)
     return "%s %s" % (firstname, lastname)
+
+def get_random_manor_name(owner = None):
+    """
+    Returns a random name for our manor.
+
+    :``owner``: The owners' last name. If none, pick a random upperclass name.
+                *Default none*.
+    """
+    if not owner:
+        owner = get_random_lastname_upperclass()
+    manor_name = "%s %s" % (owner, random.choice(("Hall", "Manor")))
+
+    return manor_name
