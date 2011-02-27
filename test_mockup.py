@@ -44,6 +44,7 @@ class Game (object):
         self.base_manor.add_doors()
         # Add doors along corridors, and windows.
         self.base_manor.add_windows()
+
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()
 
@@ -266,7 +267,7 @@ class Game (object):
             self.move_was_blocked = True
         else:
             self.tried_move_feat = self.base_manor.get_feature(next_pos)
-            if not self.tried_move_feat.traversable():
+            if not self.debugging and not self.tried_move_feat.traversable():
                 self.move_was_blocked = True
             else:
                 curr_pos += self.last_move
