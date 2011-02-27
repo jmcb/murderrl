@@ -9,6 +9,21 @@ from interface.output import *
 ROOM_WIDTH  = 12
 ROOM_HEIGHT = 7
 
+def join_strings (list):
+    if len(list) == 0:
+        return ""
+
+    if len(list) == 1:
+        return list[0]
+
+    result = list[0]
+    last   = list[-1]
+    for i in xrange(1,len(list)-1):
+        result += ", %s" % list[i]
+    result += ", and %s" % last
+
+    return result
+
 class Room (object):
     """
     Currently a builder-only representation of a room.
@@ -42,6 +57,10 @@ class RoomProps (Room):
         self.name = name
         Room.__init__(self, width, height, start)
 
+        # Initialise a few variables for later.
+        self.adj_rooms = []
+        self.adj_room_names = []
+
     def __str__ (self):
         if self.name:
             return self.name
@@ -54,6 +73,14 @@ class RoomProps (Room):
         if self.is_corridor:
             return self.is_corridor
         return False
+
+    def add_adjoining_room (self, ridx):
+        if not ridx in self.adj_rooms:
+            self.adj_rooms.append(ridx)
+
+    def add_adjoining_room_name (self, name):
+        self.adj_room_names.append(name)
+        assert(len(self.adj_rooms) >= len(self.adj_room_names))
 
     def fill_from_database (self):
         """
@@ -73,7 +100,17 @@ class RoomProps (Room):
         """
         # Very basic right now, but will eventually include adjoining rooms
         # and furniture.
-        return "You are standing in the %s." % self.name
+        desc = "You are standing in the %s.\n\n" % self.name
+        if len(self.adj_rooms) > 0:
+            desc += "There "
+            if len(self.adj_rooms) == 1:
+                desc += "is a door"
+            else:
+                desc += "are doors"
+            assert(len(self.adj_room_names) > 0)
+            desc += " leading to the %s." % join_strings(self.adj_room_names)
+
+        return desc
 
     def describe (self):
         """

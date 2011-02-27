@@ -44,6 +44,7 @@ class Game (object):
         self.base_manor.add_doors()
         # Add doors along corridors, and windows.
         self.base_manor.add_windows()
+        self.base_manor.update_adjoining_rooms()
 
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()

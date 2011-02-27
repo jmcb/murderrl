@@ -332,6 +332,19 @@ class ManorCollection (collection.ShapeCollection):
         """
         return self.get_room_index(pos, False)
 
+    def get_room_corridor_indices (self, pos):
+        """
+        Returns a list of indices of all rooms and corridors a coordinate belongs to,
+        or None if it's outside the manor.
+
+        :``pos``: A coord. *Required*.
+        """
+        rooms = self.get_room_index(pos, False)
+        corrs = self.get_corridor_index(pos, False)
+        for c in corrs:
+            rooms.append(c)
+        return rooms
+
     def get_room_corridors (self):
         """
         Get a combined list including both room and corridor indices.
@@ -552,6 +565,8 @@ class ManorCollection (collection.ShapeCollection):
                         rand_coord = random.choice(candidates) + offset
                         print "==> pick %s" % rand_coord
                         self.features.__setitem__(rand_coord, CLOSED_DOOR)
+                        self.room_props[old_room].add_adjoining_room(corrs[0])
+                        self.room_props[corrs[0]].add_adjoining_room(old_room)
                         self.doors.append(rand_coord)
                         candidates = []
                     print "curr. room: %s" % curr_room
@@ -564,6 +579,17 @@ class ManorCollection (collection.ShapeCollection):
             print "==> pick %s" % rand_coord
             self.features.__setitem__(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
+            corrs = self.get_corridor_indices(start)
+            self.room_props[old_room].add_adjoining_room(corrs[0])
+            self.room_props[corrs[0]].add_adjoining_room(old_room)
+
+    def update_adjoining_rooms (self):
+        for r in self.get_room_corridors():
+            rp = self.room_props[r]
+            for adjr in rp.adj_rooms:
+                rp2  = self.room_props[adjr]
+                name = rp2.name
+                rp.add_adjoining_room_name(name)
 
     def add_doors (self):
         """
@@ -605,7 +631,18 @@ class ManorCollection (collection.ShapeCollection):
                 candidates.append(pos)
 
         assert(len(candidates) > 0)
-        return random.choice(candidates)
+        door_pos = random.choice(candidates)
+        rooms = self.get_room_corridor_indices(door_pos)
+        for i1 in xrange(len(rooms)):
+            r1 = rooms[i1]
+            for i2 in xrange(i1+1, len(rooms)):
+                r2 = rooms[i2]
+                rp1 = self.room_props[r1]
+                rp2 = self.room_props[r2]
+                rp1.add_adjoining_room(r2)
+                rp2.add_adjoining_room(r1)
+
+        return door_pos
 
     def add_window (self, start, stop, offset_check = DIR_NOWHERE):
         """
