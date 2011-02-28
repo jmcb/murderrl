@@ -476,7 +476,7 @@ class ManorCollection (collection.ShapeCollection):
                     direction = "horizontal"
                 else:
                     direction = "vertical"
-                print "Corridor %s: start=%s, stop=%s (%s)" % (r, start, stop, direction)
+                # print "Corridor %s: start=%s, stop=%s (%s)" % (r, start, stop, direction)
 
             # Iterate over all coordinates within the room.
             for pos in coord.RectangleIterator(start, stop):
@@ -487,7 +487,7 @@ class ManorCollection (collection.ShapeCollection):
                 # Corridors overwrite walls previously set by rooms.
                 elif is_corridor:
                     self.features.__setitem__(pos, FLOOR)
-                    print pos
+                    # print pos
                     # Depending on the corridor orientation, mark the
                     # adjacent non-corridor squares as walls.
                     adjacent = []
@@ -501,12 +501,12 @@ class ManorCollection (collection.ShapeCollection):
                         if pos2 <= 0 or pos2 >= self.size():
                             continue
                         corridx = self.get_corridor_indices(pos2)
-                        print "pos2: %s -> corridors=%s" % (pos2, corridx),
+                        # print "pos2: %s -> corridors=%s" % (pos2, corridx),
                         if r in corridx:
                             corridx.remove(r)
-                            print corridx
-                        else:
-                            print
+                            # print corridx
+                        # else:
+                            # print
                         if len(corridx) == 0:
                             self.features.__setitem__(pos2, WALL)
                 # The room boundary is always a wall.
@@ -557,7 +557,7 @@ class ManorCollection (collection.ShapeCollection):
             # Make sure there's only exactly room for this wall.
             # There also may be no other corridor except this one.
             if len(rooms) == 1 and len(corrs) == 1:
-                print "(%s, %s) -> %s" % (pos.x, pos.y, rooms)
+                # print "(%s, %s) -> %s" % (pos.x, pos.y, rooms)
                 curr_room = rooms[0]
                 if old_room != curr_room:
                     # We've reached another room. Time to pick a door spot for the old room.
@@ -569,7 +569,7 @@ class ManorCollection (collection.ShapeCollection):
                         self.room_props[corrs[0]].add_adjoining_room(old_room)
                         self.doors.append(rand_coord)
                         candidates = []
-                    print "curr. room: %s" % curr_room
+                    # print "curr. room: %s" % curr_room
                 old_room = curr_room
                 candidates.append(pos)
 
@@ -595,7 +595,7 @@ class ManorCollection (collection.ShapeCollection):
         """
         For each corridor, adds doors to adjacent rooms.
         """
-        print "Adding doors..."
+        # print "Adding doors..."
         self.doors = []
         corr = self.corridors
         for c in corr:
@@ -666,7 +666,7 @@ class ManorCollection (collection.ShapeCollection):
         #       a garden of some sort, the whole routine will have to be
         #       changed. (jpeg)
         if offset_check != DIR_NOWHERE:
-            print "offset: %s, start=%s, stop=%s" % (offset_check, start, stop)
+            # print "offset: %s, start=%s, stop=%s" % (offset_check, start, stop)
             seen_nothing = False
             for pos in coord.RectangleIterator(start, stop + 1):
                 adj_pos = pos + offset_check
@@ -684,7 +684,7 @@ class ManorCollection (collection.ShapeCollection):
                             start.x = pos.x + 1
                         else:
                             start.y = pos.y + 1
-            print "new start=%s, stop=%s" % (start, stop)
+            # print "new start=%s, stop=%s" % (start, stop)
 
         full_window = False
         if start.x == stop.x:
@@ -694,7 +694,7 @@ class ManorCollection (collection.ShapeCollection):
         # else:
             # return
 
-        print "draw window for wall of length %s at (%s, %s)" % (length, start, stop)
+        # print "draw window for wall of length %s at (%s, %s)" % (length, start, stop)
         if length < 5 or (length < 7 and one_chance_in(3)):
             full_window = True
         elif length >= 6 and one_chance_in(3):
@@ -759,8 +759,8 @@ class ManorCollection (collection.ShapeCollection):
             print "Room %s: %s" % (r, curr)
 
             needs_door = (r not in door_rooms)
-            if needs_door:
-                print "-> room needs a door!"
+            # if needs_door:
+                # print "-> room needs a door!"
 
             door_candidates = []
             # left-side vertical windows
