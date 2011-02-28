@@ -3,7 +3,7 @@
 Generate random first, last and full names from various building blocks.
 """
 
-import random, sys
+import random
 
 import database.database as db
 from library.random_util import *

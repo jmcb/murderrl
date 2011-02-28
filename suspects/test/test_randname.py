@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+import sys
 from suspects.randname import *
 
 def generate_names (num = 10, style = None, gender = None):
