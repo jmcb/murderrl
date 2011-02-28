@@ -72,9 +72,10 @@ class RoomProps (Room):
         self.adj_room_names = []
         self.windows        = []
 
-    def init_db_props(self, name, section=None):
+    def init_db_props(self, name, section=None,prep="in"):
         self.name    = name
         self.section = section
+        self.prep    = prep # preposition
 
     def __str__ (self):
         if self.name:
@@ -120,7 +121,7 @@ class RoomProps (Room):
 
         if new_room:
             print new_room.name
-            self.init_db_props(new_room.name, new_room.section)
+            self.init_db_props(new_room.name, new_room.section, new_room.prep)
 
     def describe_window_dirs (self):
         dirs = []
@@ -174,7 +175,7 @@ class RoomProps (Room):
         """
         # Very basic right now, but will eventually include adjoining rooms
         # and furniture.
-        desc = "You are standing in the %s.\n\n" % self.name
+        desc = "You are standing %s the %s.\n\n" % (self.prep, self.name)
         desc += "It is part of the manor's %s area.\n" % self.section
 
         desc += "%s\n\n" % self.describe_windows()
