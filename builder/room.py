@@ -51,6 +51,9 @@ class Room (object):
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
+def check_is_passage (db_room):
+    return db_room.is_passage
+
 class RoomProps (Room):
     def __init__ (self, name=None, start=None, width=ROOM_WIDTH, height=ROOM_HEIGHT):
         Room.__init__(self, width, height, start)
@@ -89,8 +92,14 @@ class RoomProps (Room):
         """
         Pull a random room name from the database.
         """
-        dbr      = db.get_database("rooms")
-        new_room = dbr.random_pop()
+        dbr = db.get_database("rooms")
+        new_room = None
+        if len(self.adj_rooms) > 1:
+            new_room = dbr.random_pop(check_is_passage)
+
+        if new_room == None:
+            new_room = dbr.random_pop()
+
         if new_room:
             print new_room.name
             self.init_db_props(new_room.name, new_room.section)

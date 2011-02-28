@@ -418,7 +418,6 @@ class ManorCollection (collection.ShapeCollection):
                     self.entrance_hall = 0
                 else:
                     room_prop = room.RoomProps("room %s" % r, start, width, height)
-                    room_prop.fill_from_database()
             else:
                 corr   = self.corridor(r)
                 start  = corr.pos()
@@ -583,7 +582,16 @@ class ManorCollection (collection.ShapeCollection):
             self.room_props[old_room].add_adjoining_room(corrs[0])
             self.room_props[corrs[0]].add_adjoining_room(old_room)
 
+    def init_room_names (self):
+        for r in self.get_room_corridors():
+            if r in self.corridors or r == self.entrance_hall:
+                continue
+
+            rp = self.room_props[r]
+            rp.fill_from_database()
+
     def update_adjoining_rooms (self):
+        self.init_room_names()
         for r in self.get_room_corridors():
             rp = self.room_props[r]
             for adjr in rp.adj_rooms:
