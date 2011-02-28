@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import random
-from library import shape, coord
+from library.coord import *
+from library import shape
 import database.database as db
 from interface.output import *
 
@@ -19,7 +20,7 @@ def join_strings (list):
     last   = list[-1]
     for i in xrange(1,len(list)-1):
         result += ", %s" % list[i]
-    result += ", and %s" % last
+    result += " and %s" % last
 
     return result
 
@@ -60,8 +61,10 @@ class RoomProps (Room):
         self.init_db_props(name, "corridor")
 
         # Initialise a few variables for later.
-        self.adj_rooms = []
+        self.is_corridor    = False
+        self.adj_rooms      = []
         self.adj_room_names = []
+        self.windows        = []
 
     def init_db_props(self, name, section=None):
         self.name    = name
@@ -75,10 +78,8 @@ class RoomProps (Room):
     def mark_as_corridor (self, is_corridor = True):
         self.is_corridor = is_corridor
 
-    def is_corridor (self):
-        if self.is_corridor:
-            return self.is_corridor
-        return False
+    def is_a_corridor (self):
+        return self.is_corridor
 
     def add_adjoining_room (self, ridx):
         if not ridx in self.adj_rooms:
@@ -87,6 +88,9 @@ class RoomProps (Room):
     def add_adjoining_room_name (self, name):
         self.adj_room_names.append(name)
         assert(len(self.adj_rooms) >= len(self.adj_room_names))
+
+    def add_window (self, dir):
+        self.windows.append(dir)
 
     def fill_from_database (self):
         """
@@ -104,6 +108,52 @@ class RoomProps (Room):
             print new_room.name
             self.init_db_props(new_room.name, new_room.section)
 
+    def describe_window_dirs (self):
+        dirs = []
+        for d in self.windows:
+            if d == DIR_NORTH:
+                dirs.append("north")
+            elif d == DIR_SOUTH:
+                dirs.append("south")
+            elif d == DIR_WEST:
+                dirs.append("west")
+            elif d == DIR_EAST:
+                dirs.append("east")
+            else:
+                dirs.append("invalid direction")
+
+        return join_strings(dirs)
+
+    def describe_windows (self):
+        desc = "There "
+        if len(self.windows) == 0:
+            room_or_corridor = "room"
+            if self.is_a_corridor():
+                room_or_corridor = "corridor"
+            desc += "are no windows in this %s." % room_or_corridor
+        else:
+            if len(self.windows) == 1:
+                desc += "is a window "
+            else:
+                desc += "are windows "
+            desc += "to the %s." % self.describe_window_dirs()
+
+        return desc
+
+    def describe_exits (self):
+        if len(self.adj_rooms) == 0:
+            return ""
+
+        desc = "There "
+        if len(self.adj_rooms) == 1:
+            desc += "is a door"
+        else:
+            desc += "are doors"
+        assert(len(self.adj_room_names) > 0)
+        desc += " leading to the %s." % join_strings(self.adj_room_names)
+
+        return desc
+
     def get_room_description (self):
         """
         Returns a room's description.
@@ -111,16 +161,10 @@ class RoomProps (Room):
         # Very basic right now, but will eventually include adjoining rooms
         # and furniture.
         desc = "You are standing in the %s.\n\n" % self.name
-        desc += "It is part of the manor's %s area.\n\n" % self.section
+        desc += "It is part of the manor's %s area.\n" % self.section
 
-        if len(self.adj_rooms) > 0:
-            desc += "There "
-            if len(self.adj_rooms) == 1:
-                desc += "is a door"
-            else:
-                desc += "are doors"
-            assert(len(self.adj_room_names) > 0)
-            desc += " leading to the %s." % join_strings(self.adj_room_names)
+        desc += "%s\n\n" % self.describe_windows()
+        desc += self.describe_exits()
 
         return desc
 

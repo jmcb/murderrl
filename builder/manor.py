@@ -774,9 +774,11 @@ class ManorCollection (collection.ShapeCollection):
             # left-side vertical windows
             if start.x == 0:
                 self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3))
+                self.room_props[r].add_window(DIR_WEST)
             elif (self.get_feature(coord.Coord(start.x-1, start.y+1)) == NOTHING
             or self.get_feature(coord.Coord(start.x-1, stop.y-1)) == NOTHING):
                 self.add_window(coord.Coord(start.x, start.y + 2), coord.Coord(start.x, stop.y - 3), DIR_WEST)
+                self.room_props[r].add_window(DIR_WEST)
             elif needs_door: # place a door
                 d = self.pick_door_along_wall(coord.Coord(start.x, start.y + 1), coord.Coord(start.x, stop.y - 2), DIR_WEST)
                 door_candidates.append(d)
@@ -784,9 +786,11 @@ class ManorCollection (collection.ShapeCollection):
             # right-side vertical windows
             if stop.x == self.size().x:
                 self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3))
+                self.room_props[r].add_window(DIR_EAST)
             elif (self.get_feature(coord.Coord(stop.x+1, start.y+1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x+1, stop.y-1)) == NOTHING):
                 self.add_window(coord.Coord(stop.x - 1, start.y + 2), coord.Coord(stop.x - 1, stop.y - 3), DIR_EAST)
+                self.room_props[r].add_window(DIR_EAST)
             elif needs_door: # place a door
                 d = self.pick_door_along_wall(coord.Coord(stop.x - 1, start.y + 1), coord.Coord(stop.x - 1, stop.y - 2), DIR_EAST)
                 door_candidates.append(d)
@@ -794,9 +798,11 @@ class ManorCollection (collection.ShapeCollection):
             # top horizontal windows
             if start.y == 0:
                 self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y))
+                self.room_props[r].add_window(DIR_NORTH)
             elif (self.get_feature(coord.Coord(start.x+1, start.y-1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x-1, start.y-1)) == NOTHING):
                 self.add_window(coord.Coord(start.x + 2, start.y), coord.Coord(stop.x - 3, start.y), DIR_NORTH)
+                self.room_props[r].add_window(DIR_NORTH)
             elif needs_door: # place a door
                 d = self.pick_door_along_wall(coord.Coord(start.x + 1, start.y), coord.Coord(stop.x - 2, start.y), DIR_NORTH)
                 door_candidates.append(d)
@@ -804,9 +810,11 @@ class ManorCollection (collection.ShapeCollection):
             # bottom horizontal windows
             if stop.y == self.size().y:
                 self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1))
+                self.room_props[r].add_window(DIR_SOUTH)
             elif (self.get_feature(coord.Coord(start.x+1, stop.y+1)) == NOTHING
             or self.get_feature(coord.Coord(stop.x-1, stop.y+1)) == NOTHING):
                 self.add_window(coord.Coord(start.x + 2, stop.y - 1), coord.Coord(stop.x - 3, stop.y - 1), DIR_SOUTH)
+                self.room_props[r].add_window(DIR_SOUTH)
             elif needs_door: # place a door
                 d = self.pick_door_along_wall(coord.Coord(start.x + 1, stop.y - 1), coord.Coord(stop.x - 2, stop.y - 1), DIR_SOUTH)
                 door_candidates.append(d)
