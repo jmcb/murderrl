@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import random
 from library import shape, coord
 import database.database as db
@@ -54,12 +53,16 @@ class Room (object):
 
 class RoomProps (Room):
     def __init__ (self, name=None, start=None, width=ROOM_WIDTH, height=ROOM_HEIGHT):
-        self.name = name
         Room.__init__(self, width, height, start)
+        self.init_db_props(name, "corridor")
 
         # Initialise a few variables for later.
         self.adj_rooms = []
         self.adj_room_names = []
+
+    def init_db_props(self, name, section=None):
+        self.name    = name
+        self.section = section
 
     def __str__ (self):
         if self.name:
@@ -88,11 +91,9 @@ class RoomProps (Room):
         """
         dbr      = db.get_database("rooms")
         new_room = dbr.random_pop()
-        if (new_room):
-            self.name = new_room.name
-            # FIXME: Doesn't work. The value is not getting read in from the db.
-            if new_room.section == "utility":
-                self.utility = True
+        if new_room:
+            print new_room.name
+            self.init_db_props(new_room.name, new_room.section)
 
     def get_room_description (self):
         """
@@ -101,6 +102,8 @@ class RoomProps (Room):
         # Very basic right now, but will eventually include adjoining rooms
         # and furniture.
         desc = "You are standing in the %s.\n\n" % self.name
+        desc += "It is part of the manor's %s area.\n\n" % self.section
+
         if len(self.adj_rooms) > 0:
             desc += "There "
             if len(self.adj_rooms) == 1:
