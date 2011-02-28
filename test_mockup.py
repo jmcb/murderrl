@@ -73,12 +73,20 @@ class Game (object):
 
         self.game_start       = True    # Game just started.
         self.debugging        = False   # debugging mode
-        self.last_move        = DIR_NOWHERE # the last step taken by the player
-        self.move_was_blocked = False   # bumped into a wall
-        self.did_move         = True    # actually took a step
-        self.tried_move_feat  = NOTHING # The feature the player tried to move on.
         self.dir_running      = DIR_NOWHERE # Direction we are running (if any).
-        self.was_running      = False   # Running just stopped.
+        self.init_command_parameters()
+
+    def init_command_parameters (self):
+        """
+        (Re)initialises parameters pertaining to movement and other commands
+        to their default values.
+        """
+        self.last_move        = DIR_NOWHERE # the last step taken by the player
+        self.move_was_blocked = False       # bumped into an obstacle
+        self.did_move         = True        # actually took a step
+        self.tried_move_feat  = NOTHING     # The feature the player tried to move on.
+        self.was_running      = (self.dir_running != DIR_NOWHERE)
+        self.did_switch       = False       # switched to debug mode
 
     def get_welcome_message (self):
         """
@@ -162,7 +170,7 @@ class Game (object):
             self.game_start = False
         elif self.move_was_blocked:
             print_line("Ouch! You bump into a %s!" % self.tried_move_feat.name(), MSG_START)
-        elif not self.did_move and not self.was_running:
+        elif self.did_switch:
             mode = "canvas view"
             if self.debugging:
                 mode = "debug mode"
@@ -216,16 +224,6 @@ class Game (object):
         help += "Any other key exits the program."
         return help
 
-    def reinit_movement_parameters (self):
-        """
-        Reinitialises parameters pertaining to movement to their default values.
-        """
-        self.last_move        = DIR_NOWHERE
-        self.move_was_blocked = False
-        self.did_move         = True
-        self.tried_move_feat  = NOTHING
-        self.was_running      = (self.dir_running != DIR_NOWHERE)
-
     def handle_movement_keys (self, ch):
         """
         Checks whether a given keypress matches any of the movement keys
@@ -274,7 +272,8 @@ class Game (object):
                 curr_pos += self.last_move
                 if self.dir_running != DIR_NOWHERE:
                     # check whether we need to stop
-                    if feature_is_door(self.base_manor.get_feature(curr_pos)):
+                    if (feature_is_door(self.base_manor.get_feature(curr_pos))
+                    or self.debugging and not self.tried_move_feat.traversable()):
                         self.dir_running = DIR_NOWHERE
                     else:
                         in_corr = (self.base_manor.get_corridor_index(curr_pos + 1) != None)
@@ -319,7 +318,8 @@ class Game (object):
                     self.cmd_start_running()
                 elif chr(ch) == 't':
                     # Toggle debugging mode on and off.
-                    self.debugging = not self.debugging
+                    self.debugging  = not self.debugging
+                    self.did_switch = True
                 else: # exit the game
                     return False
             else:
@@ -345,7 +345,7 @@ class Game (object):
                 self.update_screen()
 
             # Reinitialise the relevant variables.
-            self.reinit_movement_parameters()
+            self.init_command_parameters()
 
             if not self.handle_commands():
                 return
