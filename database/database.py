@@ -464,7 +464,9 @@ def parse_spec (spec_file):
                         if int_conversion and item[0] in int_conversion:
                             item[1] = int(item[1])
                         assert len(item) == 2
-                        new_data[item[0]] = item[1]
+                        # Don't overwrite real data with default values!
+                        if item[0] not in new_data:
+                            new_data[item[0]] = item[1]
 
                     parent.__init__(self, **new_data)
             elif isinstance(block, list):

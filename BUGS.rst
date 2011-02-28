@@ -37,9 +37,3 @@ Manor building
   side of a corridor claim to be part of the corridor, doors on the other
   belong to the adjoining room. Only in this specialcase, neither is true.) 
   But that's only hiding the issue...
-
-Databases
-=========
-* spec's default values either override the database entries, or the latter
-  don't even get read.
-
