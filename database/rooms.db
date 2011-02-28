@@ -23,14 +23,19 @@ name=billiard room
 name=conservatory
 %
 name=picture gallery
+is_passage=1
 %
 name=hall
+is_passage=1
 %
 name=cloak room
+has_windows=0
 %
 name=lavatory
+has_windows=0
 %
 name=porch
+is_passage=1
 %
 name=guest room
 %
@@ -48,19 +53,25 @@ section=utility
 %
 name=servant's hall
 section=utility
+is_passage=1
 %
 name=pantry
 section=utility
+has_windows=0
 %
 name=attic
 section=utility
+has_windows=0
 %
 name=wine cellar
 section=utility
+has_windows=0
 %
 name=laundry
 section=utility
+has_windows=0
 %
 name=tool shed
 section=utility
+has_windows=0
 %
