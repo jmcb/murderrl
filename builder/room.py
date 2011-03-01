@@ -67,6 +67,12 @@ def check_haswindows (db_room):
 def check_nowindows (db_room):
     return not db_room.has_windows
 
+def check_is_utility (db_room):
+    return db_room.section == "utility"
+
+def check_not_utility (db_room):
+    return db_room.section != "utility"
+
 class RoomProps (Room):
     def __init__ (self, name=None, start=None, width=ROOM_WIDTH, height=ROOM_HEIGHT):
         Room.__init__(self, width, height, start)
@@ -78,10 +84,11 @@ class RoomProps (Room):
         self.adj_room_names = []
         self.windows        = []
 
-    def init_db_props(self, name, section=None,prep="in"):
+    def init_db_props(self, name, section=None, prep="in", db_data=False):
         self.name    = name
         self.section = section
         self.prep    = prep # preposition
+        self.db_data = db_data
 
     def __str__ (self):
         if self.name:
@@ -105,13 +112,19 @@ class RoomProps (Room):
     def add_window (self, dir):
         self.windows.append(dir)
 
-    def fill_from_database (self):
+    def fill_from_database (self, utility = None):
         """
         Pull a random room name from the database.
         """
         dbr = db.get_database("rooms")
         new_room = None
-        if len(self.adj_rooms) > 1:
+        # Section checks override all other checks.
+        if utility == True:
+            new_room = dbr.random_pop(check_is_utility)
+        elif utility == False:
+            new_room = dbr.random_pop(check_not_utility)
+
+        if new_room == None and len(self.adj_rooms) > 1:
             if len(self.windows) == 0:
                 new_room = dbr.random_pop(check_is_nowindows_passage)
             else:
@@ -131,7 +144,7 @@ class RoomProps (Room):
 
         if new_room:
             print new_room.name
-            self.init_db_props(new_room.name, new_room.section, new_room.prep)
+            self.init_db_props(new_room.name, new_room.section, new_room.prep, True)
 
     def describe_window_dirs (self):
         dirs = []

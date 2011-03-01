@@ -413,11 +413,7 @@ class ManorCollection (collection.ShapeCollection):
                 size   = curr.size()
                 width  = size.x
                 height = size.y
-                if r == 0:
-                    room_prop = room.RoomProps("entrance hall", start, width, height)
-                    self.entrance_hall = 0
-                else:
-                    room_prop = room.RoomProps("room %s" % r, start, width, height)
+                room_prop = room.RoomProps("room %s" % r, start, width, height)
             else:
                 corr   = self.corridor(r)
                 start  = corr.pos()
@@ -583,11 +579,55 @@ class ManorCollection (collection.ShapeCollection):
             self.room_props[corrs[0]].add_adjoining_room(old_room)
 
     def init_room_names (self):
-        for r in self.get_room_corridors():
-            if r in self.corridors or r == self.entrance_hall:
+        corrs = self.corridors[:]
+        if len(corrs) > 1:
+            corrs.remove(self.main_corridor)
+            random.shuffle(corrs)
+            utility = True
+            for c in corrs:
+                section = "domestic"
+                if utility:
+                    section = "utility"
+                print "-------\nCorridor %s is marked as %s" % (c, section)
+                corrprop = self.room_props[c]
+                for r in corrprop.adj_rooms:
+                    if r in self.corridors:
+                        continue
+
+                    rp = self.room_props[r]
+                    if not rp.db_data:
+                        rp.fill_from_database(utility)
+                utility = False
+
+        c = self.main_corridor
+        corrprop = self.room_props[c]
+        e_hall_candidates = []
+        for r in corrprop.adj_rooms:
+            if r in self.corridors:
                 continue
 
             rp = self.room_props[r]
+            if rp.db_data or len(rp.windows) == 0:
+                continue
+            e_hall_candidates.append(r)
+
+        if len(e_hall_candidates) == 0:
+            print "-------\nNo entrance hall for this manor!"
+        else:
+            self.entrance_hall = random.choice(e_hall_candidates)
+            rp = self.room_props[self.entrance_hall]
+            rp.name = "entrance hall"
+            print "-------\nentrance hall: room %s" % self.entrance_hall
+
+        print "-------\nassign remaining rooms"
+        for r in self.rooms:
+            if r == self.entrance_hall:
+                continue
+
+            rp = self.room_props[r]
+            if rp.db_data:
+                continue
+
             rp.fill_from_database()
 
     def update_adjoining_rooms (self):
