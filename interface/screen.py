@@ -54,6 +54,13 @@ class Region (object):
         self.stop = stop
         self.name = name
         self.screen = screen
+
+    def height (self):
+        return self.stop.y - self.start.y
+
+    def width (self):
+        return self.stop.x - self.start.x
+
     def size (self):
         return coord.Size(self.stop - self.start)
 
