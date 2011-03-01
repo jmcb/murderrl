@@ -38,13 +38,8 @@ class Game (object):
         # self.base_manor = builder.manor.build_L()
         self.base_manor = builder.manor.build_random()
 
-        # Translate rooms and corridors into wall and floor features.
-        self.base_manor.init_features()
-        # Add doors along corridors.
-        self.base_manor.add_doors()
-        # Add doors along corridors, and windows.
-        self.base_manor.add_windows()
-        self.base_manor.update_adjoining_rooms()
+        # Add doors and windows, etc.
+        self.base_manor.add_features()
 
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()
