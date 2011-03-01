@@ -139,7 +139,7 @@ class Screen (object):
         if index is not None:
             try:
                 return self._regions[index]
-            except IndexError:
+            except TypeError:
                 return self.region_by_name(index)
         else:
             return self._regions[:]
