@@ -1,26 +1,50 @@
 %
-name=drawing room
+name=dining room
 weight=100
 %
-name=dining room
+name=drawing room
+weight=50
 %
 name=library
+weight=50
+%
+name=study
+weight=50
+%
+name=parlour
+weight=50
+%
+name=smoking room
+weight=20
+%
+name=billiard room
+weight=20
+%
+name=conservatory
+weight=20
+%
+name=lounge
+weight=20
+%
+name=guest room
 %
 name=morning room
 %
 name=breakfast room
 %
-name=inglenook
-%
 name=boudoir
 %
 name=business room
 %
-name=smoking room
+name=cloak room
+has_windows=0
 %
-name=billiard room
+name=lavatory
+weight=5
+has_windows=0
 %
-name=conservatory
+name=inglenook
+weight=5
 %
 name=picture gallery
 is_passage=1
@@ -28,35 +52,31 @@ is_passage=1
 name=hall
 is_passage=1
 %
-name=cloak room
-has_windows=0
-%
-name=lavatory
-has_windows=0
-%
 name=porch
 is_passage=1
 prep=on
-%
-name=guest room
-%
-name=lounge
-%
-name=study
-%
-name=parlour
+weight=5
 %
 name=kitchen
+weight=100
 section=utility
 %
-name=scullery
+name=pantry
+weight=50
 section=utility
+has_windows=0
 %
-name=servant's hall
+name=servants' hall
+weight=50
 section=utility
 is_passage=1
 %
-name=pantry
+name=scullery
+weight=20
+section=utility
+%
+name=laundry
+weight=20
 section=utility
 has_windows=0
 %
@@ -65,10 +85,6 @@ section=utility
 has_windows=0
 %
 name=wine cellar
-section=utility
-has_windows=0
-%
-name=laundry
 section=utility
 has_windows=0
 %
