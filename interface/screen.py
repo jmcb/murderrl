@@ -4,6 +4,8 @@ The "screen" is the rawest part of the interface. It consists entirely of a
 grid of characters, equivalent to the width and height of the current display.
 """
 
+import textwrap
+
 from library import shape, coord
 
 class Grid (object):
@@ -74,6 +76,39 @@ class Region (object):
         if shape.size() < shape.size():
             for index, char in shape:
                 self.screen.glyphs()[index+self.start] = char
+
+class MessageRegion (Region):
+    messages = None
+
+    def __init__ (self, *args, **kwargs):
+        super(MessageRegion, self).__init__(*args, **kwargs)
+
+        self.messages = []
+
+    def append (self, message):
+        self.messages.append(message)
+
+    def as_shape (self):
+        new_shape = shape.Shape(self.width(), self.height())
+
+        text = textwrap.wrap("\n".join(self.messages), self.width())
+
+        for y, line in enumerate(text[-self.height():]):
+            if len(line) < self.width():
+                line += " " * (self.width() - len(line))
+
+            for x, char in enumerate(line):
+                new_shape[x][y] = char
+
+        return new_shape
+
+    def blit (self):
+        """
+        This function writes the contents of messages to the region defined on
+        the screen for our use, performing word-wrapping as required.
+        """
+        pass
+
 
 class Screen (object):
     _regions = None
