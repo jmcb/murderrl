@@ -77,16 +77,19 @@ class Region (object):
 
 class Screen (object):
     _regions = None
+    _glyphs = None
+    _colours = None
+    _screen = None
 
     def __init__ (self, size, phys_screen):
         width, height = size
 
-        self.glyphs = ScreenGrid(width=width, height=height, fill=" ")
-        self.colours = ColourGrid(width=width, height=height)
+        self._glyphs = ScreenGrid(width=width, height=height, fill=" ")
+        self._colours = ColourGrid(width=width, height=height)
 
         self._regions = []
 
-        self.screen = phys_screen
+        self._screen = phys_screen
 
     def region (self, start, stop=None, name=None):
         if stop is not None:
@@ -114,13 +117,13 @@ class Screen (object):
         return None
 
     def colours (self):
-        return self.colours
+        return self._colours
 
     def glyphs (self):
-        return self.glyphs
+        return self._glyphs
 
     def physical (self):
-        return self.screen
+        return self._screen
 
     def blit (self):
         """
