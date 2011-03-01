@@ -52,11 +52,17 @@ class Room (object):
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
+def check_haswindows_passage (db_room):
+    return db_room.is_passage and db_room.has_windows
+
 def check_is_nowindows_passage (db_room):
     return db_room.is_passage and not db_room.has_windows
 
 def check_is_passage (db_room):
     return db_room.is_passage
+
+def check_haswindows (db_room):
+    return db_room.has_windows
 
 def check_nowindows (db_room):
     return not db_room.has_windows
@@ -108,6 +114,8 @@ class RoomProps (Room):
         if len(self.adj_rooms) > 1:
             if len(self.windows) == 0:
                 new_room = dbr.random_pop(check_is_nowindows_passage)
+            else:
+                new_room = dbr.random_pop(check_haswindows_passage)
 
             if new_room == None:
                 new_room = dbr.random_pop(check_is_passage)
@@ -115,6 +123,8 @@ class RoomProps (Room):
         if new_room == None:
             if len(self.windows) == 0:
                 new_room = dbr.random_pop(check_nowindows)
+            else:
+                new_room = dbr.random_pop(check_haswindows)
 
             if new_room == None:
                 new_room = dbr.random_pop()
