@@ -88,14 +88,16 @@ class MessageRegion (Region):
     def append (self, message):
         self.messages.append(message)
 
-    def as_shape (self):
+    def as_shape (self, padding=" "):
         new_shape = shape.Shape(self.width(), self.height())
 
-        text = textwrap.wrap("\n".join(self.messages), self.width())
+        lines = []
+        for line in self.messages[-self.height():]:
+            lines.extend(textwrap.wrap(line, self.width()))
 
-        for y, line in enumerate(text[-self.height():]):
+        for y, line in enumerate(lines[-self.height():]):
             if len(line) < self.width():
-                line += " " * (self.width() - len(line))
+                line += padding * (self.width() - len(line))
 
             for x, char in enumerate(line):
                 new_shape[x][y] = char
@@ -107,8 +109,7 @@ class MessageRegion (Region):
         This function writes the contents of messages to the region defined on
         the screen for our use, performing word-wrapping as required.
         """
-        pass
-
+        super(MessageRegion, self).blit(self.as_shape())
 
 class Screen (object):
     _regions = None
