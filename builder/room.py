@@ -80,15 +80,17 @@ class RoomProps (Room):
 
         # Initialise a few variables for later.
         self.is_corridor    = False
-        self.adj_rooms      = []
-        self.adj_room_names = []
-        self.windows        = []
+        self.adj_rooms      = [] # adjoining room ids (connected by doors)
+        self.adj_room_names = [] # names for the above
+        self.windows        = [] # on which sides a room has windows
+        self.owners         = [] # private room of one or more person(s)
+        self.owner_names    = []
 
-    def init_db_props(self, name, section=None, prep="in", db_data=False):
-        self.name    = name
-        self.section = section
-        self.prep    = prep # preposition
-        self.db_data = db_data
+    def init_db_props(self, name, section=None, prep="in", complete=False):
+        self.name       = name
+        self.section    = section
+        self.prep       = prep # preposition
+        self.has_data   = complete
 
     def __str__ (self):
         if self.name:
@@ -112,10 +114,30 @@ class RoomProps (Room):
     def add_window (self, dir):
         self.windows.append(dir)
 
-    def fill_from_database (self, utility = None):
+    def is_good_bedroom (self):
+        # May not be a passage room, needs windows.
+        return len(self.adj_rooms) == 1 and len(self.windows) > 0
+
+    def make_bedroom (self, owner):
+        assert(len(owner) > 1)
+        owner_id   = owner[0]
+        owner_name = owner[1]
+        if isinstance(owner_name, list):
+            owner_name = join_strings(owner_name)
+        room_name  = "%s's bedroom" % owner_name
+        print room_name
+        self.init_db_props(room_name, "domestic", "in", True)
+        self.owners.append(owner_id)
+        self.owner_names.append(owner_name)
+
+    def fill_from_database (self, utility = None, owner = None):
         """
         Pull a random room name from the database.
         """
+        if owner != None and self.is_good_bedroom():
+            self.make_bedroom(owner)
+            return
+
         dbr = db.get_database("rooms")
         new_room = None
         # Section checks override all other checks.

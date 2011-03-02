@@ -41,6 +41,10 @@ class Game (object):
         # Add doors and windows, etc.
         self.base_manor.add_features()
 
+        # In the absence of the real suspects, this is for testing purposes.
+        list = [([0, 1], ["Anna", "Bob"]), ([2, 3], ["Charles", "Doris"]), (4, "Edith"), (5, "Franklin")]
+        self.base_manor.init_room_names(list)
+
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()
 

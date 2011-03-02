@@ -446,8 +446,6 @@ class ManorCollection (collection.ShapeCollection):
         self.add_windows()
         # Add doors to rooms still missing them.
         self.add_missing_doors()
-        # Update room names.
-        self.update_adjoining_rooms()
 
     def init_features (self):
         """
@@ -592,67 +590,6 @@ class ManorCollection (collection.ShapeCollection):
                 self.room_props[corrs[0]].add_adjoining_room(old_room)
             else:
                 print "no corridor matching doorpos %s of room %s" % (rand_coord, old_room)
-
-    def init_room_names (self):
-        corrs = self.corridors[:]
-        if len(corrs) > 1:
-            corrs.remove(self.main_corridor)
-            random.shuffle(corrs)
-            utility = True
-            for c in corrs:
-                section = "domestic"
-                if utility:
-                    section = "utility"
-                print "-------\nCorridor %s is marked as %s" % (c, section)
-                corrprop = self.room_props[c]
-                for r in corrprop.adj_rooms:
-                    if r in self.corridors:
-                        continue
-
-                    rp = self.room_props[r]
-                    if not rp.db_data:
-                        rp.fill_from_database(utility)
-                utility = False
-
-        c = self.main_corridor
-        corrprop = self.room_props[c]
-        e_hall_candidates = []
-        for r in corrprop.adj_rooms:
-            if r in self.corridors:
-                continue
-
-            rp = self.room_props[r]
-            if rp.db_data or len(rp.windows) == 0:
-                continue
-            e_hall_candidates.append(r)
-
-        if len(e_hall_candidates) == 0:
-            print "-------\nNo entrance hall for this manor!"
-        else:
-            self.entrance_hall = random.choice(e_hall_candidates)
-            rp = self.room_props[self.entrance_hall]
-            rp.name = "entrance hall"
-            print "-------\nentrance hall: room %s" % self.entrance_hall
-
-        print "-------\nassign remaining rooms"
-        for r in self.rooms:
-            if r == self.entrance_hall:
-                continue
-
-            rp = self.room_props[r]
-            if rp.db_data:
-                continue
-
-            rp.fill_from_database()
-
-    def update_adjoining_rooms (self):
-        self.init_room_names()
-        for r in self.get_room_corridors():
-            rp = self.room_props[r]
-            for adjr in rp.adj_rooms:
-                rp2  = self.room_props[adjr]
-                name = rp2.name
-                rp.add_adjoining_room_name(name)
 
     def add_doors (self):
         """
@@ -901,6 +838,117 @@ class ManorCollection (collection.ShapeCollection):
                 for r in other_rooms:
                     if r not in door_rooms:
                         door_rooms.append(r)
+
+    def init_room_names (self, list = None):
+        owner_list = []
+        if list != None:
+            owner_list = list
+
+        # There should be at least 5 rooms available to the public.
+        # This is only really a problem for smallish layouts, if there
+        # are many suspects. (jpeg)
+        max_no_bedrooms = len(self.rooms) - 5
+        print "-------\nallow for max. %s bedrooms" % max_no_bedrooms
+
+        corrs = self.corridors[:]
+        if len(corrs) > 1:
+            corrs.remove(self.main_corridor)
+            random.shuffle(corrs)
+            utility = True
+            for c in corrs:
+                section = "domestic"
+                if utility:
+                    section = "utility"
+                elif len(owner_list) > 0:
+                    section = "bedrooms"
+                print "-------\nCorridor %s is marked as %s" % (c, section)
+                corrprop = self.room_props[c]
+                for r in corrprop.adj_rooms:
+                    if r in self.corridors:
+                        continue
+
+                    rp = self.room_props[r]
+                    if rp.has_data:
+                        continue
+
+                    max_no_bedrooms -= 1
+                    if (not utility and len(owner_list) > 0
+                    and rp.is_good_bedroom()):
+                        owner = owner_list[0]
+                        owner_list.remove(owner)
+                        rp.make_bedroom(owner)
+                        continue
+
+                    rp.fill_from_database(utility)
+
+                utility = False
+
+        # One of the rooms off the main corridor is the entrance hall.
+        c = self.main_corridor
+        corrprop = self.room_props[c]
+        e_hall_candidates = []
+        for r in corrprop.adj_rooms:
+            if r in self.corridors:
+                continue
+
+            rp = self.room_props[r]
+            if rp.has_data or len(rp.windows) == 0:
+                continue
+            e_hall_candidates.append(r)
+
+        if len(e_hall_candidates) == 0:
+            print "-------\nNo entrance hall for this manor!"
+        else:
+            self.entrance_hall = random.choice(e_hall_candidates)
+            rp = self.room_props[self.entrance_hall]
+            rp.name = "entrance hall"
+            rp.has_data = True
+            max_no_bedrooms -= 1
+            print "-------\nentrance hall: room %s" % self.entrance_hall
+
+        if len(owner_list) > 0:
+            print "-------\nremaining rooms - allow for max. %s bedrooms" % max_no_bedrooms
+            rooms = self.rooms[:]
+            random.shuffle(rooms)
+            for r in rooms:
+                rp = self.room_props[r]
+                if rp.has_data:
+                    continue
+
+                if (len(owner_list) > 0 and max_no_bedrooms > 0
+                and rp.is_good_bedroom()):
+                    owner = owner_list[0]
+                    owner_list.remove(owner)
+                    rp.make_bedroom(owner)
+                    max_no_bedrooms -= 1
+
+        print "-------\nassign remaining rooms"
+        rooms = self.rooms[:]
+        random.shuffle(rooms)
+        for r in rooms:
+            rp = self.room_props[r]
+            if rp.has_data:
+                continue
+
+            if (len(owner_list) > 0 and max_no_bedrooms > 0
+            and len(rp.adj_rooms) == 1):
+                owner = owner_list[0]
+                owner_list.remove(owner)
+                rp.make_bedroom(owner)
+                max_no_bedrooms -= 1
+                continue
+
+            rp.fill_from_database()
+
+        self.update_adjoining_rooms()
+
+    def update_adjoining_rooms (self):
+        for r in self.get_room_corridors():
+            rp = self.room_props[r]
+            for adjr in rp.adj_rooms:
+                rp2  = self.room_props[adjr]
+                name = rp2.name
+                rp.add_adjoining_room_name(name)
 
     def mark_leg (self, leg):
         self.legs.append(leg)
