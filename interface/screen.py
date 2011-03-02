@@ -73,7 +73,7 @@ class Region (object):
         and is therefore immediately visible. It does not wipe out any colours
         in the area controlled by this image.
         """
-        if shape.size() < shape.size():
+        if shape.size() <= self.size():
             for index, char in shape:
                 self.screen.glyphs()[index+self.start] = char
 
