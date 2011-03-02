@@ -167,7 +167,7 @@ class Screen (object):
         colours where appropriate.
         """
 
-        for coord, glyph in self.glyphs():
-            colour = self.colours().at(coord)
+        for c, glyph in self.glyphs():
+            colour = self.colours().at(c)
 
-            self.physical().put(coord, glyph, colour)
+            self.physical().put(glyph, c, colour)
