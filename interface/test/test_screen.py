@@ -3,7 +3,7 @@
 import unittest
 
 from interface import screen, console
-from library import coord
+from library import coord, shape
 
 class RegionTest (unittest.TestCase):
     """
@@ -16,28 +16,27 @@ class RegionTest (unittest.TestCase):
         self.physical_screen = console.select()
 
         self.physical_screen.init()
-
         self.screen = screen.Screen(self.physical_screen.size(), self.physical_screen)
 
     def tearDown (self):
         self.physical_screen.deinit()
+        pass
 
     def test_message_region (self):
-        message_region = screen.MessageRegion(coord.Coord(0, 0), coord.Coord(20, 10), "messages", self.screen)
+        message_region = screen.MessageRegion(coord.Coord(0, 0), coord.Coord(5, 5), "messages", self.screen)
         self.screen.region(message_region)
 
         mr = self.screen.region_by_name("messages")
 
-        for count in xrange(10):
-            mr.append("This is a test")
-        for count in xrange(5):
-            mr.append("Why hello there")
+        mr.append("This is a test of wrapping.")
+
+        result = shape.Shape(["is a ", "test ", "of wr", "appin", "g.   "])
+        self.assertEqual(mr.as_shape()._canvas, result._canvas)
 
         mr.blit()
+        self.screen.blit()
 
-        self.physical_screen.deinit()
-        import pdb
-        pdb.set_trace()
+        self.physical_screen.get(block=True)
 
 def main ():
     unittest.main()
