@@ -220,7 +220,10 @@ class RoomProps (Room):
         """
         # Very basic right now, but will eventually include adjoining rooms
         # and furniture.
-        desc = "You are standing %s the %s.\n\n" % (self.prep, self.name)
+        article = "the "
+        if len(self.owners) > 0:
+            article = ""
+        desc = "You are standing %s %s%s.\n\n" % (self.prep, article, self.name)
         desc += "It is part of the manor's %s area.\n" % self.section
 
         desc += "%s\n\n" % self.describe_windows()

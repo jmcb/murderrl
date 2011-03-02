@@ -7,6 +7,7 @@ from builder import manor
 from library import coord
 from library.feature import *
 from interface.features import *
+from suspects import person
 
 def build_manor (type):
     if type == 'L':
@@ -28,8 +29,9 @@ def build_manor (type):
     # Add doors and windows, etc.
     m.add_features()
 
-    # In the absence of the real suspects, this is for testing purposes.
-    list = [([0, 1], ["Anna", "Bob"]), ([2, 3], ["Charles", "Doris"]), (4, "Edith"), (5, "Franklin")]
+    # Add bed rooms for a number of suspects.
+    sl = person.SuspectList(10)
+    list = sl.get_id_name_tuples()
     m.init_room_names(list)
 
     return m

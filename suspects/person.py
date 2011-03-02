@@ -1114,6 +1114,47 @@ class SuspectList (object):
             print "Suspect %s:" % (i+1),
             self.describe_suspect_relationships(i)
 
+    def get_id_name_tuples (self):
+        """
+        Returns a list of (id, name) or, for couples, ([ids], [names])
+        tuples, then to be used in bedroom generation.
+        Bedrooms are assigned in order of suspects, so the owners
+        come first, followed by the immediate family, then the guests,
+        and lastly, the servants, meaning if there's not enough space
+        to fit everyone, the most important NPCs have higher chances.
+        """
+        owner_list = []
+        people = range(0, self.no_of_suspects())
+        while len(people) > 0:
+            idx1  = people[0]
+            people.remove(idx1)
+            curr  = self.get_suspect(idx1)
+            name1 = curr.get_fullname()
+            print "%s (%s, %s)" % (name1, idx1, curr.role)
+            idx2  = curr.get_relative(REL_SPOUSE)
+            if idx2 == -1:
+                owner_list.append((idx1, name1))
+            else:
+                if idx2 in people:
+                    people.remove(idx2)
+
+                if curr.gender == 'm':
+                    p1 = curr
+                    p2 = self.get_suspect(idx2)
+                else:
+                    tmp  = idx1
+                    idx1 = idx2
+                    idx2 = tmp
+                    p1 = self.get_suspect(idx1)
+                    p2 = curr
+
+                name1 = "%s%s" % (p1.title, p1.first)
+                name2 = p2.get_fullname()
+                print "-> married: %s (%s) and %s (%s)" % (name1, idx1, name2, idx2)
+                owner_list.append(([idx1, idx2], [name1, name2]))
+
+        return owner_list
+
 ##############################################
 # Global methods
 

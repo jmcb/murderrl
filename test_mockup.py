@@ -13,7 +13,7 @@ from library.feature import *
 import interface.console
 from interface.features import *
 from interface.output import *
-from suspects.randname import *
+from suspects import person, randname
 
 screen = interface.console.select()
 
@@ -41,9 +41,7 @@ class Game (object):
         # Add doors and windows, etc.
         self.base_manor.add_features()
 
-        # In the absence of the real suspects, this is for testing purposes.
-        list = [([0, 1], ["Anna", "Bob"]), ([2, 3], ["Charles", "Doris"]), (4, "Edith"), (5, "Franklin")]
-        self.base_manor.init_room_names(list)
+        self.add_suspects()
 
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()
@@ -61,6 +59,17 @@ class Game (object):
 
         # Initialise a couple of other variables.
         self.initialise_parameters()
+
+    def add_suspects (self):
+        """
+        Initialise the suspect list, generate bedrooms.
+        """
+        self.suspect_list = person.SuspectList(10)
+
+        sl = self.suspect_list
+        self.manor_name = sl.get_suspect(0).last
+        owner_list = sl.get_id_name_tuples()
+        self.base_manor.init_room_names(owner_list)
 
     def initialise_parameters (self):
         """
@@ -91,7 +100,7 @@ class Game (object):
         """
         Returns the message that is printed at game start.
         """
-        return "Welcome to %s! To view the list of commands, press 'h'." % get_random_manor_name()
+        return "Welcome to %s! To view the list of commands, press 'h'." % randname.get_random_manor_name(self.manor_name)
 
     def draw_feature_grid (self):
         """
