@@ -73,9 +73,11 @@ class Region (object):
         and is therefore immediately visible. It does not wipe out any colours
         in the area controlled by this image.
         """
-        if shape.size() <= self.size():
-            for index, char in shape:
-                self.screen.glyphs()[index+self.start] = char
+        if shape.size() > self.size():
+            shape = shape.section(coord.Coord(0, 0), self.size())
+
+        for index, char in shape:
+            self.screen.glyphs()[index+self.start] = char
 
 class MessageRegion (Region):
     messages = None
