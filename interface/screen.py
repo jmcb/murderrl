@@ -6,7 +6,7 @@ grid of characters, equivalent to the width and height of the current display.
 
 import textwrap
 
-from library import shape, coord
+from library import shape, coord, viewport
 
 class Grid (object):
     _grid = None
@@ -112,6 +112,28 @@ class MessageRegion (Region):
         the screen for our use, performing word-wrapping as required.
         """
         super(MessageRegion, self).blit(self.as_shape())
+
+class ViewPortRegion (Region):
+    _viewport = None
+    _buffer = None
+
+    def __init__ (self, *args, **kwargs):
+        super(ViewPortRegion, self).__init__(*args, **kwargs)
+
+        self._viewport = viewport.ViewPort(self.width(), self.height(), buffer=self._buffer)
+
+    def buffer (self, buffer=None):
+        if buffer is None:
+            return self._buffer
+        else:
+            self._buffer = buffer
+            return self.buffer
+
+    def viewport (self):
+        return self._viewport
+
+    def blit (self):
+        super(ViewPortRegion, self).blit(self.viwer().sect())
 
 class Screen (object):
     _regions = None
