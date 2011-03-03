@@ -8,8 +8,26 @@ Welcome to murderrl's documentation!
 
 Contents:
 
-.. toctree::
-   :maxdepth: 2
+.. autosummary::
+    :toctree:
+
+    database.database
+    library.shape
+    library.coord
+    library.collection
+    library.colour
+    library.feature
+    library.random_util
+    library.viewport
+    suspects.randname
+    suspects.person
+    interface.features
+    interface.console
+    interface.screen
+    interface.menu
+    interface.output
+    builder.room
+    builder.manor
 
 Indices and tables
 ==================
