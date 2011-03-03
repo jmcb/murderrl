@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Attempt to create a "manor" akin to:
+Attempt to create a "manor" akin to::
 
   ###############################################
   #.........#......#........#...........#.......#
