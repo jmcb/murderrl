@@ -37,13 +37,15 @@ class Region (object):
             self.screen.glyphs()[index+self.start] = char
 
 class VariableRegion (Region):
-    def __init__ (self, per_width, per_height, name, screen, min_width=0, min_height=0):
-        sw, sh = screen.size()
+    def __init__ (self, start, per_width, per_height, name, screen, min_width=0, min_height=0):
+        sw, sh = screen.size() - start
 
         width = max(round(sw*(per_width/100)), min_width)
         height = max(round(sh*(per_height/100)), min_height)
 
-        super(VariableRegion, self).__init__(width, height, name, screen)
+        stop = coord.Coord(width, height)
+
+        super(VariableRegion, self).__init__(start, stop, name, screen)
 
 class MessageRegion ():
     messages = None
