@@ -4,3 +4,5 @@
 *.pyc
 *.html
 tags
+docs/*.rst
+docs/.build
