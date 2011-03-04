@@ -194,3 +194,7 @@ latex_documents = [
 #latex_use_modindex = True
 
 autosummary_generate = ["index.rst"]
+
+autodoc_member_order = "groupwise"
+
+autodoc_default_flags = ["members", "undoc-members"]

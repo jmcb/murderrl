@@ -26,6 +26,7 @@ Contents:
     interface.screen
     interface.menu
     interface.output
+    interface.regions
     builder.room
     builder.manor
 
