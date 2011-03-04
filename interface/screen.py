@@ -79,7 +79,16 @@ class Region (object):
         for index, char in shape:
             self.screen.glyphs()[index+self.start] = char
 
-class MessageRegion (Region):
+class VariableRegion (Region):
+    def __init__ (self, per_width, per_height, name, screen, min_width=0, min_height=0):
+        sw, sh = screen.size()
+
+        width = max(round(sw*(per_width/100)), min_width)
+        height = max(round(sh*(per_height/100)), min_height)
+
+        super(VariableRegion, self).__init__(width, height, name, screen)
+
+class MessageRegion ():
     messages = None
 
     def __init__ (self, *args, **kwargs):
@@ -113,6 +122,10 @@ class MessageRegion (Region):
         """
         super(MessageRegion, self).blit(self.as_shape())
 
+class VariableMessageRegion (VariableRegion, MessageRegion):
+    def __init__ (self, *args, **kwargs):
+        super(VariableMessageRegion, self).__init__(*args, **kwargs)
+
 class ViewPortRegion (Region):
     _viewport = None
     _buffer = None
@@ -134,6 +147,10 @@ class ViewPortRegion (Region):
 
     def blit (self):
         super(ViewPortRegion, self).blit(self.viwer().sect())
+
+class VariableViewPortRegion (VariableRegion, ViewPortRegion):
+    def __init__ (self, *args, **kwargs):
+        super(VariableViewPortRegion, self).__init__(*args, **kwargs)
 
 class Screen (object):
     _regions = None
