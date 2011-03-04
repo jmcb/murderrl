@@ -7,26 +7,27 @@ General or uncategorized
 
 Manor building
 ==============
-* Doors are sometimes placed in a corner wall.
 
-  #####
-  #...#
-  #...#
-  ####+
+* Doors are sometimes placed in a corner wall::
+
+      #####
+      #...#
+      #...#
+      ####+
 
 * The corridor walls of the rooms in the leg attachment region (the rooms
   that had to have their size adjusted to fit the corridor) still claim to
   belong to the room on the other side of the room.
 
-  Example:
+  Example::
 
-  ########.########
-  #......#.+......#
-  #.porch+.#.guest#
-  #......#.#..room#
-  ########.########
-           ^
-           |- This wall (including the door!) claims to be part of the porch.
+      ########.########
+      #......#.+......#
+      #.porch+.#.guest#
+      #......#.#..room#
+      ########.########
+               ^
+               |- This wall (including the door!) claims to be part of the porch.
 
   If I move from the guest room to the corridor, the message area says:
   "You are currently in the porch." which, even ignoring the grammatical
