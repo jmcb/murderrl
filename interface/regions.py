@@ -244,3 +244,35 @@ class VariableViewPortRegion (VariableRegion, ViewPortRegion):
     @decorators.extends_multiple(VariableRegion.__init__, ViewPortRegion.__init__)
     def __init__ (self, *args, **kwargs):
         super(VariableViewPortRegion, self).__init__(*args, **kwargs)
+
+class Template (object):
+    """
+    Templates are provided to a :class:`TemplateRegion`, and define either
+    hard-coded text, a variable, or a combination of some hard-coded text and a
+    variable. It also defines how this should be displayed: if the length of
+    the template cannot fit within the region, should it be truncated? Not
+    displayed? Wrapped onto a new line?
+    """
+
+    def __init__ (self, string, length_handle="truncate", **variables):
+        """
+        Create a new template.
+
+        :param string: This is the string that is printed to the screen. It
+          should contain a series of place-holders (using %(variable)s), whih are
+          equivalent to ``variables``.
+        :param length_handle: How "over-long" lines should be dealt with.
+          Options are: "``truncate``", "``wrap``", "``hide``". *Default
+          truncate*.
+        :param **variables: These keyword arguments should be equivalent to the
+          number of place-holders in ``string``.
+        """
+        pass
+
+class TemplateRegion (Region):
+    """
+    The template defines a way of placing certain strings (either hard-coded or
+    variable) on certain parts of a region. For instance, it could be used to
+    code up a "heads-up" display. 
+    """
+    pass
