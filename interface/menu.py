@@ -150,7 +150,20 @@ class ScrollMenu (Menu):
             if char == None:
                 char = " "
             screen.put(char, pos+1)
-        print_line("[scroll with up/down keys]", coord.Coord(0, self.rows+1))
+        self.write_scrolling_help()
+
+    def write_scrolling_help (self):
+        scrollkeys = []
+        if self.vp._top > 0:
+            scrollkeys.append("up")
+        if self.vp._top + self.vp._height < self.canvas.size().y:
+            scrollkeys.append("down")
+        if len(scrollkeys) > 0:
+            keys = '/'.join(scrollkeys)
+            plural_s = "s"
+            if len(scrollkeys) == 1:
+                plural_s = ""
+            print_line("[scroll with %s key%s]" % (keys, plural_s), coord.Coord(0, self.rows+1))
 
     def process_key (self, key = None):
         """
@@ -182,8 +195,8 @@ class ScrollMenu (Menu):
         return True
 
     def do_menu (self):
-        self.rows = 15
         self.paint_canvas()
+        self.rows = min(15, self.canvas.size().y)
         self.vp = viewport.ViewPort(buffer=self.canvas, width=70, height=self.rows)
 
         while True:
