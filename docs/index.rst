@@ -10,7 +10,6 @@ Contents:
 
 .. autosummary::
     :toctree:
-    :template: auto.rst.template
 
     database.database
     library.shape

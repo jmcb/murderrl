@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import sys, os
+import inspect
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -193,8 +194,30 @@ latex_documents = [
 # If false, no module index is generated.
 #latex_use_modindex = True
 
-autosummary_generate = ["index.rst"]
-
 autodoc_member_order = "groupwise"
 
-autodoc_default_flags = ["members", "undoc-members"]
+autodoc_default_flags = ["members", "undoc-members", "special-members"]
+
+autoclass_content = "class"
+
+def process_signature (app, what, name, obj, options, signature, return_annotation):
+    if hasattr(obj, "extends"):
+        extends = obj.extends
+        if isinstance(extends, list):
+            argspec = inspect.getargspec(extends[0])
+        else:
+            argspec = inspect.getargspec(extends)
+
+        if argspec[0] and argspec[0][0] in ('cls', 'self'):
+            del argspec[0][0]
+
+        signature = inspect.formatargspec(*argspec)
+
+    return (signature, return_annotation)
+
+def process_docstring (app, what, name, obj, options, lines):
+    return lines
+
+def setup (app):
+    app.connect('autodoc-process-docstring', process_docstring)
+    app.connect('autodoc-process-signature', process_signature)
