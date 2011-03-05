@@ -19,6 +19,7 @@ region should take up.  """
 import textwrap
 
 from library import coord, shape, viewport
+from util import decorators
 
 class Region (object):
     """
@@ -100,9 +101,16 @@ class VariableRegion (Region):
 
         super(VariableRegion, self).__init__(start, stop, name, screen)
 
-class MessageRegion ():
+class MessageRegion (Region):
+    """
+    A message region is a buffer of strings contained within a list. The latest
+    strings are displayed at the bottom of the region, with older strings above
+    that, until it runs out of space; thus, you will always have the most
+    recent message on the screen.
+    """
     messages = None
 
+    @decorators.extends(Region.__init__)
     def __init__ (self, *args, **kwargs):
         super(MessageRegion, self).__init__(*args, **kwargs)
 
