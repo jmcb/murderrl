@@ -1,12 +1,12 @@
 :mod:`{{name}}`
-{{ underline }}
+{{ mod_underline }}
 
 .. automodule:: {{ fullname }}
 
 {% if functions %}
 Functions
 ----------
-{% for item in functions %}
+{% for item, members in functions %}
 .. autofunction:: {{item}}
 {% endfor %}
 {% endif %}
@@ -14,29 +14,29 @@ Functions
 {% if classes %}
 Classes
 --------
-{% for item in classes %}
+{% for item, members in classes %}
 .. autoclass:: {{item}}
-   :show-inheritance:
-   :members:
-   :inherited-members:
-   :undoc-members:
-   
-   .. automethod:: __init__
-   
+    :show-inheritance:
+    :members:
+    :inherited-members:
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
 {% endfor %}
 {% endif %}
 
 {% if exceptions %}
 Exceptions
 ------------
-{% for item in exceptions %}
+{% for item, members in exceptions %}
 .. autoclass:: {{item}}
-   :show-inheritance:
-   :members:
-   :inherited-members:
-   :undoc-members:
-   
-   .. automethod:: __init__
-   
+    :show-inheritance:
+    :members:
+    :inherited-members:
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
 {% endfor %}
 {% endif %}

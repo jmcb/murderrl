@@ -32,11 +32,19 @@ def main ():
             mod_base = orig_module.split(".")[-1]
             module = __import__(orig_module, fromlist=mod_base)
 
+            def get_methods_etc (obj):
+                if not hasattr(obj, "__dict__"):
+                    return ""
+
+                obj_dict = getattr(obj, "__dict__")
+                return ", ".join(set(obj_dict.keys()))
+
             def get_members (obj, typ):
                 items = [
-                    name for name in dir(obj)
+                    (name, get_methods_etc(getattr(obj, name))) for name in dir(obj)
                     if get_documenter(getattr(obj, name), obj).objtype == typ
                 ]
+
                 return items
 
             ns = {}
@@ -48,6 +56,7 @@ def main ():
             ns['fullname'] = orig_module
             ns['name_underline'] = "=" * len(mod_base)
             ns['fullname_underline'] = "=" * len(orig_module)
+            ns['mod_underline'] = "=" * (len(mod_base) + len(":mod:``"))
 
             template = env.get_template("module.rst")
             rendered = template.render(**ns)

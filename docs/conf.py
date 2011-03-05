@@ -11,8 +11,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
 import inspect
+
+from sphinx.ext.autodoc import ClassDocumenter
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -196,8 +197,6 @@ latex_documents = [
 
 autodoc_member_order = "groupwise"
 
-autodoc_default_flags = ["members", "undoc-members", "special-members"]
-
 autoclass_content = "class"
 
 def process_signature (app, what, name, obj, options, signature, return_annotation):
@@ -218,6 +217,37 @@ def process_signature (app, what, name, obj, options, signature, return_annotati
 def process_docstring (app, what, name, obj, options, lines):
     return lines
 
+class NewClassDocumenter(ClassDocumenter):
+    def format_args(self):
+        # for classes, the relevant signature is the __init__ method's
+        initmeth = self.get_attr(self.object, '__init__', None)
+        # classes without __init__ method, default __init__ or
+        # __init__ written in C?
+        if initmeth is None or initmeth is object.__init__ or not \
+               (inspect.ismethod(initmeth) or inspect.isfunction(initmeth)):
+            return None
+        try:
+            argspec = inspect.getargspec(initmeth)
+        except TypeError:
+            # still not possible: happens e.g. for old-style classes
+            # with __init__ in C
+            return None
+
+        if argspec[0] and argspec[0][0] in ('cls', 'self'):
+            del argspec[0][0]
+
+        args = inspect.formatargspec(*argspec)
+
+        result = self.env.app.emit_firstresult(
+            'autodoc-process-signature', self.objtype, self.fullname,
+            initmeth, self.options, args, None)
+
+        if result:
+            return result[0]
+        else:
+            return args
+
 def setup (app):
+    app.add_autodocumenter(NewClassDocumenter)
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-process-signature', process_signature)
