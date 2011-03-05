@@ -3,12 +3,13 @@
 The main game loop, where all components come together.
 """
 
-import curses
+import curses, random
 
 import builder.manor
 from library import viewport
 from library.coord import *
 from library.feature import *
+from library.random_util import *
 import interface.console
 from interface.features import *
 from interface.output import *
@@ -28,19 +29,19 @@ class Game (object):
     """
     The module to handle the main game loop.
     """
-    def __init__ (self):
+    def __init__ (self, type = None):
         """
         Initialise the manor, viewport and other objects and parameters.
         """
         # First, build the manor.
-        # self.base_manor = builder.manor.base_builder()
-        # self.base_manor = builder.manor.build_L()
-        self.base_manor = builder.manor.build_random()
+        self.base_manor = builder.manor.builder_by_type(type)
 
         # Add doors and windows, etc.
         self.base_manor.add_features()
 
         self.add_suspects()
+
+        self.add_alibis()
 
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()
@@ -69,6 +70,100 @@ class Game (object):
         self.manor_name = sl.get_suspect(0).last
         owner_list = sl.get_id_name_tuples()
         self.base_manor.init_room_names(owner_list)
+
+    def add_alibi_for_suspect(self, sid, rids):
+        # The murderer always picks a room adjacent to one of the corridors,
+        # so they don't have to meet any people.
+        force_adj_corr = (sid == self.suspect_list.murderer)
+        r = self.base_manor.pick_room_for_suspect(rids, sid, None, force_adj_corr)
+
+        if r == -1:
+            return -1
+
+        self.suspect_list.get_suspect(sid).set_alibi(r, self.base_manor.room_props[r].name)
+        return r
+
+    def add_alibis (self):
+        # Shortcuts for commonly used variables.
+        sl = self.suspect_list
+        m  = self.base_manor
+        rprops = m.room_props
+
+        # Rooms that are not used in an alibi yet. To begin with, all of them.
+        rids = m.rooms[:]
+
+        # First, pick the murder room (stored as victim's "alibi").
+        r = self.add_alibi_for_suspect(sl.victim, rids)
+        if r == -1:
+            print "Found no murder room! Exit early."
+            return False
+
+        print "Murder room: %s (%s, Victim: %s)" % (rprops[r].name, r, sl.get_victim().get_name())
+        rids.remove(r)
+        for adj in rprops[r].adj_rooms:
+            if rprops[adj].is_corridor:
+                continue
+            print "block adjoining room %s (%s)" % (rprops[adj].name, adj)
+            rids.remove(adj)
+
+        r = self.add_alibi_for_suspect(sl.murderer, rids)
+        if r != -1:
+            print "Alibi room for murderer: %s (%s, %s)" % (rprops[r].name, r, sl.get_murderer().get_name())
+            sl.get_murderer().set_alibi(r, rprops[r].name)
+            rids.remove(r)
+        else:
+            print "Found no alibi room for murderer (%s)" % sl.get_murderer().get_name()
+        murderer_room = r
+
+        # Suspects that don't have an alibi yet.
+        sids = range(0, len(sl.suspects))
+        sids.remove(sl.victim)
+        sids.remove(sl.murderer)
+
+        N = len(sids)
+        PAIRS = max(1, random.randint((N+1)/5, (N+1)/3))
+        for i in xrange(0, PAIRS):
+            idx1 = random.choice(sids)
+            sids.remove(idx1)
+            p1 = sl.get_suspect(idx1)
+            # If this person has relatives, it is highly likely one of them
+            # was the witness.
+            if coinflip() and len(p1.rel) > 0:
+                rel  = random.choice(p1.rel)
+                idx2 = rel[0]
+                p2   = sl.get_suspect(idx2)
+                if idx2 in sids:
+                    sids.remove(idx2)
+                    r = m.pick_room_for_suspect(rids, idx1, idx2)
+                    if r == -1:
+                        return False
+                    print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                    sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
+                    rids.remove(r)
+                    continue
+
+            idx2 = random.choice(sids)
+            sids.remove(idx2)
+            r = m.pick_room_for_suspect(rids, idx1, idx2)
+            if r != -1:
+                print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                rids.remove(r)
+                sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
+            else:
+                print "Found no alibi room for %s and %s" % (sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+
+        # Shuffle the remaining list.
+        random.shuffle(sids)
+
+        # The remaining suspects don't have a witness.
+        for s in sids:
+            r = self.add_alibi_for_suspect(s, rids)
+            if r != -1:
+                print "%s (%s) for %s" % (rprops[r].name, r, sl.get_suspect(s).get_name())
+                rids.remove(r)
+                sl.get_suspect(s).set_alibi(r, rprops[r].name)
+            else:
+                print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
 
     def initialise_parameters (self):
         """

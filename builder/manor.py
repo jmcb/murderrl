@@ -844,10 +844,10 @@ class ManorCollection (collection.ShapeCollection):
         if list != None:
             owner_list = list
 
-        # There should be at least 5 rooms available to the public.
+        # There should be at least 7 rooms available to the public.
         # This is only really a problem for smallish layouts, if there
         # are many suspects. (jpeg)
-        max_no_bedrooms = len(self.rooms) - 5
+        max_no_bedrooms = len(self.rooms) - 7
         print "-------\nallow for max. %s bedrooms" % max_no_bedrooms
 
         corrs = self.corridors[:]
@@ -871,12 +871,12 @@ class ManorCollection (collection.ShapeCollection):
                     if rp.has_data:
                         continue
 
-                    max_no_bedrooms -= 1
                     if (not utility and len(owner_list) > 0
                     and rp.is_good_bedroom()):
                         owner = owner_list[0]
                         owner_list.remove(owner)
                         rp.make_bedroom(owner)
+                        max_no_bedrooms -= 1
                         continue
 
                     rp.fill_from_database(utility)
@@ -949,6 +949,64 @@ class ManorCollection (collection.ShapeCollection):
                 rp2  = self.room_props[adjr]
                 name = rp2.name
                 rp.add_adjoining_room_name(name)
+
+    def get_bedroom_id (self, owner, rids = None, do_chance = True):
+        if do_chance and not one_chance_in(4):
+            return -1
+
+        if rids == None:
+            rids = self.rooms
+        rp = self.room_props
+        for r in rids:
+            if owner in rp[r].owners:
+                return r
+        return -1
+
+    def pick_random_public_room (self, rids = None, force_adj_corr = False):
+        if rids == None:
+            rids = self.rooms
+        rp = self.room_props
+        candidates = []
+        for r in rids:
+            if force_adj_corr:
+                found_corr = False
+                for adj in rp[r].adj_rooms:
+                    if rp[adj].is_corridor:
+                        found_corr = True
+                        break
+                if not found_corr:
+                    continue
+
+            if len(rp[r].owners) == 0:
+                candidates.append(r)
+        if len(candidates) == 0:
+            return -1
+        return random.choice(candidates)
+
+    def pick_room_for_suspect (self, rids, idx1, idx2 = None, force_adj_corr = False):
+        rp = self.room_props
+        r = self.get_bedroom_id(idx1, rids)
+        if r != -1:
+            return r
+
+        if idx2 != None:
+            r = self.get_bedroom_id(idx2, rids)
+            if r != -1:
+                return r
+
+        r = self.pick_random_public_room(rids, force_adj_corr)
+        if r != -1:
+            return r
+
+        # Try for bedrooms again.
+        r = self.get_bedroom_id(idx1, rids)
+        if r != -1:
+            return r
+
+        if idx2 != None:
+            r = self.get_bedroom_id(idx2, rids)
+
+        return r
 
     def mark_leg (self, leg):
         self.legs.append(leg)
@@ -1146,6 +1204,27 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None):
     base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
     base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement)
     return base
+
+def builder_by_type (type = None):
+    if type == None:
+        return build_random()
+    if type == 'B':
+        return base_builder()
+    if type == 'L':
+        return build_L()
+    if type == 'U':
+        return build_U()
+    if type == 'H':
+        return build_H()
+    # The other types don't exist yet and fall back on the base_builder.
+    if type == 'O':
+        return build_O()
+    if type == 'N':
+        return build_N()
+    if type == 'Z':
+        return build_Z()
+    else:
+        return base_builder()
 
 def build_random (base=None):
 	l_list = [L_LAYOUT, Z_LAYOUT, N_LAYOUT, H_LAYOUT, O_LAYOUT, U_LAYOUT]

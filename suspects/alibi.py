@@ -10,14 +10,16 @@ class Alibi (object):
     """
     Alibi class. Where was a suspect at the time of the murder, and with whom?
     """
-    def __init__ (self, place, witness = -1):
+    def __init__ (self, rid, rname, witness = -1):
         """
         Initialize a suspect's alibi.
 
-        :``place``: A room name. *Required*.
+        :``rid``: A room index. *Required*.
+        :``rname``: A room name. *Required*.
         :``witness``: Index of a suspect who can confirm the alibi, or -1 if none. *Default -1*.
         """
-        self.room = place
+        self.rid     = rid
+        self.rname   = rname
         self.witness = witness
 
 ##################################################

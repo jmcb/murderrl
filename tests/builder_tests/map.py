@@ -10,21 +10,7 @@ from interface.features import *
 from suspects import person
 
 def build_manor (type):
-    if type == 'L':
-        m = manor.build_L()
-    elif type == 'U':
-        m = manor.build_U()
-    elif type == 'H':
-        m = manor.build_H()
-    # The other types don't exist yet and fall back on the base_builder.
-    elif type == 'O':
-        m = manor.build_O()
-    elif type == 'N':
-        m = manor.build_N()
-    elif type == 'Z':
-        m = manor.build_Z()
-    else:
-        m = manor.base_builder()
+    m = manor.builder_by_type(type)
 
     # Add doors and windows, etc.
     m.add_features()

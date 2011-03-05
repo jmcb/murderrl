@@ -138,14 +138,15 @@ class Person (object):
         """
         self.rel.append((idx, type))
 
-    def set_alibi (self, room, witness = -1):
+    def set_alibi (self, rid, rname, witness = -1):
         """
         Provides this person with an alibi.
 
-        :``room``: A room name (string). *Required*.
+        :``rid``: A room index. *Required*.
+        :``rname``: A room name. *Required*.
         :``witness``: Suspect list index of another person. *Default -1*.
         """
-        self.alibi = Alibi(room, witness)
+        self.alibi = Alibi(rid, rname, witness)
 
     def has_alibi_witness (self):
         """
@@ -449,7 +450,7 @@ class SuspectList (object):
         :``idx``: An index of the suspects[] list. *Required*.
         """
         if idx < 0 or idx >= self.no_of_suspects():
-            raise IndexError, "Index %d exceeds list of size %s." % (idx, self.no_of_suspects())
+            raise IndexError, "Index %d exceeds list of size %d." % (idx, self.no_of_suspects())
         return self.suspects[idx]
 
     def get_extended_relationship (self, idx, other_idx):
@@ -690,7 +691,7 @@ class SuspectList (object):
             witness = "with %s" % self.get_suspect(a.witness).get_name()
         else:
             witness = "alone"
-        return "%s, %s" % (a.room, witness)
+        return "%s, %s" % (a.rname, witness)
 
     def get_alibi_statement (self, idx):
         """
@@ -707,7 +708,7 @@ class SuspectList (object):
         if p.has_alibi_witness():
             witness = self.call_relative(idx, a.witness)
 
-        return "\"%s\"" % db_get_alibi_statement(a.room, witness)
+        return "\"%s\"" % db_get_alibi_statement(a.rname, witness)
 
     def pick_victim (self):
         """
@@ -933,16 +934,17 @@ class SuspectList (object):
                 else:
                     s.occupation = random.choice(jobs_staff_male)
 
-    def create_paired_alibi (self, p1, p2, room):
+    def create_paired_alibi (self, p1, p2, rid, rname):
         """
         Set mutual alibis for two suspects confirming one another.
 
         :``p1``: Index of a suspect. *Required*.
         :``p2``: Index of another suspect. *Required*.
-        :``room``: Room name. *Required*.
+        :``rid``: Room index. *Required*.
+        :``rname``: Room name. *Required*.
         """
-        self.get_suspect(p1).set_alibi(room, p2)
-        self.get_suspect(p2).set_alibi(room, p1)
+        self.get_suspect(p1).set_alibi(rid, rname, p2)
+        self.get_suspect(p2).set_alibi(rid, rname, p1)
 
     def create_alibis (self, rooms):
         """
@@ -993,7 +995,7 @@ class SuspectList (object):
                 print "pick random witness for %s" % p1
 
             idx2 = suspects[random.randint(0, len(suspects)-1)]
-            self.create_paired_alibi(idx1, idx2, room)
+            self.create_paired_alibi(idx1, idx2, 0, room)
             suspects.remove(idx2)
 
         # Shuffle the remaining list.
@@ -1006,7 +1008,7 @@ class SuspectList (object):
         # TODO: Sometimes allow the murderer to lie about having a witness.
         for i in xrange(0, len(suspects)):
             p = suspects[i]
-            self.get_suspect(p).set_alibi(rooms.pop())
+            self.get_suspect(p).set_alibi(0, rooms.pop())
 
     def get_create_alibis (self, rooms):
         """

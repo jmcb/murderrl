@@ -127,7 +127,10 @@ class RoomProps (Room):
         room_name  = "%s's bedroom" % owner_name
         print room_name
         self.init_db_props(room_name, "domestic", "in", True)
-        self.owners.append(owner_id)
+        if isinstance(owner_id, list):
+            self.owners = owner_id
+        else:
+            self.owners.append(owner_id)
         self.owner_names.append(owner_name)
 
     def fill_from_database (self, utility = None, owner = None):
