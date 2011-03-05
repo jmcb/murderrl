@@ -15,6 +15,9 @@ from suspects import person
 def draw_number (canvas, pos, number):
     """
     Draw a number with up to two digits in a given position.
+
+    :``pos``: The position to draw the number. *Required*.
+    :``number``: The number to be drawn. Only works for up to 2 digits. *Required*.
     """
     single = number % 10
     digit  = number/10
@@ -24,13 +27,20 @@ def draw_number (canvas, pos, number):
 
 def add_symbol (canvas, pos, char):
     """
-    Draw a symbol slightly off-centre of a room.
+    Draw a symbol slightly off-centre of a given position.
+
+    :``pos``: Two steps to the right of this position, the symbol will be drawn. *Required*.
+    :``char``: The character to be drawn at the given position. *Required*.
     """
     canvas.__setitem__(coord.Coord(pos.x+2,pos.y), char)
 
-def draw_alibi_rooms(canvas, sl, m):
+def draw_alibi_rooms (canvas, sl, m):
     """
     Draws a map of the manor, while adding symbols for alibis and room types.
+
+    :``canvas``: The manor in canvas form, so we can draw on it. *Required*.
+    :``sl``: A ``SuspectList`` object. *Required*.
+    :``m``: The manor itself. *Required*.
     """
     murder_room = sl.get_victim().alibi.rid
     # Get a list of alibi rooms matching each suspect id.

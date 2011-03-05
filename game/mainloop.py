@@ -32,6 +32,9 @@ class Game (object):
     def __init__ (self, type = None):
         """
         Initialise the manor, viewport and other objects and parameters.
+
+        :``type``: The manor layout type. One of B (base), L, U, H, R (random).
+                   *Default random*.
         """
         # First, build the manor.
         self.base_manor = builder.manor.builder_by_type(type)
@@ -72,6 +75,12 @@ class Game (object):
         self.base_manor.init_room_names(owner_list)
 
     def add_alibi_for_suspect(self, sid, rids):
+        """
+        Generates an alibi for a given suspect in the form of an unoccupied room.
+
+        :``sid``: The suspect id. *Required*.
+        :``rids``: Room ids of rooms that are still unoccupied. *Required*.
+        """
         # The murderer always picks a room adjacent to one of the corridors,
         # so they don't have to meet any people.
         force_adj_corr = (sid == self.suspect_list.murderer)
@@ -84,6 +93,10 @@ class Game (object):
         return r
 
     def add_alibis (self):
+        """
+        Picks the murder room and assigns alibis (in the form of a room and,
+        sometimes, a witness) for all suspects.
+        """
         # Shortcuts for commonly used variables.
         sl = self.suspect_list
         m  = self.base_manor
