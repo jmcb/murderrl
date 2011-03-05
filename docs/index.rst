@@ -10,6 +10,7 @@ Contents:
 
 .. autosummary::
     :toctree:
+    :template: auto.rst.template
 
     database.database
     library.shape
@@ -29,6 +30,7 @@ Contents:
     interface.regions
     builder.room
     builder.manor
+    util.decorators
     tests.console
     tests.db
     tests.features

@@ -4,6 +4,8 @@ This is a series of decorators that will hopefully make automatically generated
 documentation slightly more comprehensive.
 """
 
+__all__ = ("extends", "extends_multiple")
+
 from functools import wraps
 
 def extends (function_extending):
@@ -55,9 +57,9 @@ def extends (function_extending):
 
 def extends_multiple (*functions):
     """
-    This is a modification of the :function:`extends` decorator. Instead of
-    taking the name of a single function that this function extends, it takes
-    the names of multiple functions. These values are then stored within the
+    This is a modification of the :func:`extends` decorator. Instead of taking
+    the name of a single function that this function extends, it takes the
+    names of multiple functions. These values are then stored within the
     returned function, and are used to generate documentation. In these
     instances, the documentation of each of these is "merged" to form a single
     documentation -- with notes made as to where the documentation comes from;
@@ -82,7 +84,7 @@ def extends_multiple (*functions):
 
     :param functions: This is a ``varags`` parameter. It is presumed that
       functions will be passed as a list; if the list contained only has one
-      function, it will act as though :function:`extends` were called instead.
+      function, it will act as though :func:`extends` were called instead.
       Otherwise, these functions will be stored in the `extends` member of the
       returned wrapper function.
     """
