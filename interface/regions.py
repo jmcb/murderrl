@@ -3,7 +3,7 @@
 Regions are a section of a screen. They are basically a set width and height,
 in screen columns and rows, that has been "set aside". The basic
 :class:`Region` takes a two co-ordinates: ``start`` and ``stop``. You can then
-pass any shape or shape-like object to the Region's :function:`Region.blit`
+pass any shape or shape-like object to the Region's :func:`Region.blit`
 function.
 
 Extensions of the base Region include :class:`MessageRegion`, whose primary
@@ -14,7 +14,8 @@ a ViewPort on the screen.
 Finally, there exists :class:`VariableRegion` and variable variations of
 :class:`MessageRegion` and :class:`ViewPortRegion`, which allow you to specify
 a starting location as well as a percentage of width and screen height the
-region should take up.  """
+region should take up.
+"""
 
 import textwrap
 
@@ -117,9 +118,25 @@ class MessageRegion (Region):
         self.messages = []
 
     def append (self, message):
+        """
+        This appends a single message string to the current set of messages;
+        this will become the "most recent" message, and will be the one
+        displayed next time the region is blitted.
+
+        :param message: The next string message.
+        """
         self.messages.append(message)
 
     def as_shape (self, padding=" "):
+        """
+        Using the information available to the region, this constructs a new Shape object which is the width and height of this region. It then uses the standard library :mod:`textwrap` module to wrap all recent messages that could fit on the screen, then takes these and draws them to the shape.
+
+        Finally, the shape is returned. This shape can be used for blitting purposes, or it could be used for other purposes.
+
+        :param padding: When short messages are encountered, this value is used
+          to "pad" them. Short messages are defined as any message whose length
+          is less than the width of the region. *Default " "*.
+        """
         new_shape = shape.Shape(self.width(), self.height())
 
         lines = []
@@ -135,40 +152,95 @@ class MessageRegion (Region):
 
         return new_shape
 
-    def blit (self):
+    def blit (self, bshape=None):
         """
-        This function writes the contents of messages to the region defined on
-        the screen for our use, performing word-wrapping as required.
+        If ``bshape`` is None, this function converts the contained messages
+        into a shape and then uses parent functions of this class in order to
+        blit it onto the screen.
+
+        If ``bshape`` is not None, it acts exactly like Region.blit.
+
+        :param bshape: The shape to be blitted onto the region. By default,
+          this is ``None``, and when it is None,
+          :func:`MessageRegion.as_shape` is called, and ``bshape`` is set
+          to this. This is then passed up to parent methods of this class.
+          *Default None*.
         """
-        super(MessageRegion, self).blit(self.as_shape())
+        if bshape is None:
+            super(MessageRegion, self).blit(self.as_shape())
+        else:
+            super(MessageRegion, self).blit(bshape)
 
 class VariableMessageRegion (VariableRegion, MessageRegion):
+    """
+    This is identical to a normal :class:`MessageRegion`, except that it
+    subclasses :class:`VariableRegion` instead of the base :class:`Region`.
+    Thus, instead of having a defined height and width passed in by the user by
+    defining start and stop co-ordinates, it is instead given a start
+    co-ordinate and a series of percentages that describe how much of the
+    remaining screen space is to be taken up by this.
+    """
+
+    @decorators.extends_multiple(VariableRegion.__init__, MessageRegion.__init__)
     def __init__ (self, *args, **kwargs):
         super(VariableMessageRegion, self).__init__(*args, **kwargs)
 
 class ViewPortRegion (Region):
+    """
+    This provides a way of placing a ViewPort within a region. It uses the
+    values passed to the :class:`Region` to decide how large the resulting
+    view-port will be; it also uses a buffer provided to the region to pass
+    through to the viewport; finally, it provides accessor functions to both
+    the buffer (and for replacing it) and the ViewPort.
+    """
     _viewport = None
-    _buffer = None
 
+    @decorators.extends(Region.__init__)
     def __init__ (self, *args, **kwargs):
         super(ViewPortRegion, self).__init__(*args, **kwargs)
 
         self._viewport = viewport.ViewPort(self.width(), self.height(), buffer=self._buffer)
 
     def buffer (self, buffer=None):
+        """
+        Either fetch the buffer contained within our viewport, or replace it.
+
+        :param buffer: If not ``None``, this buffer will replace the buffer
+          contained within our viewport. Otherwise, this function will return the
+          contained viewport. *Default None*.
+        """
         if buffer is None:
-            return self._buffer
+            return self._viewport.buffer
         else:
-            self._buffer = buffer
-            return self.buffer
+            self._viewport.buffer = buffer
+            return self._viewport.buffer
 
     def viewport (self):
+        """
+        Returns the viewport object contained within ourselves.
+        """
         return self._viewport
 
-    def blit (self):
-        super(ViewPortRegion, self).blit(self.viwer().sect())
+    def blit (self, bshape=None):
+        """
+        If ``bshape`` is None, the result of our contained viewport's `sect`
+        method will be blitted onto this region.
+
+        If ``bshape`` is not None, this shape will instead be blitted onto this
+        region.
+
+        :param bshape: The shape to be blitted, or ``None``. *Default None*.
+        """
+        super(ViewPortRegion, self).blit(self.viewport().sect())
 
 class VariableViewPortRegion (VariableRegion, ViewPortRegion):
+    """
+    As per :class:`VariableMessageRegion`, this class provides a subclass of
+    :class:`VariableRegion` for :class:`ViewPortRegion`, allowing you to
+    specify a starting location and screen height and width percentages to be
+    used. These values will also be used for the creation of the viewport.
+    """
+
+    @decorators.extends_multiple(VariableRegion.__init__, ViewPortRegion.__init__)
     def __init__ (self, *args, **kwargs):
         super(VariableViewPortRegion, self).__init__(*args, **kwargs)
-
