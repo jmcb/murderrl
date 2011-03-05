@@ -6,7 +6,7 @@ import sphinx.ext.autosummary.generate
 
 def main ():
     sphinx.ext.autosummary.generate.env = Environment(loader=FileSystemLoader('.templates'))
-    sphinx.ext.autosummary.generate.main(argv=sys.argv)
+    sphinx.ext.autosummary.generate.main(argv=["autogen.py", "index.rst"])
 
 if __name__=="__main__":
     main ()
