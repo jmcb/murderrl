@@ -21,6 +21,8 @@ def main ():
     loader = FileSystemLoader([".templates"])
     env = SandboxedEnvironment(loader=loader)
 
+    done_files = []
+
     for orig_module in auto.modules:
         output = orig_module + ".rst"
 
@@ -52,6 +54,17 @@ def main ():
             f.write(rendered)
         finally:
             f.close()
+            done_files.append(output)
+
+    summary_template = open("summary.rst.template").read()
+    modules = ""
+
+    for module in done_files:
+        modules += "    %s\n" % module
+
+    f = open("summary.rst", "w")
+    f.write(summary_template % {"files": modules})
+    f.close()
 
 if __name__=="__main__":
     main ()

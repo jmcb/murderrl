@@ -10,7 +10,7 @@ Contents:
 
 .. toctree::
 
-    summary.rst
+%(files)s
 
 Indices and tables
 ==================
