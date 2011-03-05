@@ -201,9 +201,9 @@ autodoc_default_flags = ["members", "undoc-members", "special-members"]
 autoclass_content = "class"
 
 def process_signature (app, what, name, obj, options, signature, return_annotation):
-    if hasattr(obj, "extends"):
+    if hasattr(obj, "extends") and callable(obj):
         extends = obj.extends
-        if isinstance(extends, list):
+        if isinstance(extends, tuple):
             argspec = inspect.getargspec(extends[0])
         else:
             argspec = inspect.getargspec(extends)
@@ -219,8 +219,5 @@ def process_docstring (app, what, name, obj, options, lines):
     return lines
 
 def setup (app):
-    import docs.scripts.autogen
-    docs.scripts.autogen.main()
-
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-process-signature', process_signature)

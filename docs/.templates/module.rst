@@ -1,10 +1,7 @@
 :mod:`{{name}}`
-======{{ underline }}=
+{{ underline }}
 
-
-.. automodule:: {{name}}
-
-{% if len_functions > 0 %}
+{% if functions %}
 Functions
 ----------
 {% for item in functions %}
@@ -12,7 +9,7 @@ Functions
 {% endfor %}
 {% endif %}
 
-{% if len_classes > 0 %}
+{% if classes %}
 Classes
 --------
 {% for item in classes %}
@@ -21,12 +18,13 @@ Classes
    :members:
    :inherited-members:
    :undoc-members:
-   :special-members:
+   
+   .. automethod:: __init__
    
 {% endfor %}
 {% endif %}
 
-{% if len_exceptions > 0 %}
+{% if exceptions %}
 Exceptions
 ------------
 {% for item in exceptions %}
@@ -35,8 +33,8 @@ Exceptions
    :members:
    :inherited-members:
    :undoc-members:
-   :special-members:
+   
+   .. automethod:: __init__
    
 {% endfor %}
 {% endif %}
-
