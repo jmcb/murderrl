@@ -120,16 +120,23 @@ class Menu (object):
                 break
 
 class ScrollMenu (Menu):
-    # def __init__ (self, title = None):
-        # Menu.__init__(self, title)
-
     def write_on_canvas (self, text, line = 0):
+        """
+        Writes a line of text onto the canvas object.
+
+        :``text``: The text to be printed. *Required*.
+        :``line``: The line number on the canvas. *Default 0*.
+        """
         for ind, char in enumerate(text):
             if ind >= self.canvas.size().x:
                 return
             self.canvas.__setitem__(coord.Coord(ind, line), char)
 
     def paint_canvas (self):
+        """
+        Creates a Shape object filled with the menu data, that can then be
+        displayed and scrolled through.
+        """
         rows = len(self.mlist)
         if self.title:
             rows += 1
@@ -144,6 +151,9 @@ class ScrollMenu (Menu):
             self.write_on_canvas(mlist[i].__str__(), line + i)
 
     def draw_menu (self):
+        """
+        Draws the currently visible part of the menu onto the screen.
+        """
         screen.clear(" ")
         sect = self.vp.sect()
         for pos, char in sect:
@@ -153,6 +163,9 @@ class ScrollMenu (Menu):
         self.write_scrolling_help()
 
     def write_scrolling_help (self):
+        """
+        If necessary, displays the command help for scrolling below the menu.
+        """
         scrollkeys = []
         if self.vp._top > 0:
             scrollkeys.append("up")
@@ -195,6 +208,10 @@ class ScrollMenu (Menu):
         return True
 
     def do_menu (self):
+        """
+        Loop over drawing the menu and executing entry actions. Quits if the
+        player presses a key that does not match any of the entries.
+        """
         self.paint_canvas()
         self.rows = min(15, self.canvas.size().y)
         self.vp = viewport.ViewPort(buffer=self.canvas, width=70, height=self.rows)
