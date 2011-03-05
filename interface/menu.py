@@ -164,9 +164,11 @@ class ScrollMenu (Menu):
             key = screen.get(block=True)
 
         if key == curses.KEY_UP:
-            self.vp.up(1)
+            if self.vp._top > 0:
+                self.vp.up(1)
         elif key == curses.KEY_DOWN:
-            self.vp.down(1)
+            if self.vp._top + self.vp._height < self.canvas.size().y:
+                self.vp.down(1)
         else:
             mlist = self.mlist
             for i in xrange(len(mlist)):
