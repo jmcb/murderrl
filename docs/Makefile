@@ -16,7 +16,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 .PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
 
 gen:
-	$(PYTHON) scripts/autogen.py
+	$(PYTHON) -m scripts.autogen
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
