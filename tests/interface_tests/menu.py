@@ -3,6 +3,9 @@
 import database.database as db
 from suspects.person import *
 from interface.menu import *
+from interface import console
+
+screen = console.select()
 
 def get_rooms (num = 10):
     """

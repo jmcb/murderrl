@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from library import coord
+import curses
+from library import coord, shape, collection, viewport
 from interface import console
 from output import *
 
@@ -19,18 +20,14 @@ class Entry (object):
         :``action``: What happens if the entry key is pressed. Points to a method
                      that takes a single argument, namely ``arg``. *Required*.
         :``arg``: The argument that is passed to action() when the entry is activated.
-                  If none, identical to ``key``. *Default none*.
+                  *Default none*.
         :``key2``: An alternative activation key. *Default none*.
         """
         self.key    = key
         self.desc   = desc
         self.action = action
+        self.arg    = arg
         self.key2   = key2
-
-        if arg == None:
-            self.arg = key
-        else:
-            self.arg = arg
 
     def __str__ (self):
         """
@@ -50,7 +47,10 @@ class Entry (object):
         """
         Triggers and returns the entry's action method, i.e. action(arg).
         """
-        return self.action(self.arg)
+        if self.arg == None:
+            return self.action()
+        else:
+            return self.action(self.arg)
 
 class Menu (object):
     """
@@ -114,6 +114,76 @@ class Menu (object):
         Loop over drawing the menu and executing entry actions. Quits if the
         player presses a key that does not match any of the entries.
         """
+        while True:
+            self.draw_menu()
+            if not self.process_key():
+                break
+
+class ScrollMenu (Menu):
+    # def __init__ (self, title = None):
+        # Menu.__init__(self, title)
+
+    def write_on_canvas (self, text, line = 0):
+        for ind, char in enumerate(text):
+            if ind >= self.canvas.size().x:
+                return
+            self.canvas.__setitem__(coord.Coord(ind, line), char)
+
+    def paint_canvas (self):
+        rows = len(self.mlist)
+        if self.title:
+            rows += 1
+        self.canvas = shape.Shape(width=60, height=rows, fill=" ")
+        line = 0
+        if self.title:
+            self.write_on_canvas(self.title)
+            line = 1
+
+        mlist = self.mlist
+        for i in xrange(len(mlist)):
+            self.write_on_canvas(mlist[i].__str__(), line + i)
+
+    def draw_menu (self):
+        screen.clear(" ")
+        sect = self.vp.sect()
+        for pos, char in sect:
+            if char == None:
+                char = " "
+            screen.put(char, pos+1)
+        print_line("[scroll with up/down keys]", coord.Coord(0, self.rows+1))
+
+    def process_key (self, key = None):
+        """
+        Compares the input with the entry keys and triggers the corresponding action.
+        This action is currently assumed to return a string that is subsequently
+        printed to the screen.
+
+        :``key``: The entered key. If none, call get(). *Default none*.
+        """
+        if key == None:
+            key = screen.get(block=True)
+
+        if key == curses.KEY_UP:
+            self.vp.up(1)
+        elif key == curses.KEY_DOWN:
+            self.vp.down(1)
+        else:
+            mlist = self.mlist
+            for i in xrange(len(mlist)):
+                if mlist[i].key_matches(chr(key)):
+                    fulldesc = mlist[i].activate()
+                    if fulldesc:
+                        print_screen(fulldesc)
+                    return True
+            return False
+
+        return True
+
+    def do_menu (self):
+        self.rows = 15
+        self.paint_canvas()
+        self.vp = viewport.ViewPort(buffer=self.canvas, width=70, height=self.rows)
+
         while True:
             self.draw_menu()
             if not self.process_key():

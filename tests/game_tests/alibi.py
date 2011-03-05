@@ -12,14 +12,6 @@ from library.random_util import *
 from interface.features import *
 from suspects import person
 
-def build_manor (type):
-    m = manor.builder_by_type(type)
-
-    # Add doors and windows, etc.
-    m.add_features()
-
-    return m
-
 def draw_number (canvas, pos, number):
     """
     Draw a number with up to two digits in a given position.
