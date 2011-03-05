@@ -1,6 +1,8 @@
 :mod:`{{name}}`
 {{ underline }}
 
+.. automodule:: {{ fullname }}
+
 {% if functions %}
 Functions
 ----------
