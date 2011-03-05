@@ -219,5 +219,8 @@ def process_docstring (app, what, name, obj, options, lines):
     return lines
 
 def setup (app):
+    import docs.scripts.autogen
+    docs.scripts.autogen.main()
+
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-process-signature', process_signature)
