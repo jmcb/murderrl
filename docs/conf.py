@@ -199,6 +199,46 @@ autodoc_member_order = "groupwise"
 
 autoclass_content = "class"
 
+def method_info (method):
+    if inspect.ismethod(method):
+        return "%s.%s" % (method.im_class.__name__, method.im_func.__name__)
+    return "%s" % (method.__name__)
+
+def _resolve_doc (method):
+    my_docs = []
+
+    if hasattr(method, "extends"):
+        extends = method.extends
+        if isinstance(extends, tuple):
+            for exmeth in extends:
+                assert inspect.ismethod(exmeth)
+                doc = _resolve_doc(exmeth)
+                if doc:
+                    my_docs.extend(doc)
+        else:
+            my_docs.extend(_resolve_doc(extends))
+    elif method.__doc__:
+        my_docs.append((method_info(method), inspect.getdoc(method)))
+
+    return my_docs
+
+def resolve_doc (method):
+    lines = _resolve_doc(method)
+    result = []
+
+    done_methods = []
+
+    for method, line in lines:
+        if method in done_methods:
+            continue
+
+        result.append("*Documentation inherited from* :meth:`%s`:" % (method))
+        result.append("")
+        result.extend(line.split("\n"))
+        done_methods.append(method)
+
+    return result
+
 def process_signature (app, what, name, obj, options, signature, return_annotation):
     if hasattr(obj, "extends") and callable(obj):
         extends = obj.extends
@@ -215,6 +255,9 @@ def process_signature (app, what, name, obj, options, signature, return_annotati
     return (signature, return_annotation)
 
 def process_docstring (app, what, name, obj, options, lines):
+    if hasattr(obj, "extends") and callable(obj):
+        lines.extend(resolve_doc(obj))
+
     return lines
 
 class NewClassDocumenter(ClassDocumenter):

@@ -9,6 +9,7 @@ Welcome to murderrl's documentation!
 Contents:
 
 .. toctree::
+    :maxdepth 1:
 
     summary.rst
 
