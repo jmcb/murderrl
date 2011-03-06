@@ -31,6 +31,8 @@ class Region (object):
     name = None
     def __init__ (self, start, stop, name, screen):
         """
+        Create a new region with the following:
+
         :param start: The starting co-ordinate for this region.
         :param stop: The stop co-ordinate for this region.
         :param name: The name used to index this region.
@@ -83,6 +85,8 @@ class VariableRegion (Region):
     """
     def __init__ (self, start, per_width, per_height, name, screen, min_width=0, min_height=0):
         """
+        Create a new variable region with the following:
+
         :param start: The starting location for this region.
         :param per_width: How big a percentage of columns to take up (out of
           100).
@@ -129,9 +133,14 @@ class MessageRegion (Region):
 
     def as_shape (self, padding=" "):
         """
-        Using the information available to the region, this constructs a new Shape object which is the width and height of this region. It then uses the standard library :mod:`textwrap` module to wrap all recent messages that could fit on the screen, then takes these and draws them to the shape.
+        Using the information available to the region, this constructs a new
+        Shape object which is the width and height of this region. It then uses
+        the standard library :mod:`textwrap` module to wrap all recent messages
+        that could fit on the screen, then takes these and draws them to the
+        shape.
 
-        Finally, the shape is returned. This shape can be used for blitting purposes, or it could be used for other purposes.
+        Finally, the shape is returned. This shape can be used for blitting
+        purposes, or it could be used for other purposes.
 
         :param padding: When short messages are encountered, this value is used
           to "pad" them. Short messages are defined as any message whose length
