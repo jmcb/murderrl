@@ -254,6 +254,14 @@ class VariableViewPortRegion (VariableRegion, ViewPortRegion):
     def __init__ (self, *args, **kwargs):
         super(VariableViewPortRegion, self).__init__(*args, **kwargs)
 
+class TemplateError (Exception):
+    """
+    This error is raised whenever there is an issue when creating or formatting
+    a template. The error message given specifically explains the actual cause
+    of the error, while the trace-back allows locating the error in the source.
+    """
+    pass
+
 class Template (object):
     """
     Templates are provided to a :class:`TemplateRegion`, and define either
@@ -263,20 +271,48 @@ class Template (object):
     displayed? Wrapped onto a new line?
     """
 
-    def __init__ (self, string, length_handle="truncate", **variables):
+    def __init__ (self, string, name=None, length_handle="truncate", **variables):
         """
         Create a new template.
 
         :param string: This is the string that is printed to the screen. It
           should contain a series of place-holders (using %(variable)s), whih are
           equivalent to ``variables``.
+        :param name: If provided, this is used as the internal representation
+          of this template object. *Default None*.
         :param length_handle: How "over-long" lines should be dealt with.
           Options are: "``truncate``", "``wrap``", "``hide``". *Default
           truncate*.
         :param **variables: These keyword arguments should be equivalent to the
           number of place-holders in ``string``.
         """
-        pass
+        assert length_handle in ("truncate", "wrap", "hide")
+
+        self.length_handle = length_handle
+        self.string = string
+        self.name = name
+        self.variables = variables
+
+        for name in variables.keys():
+            if hasattr(self, name):
+                raise TemplateError("Can't have variable named '%s', it's already an attribute of Template!" % name)
+
+            setattr(self, name, property(lambda self: self.variables[name], lambda self, value: self.variables.__setitem__(name, value)))
+
+    def format (self):
+        return self.string % self.variables
+
+    def named (self):
+        return self.name is not None
+
+    def __len__ (self):
+        return len(self.format())
+
+    def __repr__ (self):
+        if self.name is not None:
+            return "<Template %s: '%s', %s>" % (self.name, self.string, repr(self.variables))
+        else:
+            return "<Template '%s', %s>" % (self.string, repr(self.variables))
 
 class TemplateRegion (Region):
     """
@@ -284,4 +320,163 @@ class TemplateRegion (Region):
     variable) on certain parts of a region. For instance, it could be used to
     code up a "heads-up" display. 
     """
-    pass
+
+    def __init__ (self, start, stop, name, screen, templates):
+        """
+        This initialises a region according to the provided variables, and then
+        initialises a list of templates. These templates can be accessed via
+        the :method:`template` function --- which either provides the entire
+        list of templates, per-index based access, per-index based replacement,
+        or alternately, per-name variations of the above.
+
+        If the templates provide names, then these can be access directly
+        through the TemplateRegion object::
+
+            >>> template = Template("%(test)s", name='Test', test=1)
+            >>> tr = TemplateRegion(start, stop, name='TestRegion',
+            ...   screen=screen, templates=[template])
+            >>> tr.Test == template
+            True
+
+        :param start: The starting co-ordinate for this region.
+        :param stop: The stop co-ordinate for this region.
+        :param name: The name used to index this region.
+        :param screen: An instance of Screen.
+        :param templates: A list of :class:`Template` instances. If these
+          templates are named, they will be initialised as members of the
+          TemplateRegion.
+        """
+        super(TemplateRegion, self).__init__(start=start,
+        stop=stop, name=name, screen=screen)
+
+        if templates is None:
+            templates = []
+
+        self.templates = templates
+
+        if len(self.templates) > self.height():
+            raise TemplateError()
+
+        self.indexes = {}
+
+        for index, template in enumerate(self.templates):
+            if template.named():
+                if hasattr(self, name):
+                    raise TemplateError("Template '%s' shadows member '%s'." % (template, template.name))
+
+            self.indexes[name] = index
+
+            setattr(self, name, property(lambda self: self.template(name), lambda self, value: self.template(name, value)))
+
+    def index (self, name):
+        """
+        Determine the index of a specified template name, or return None.
+
+        :param name: The name of the template, equivalent to
+          :method:`Template.name`. If the template is not found, or there are no
+          named templates, this operation will always return None.
+        """
+        if self.indexes.has_key(name):
+            return self.indexes[name]
+
+        return None
+
+    def template (self, name=None, value=None):
+        """
+        Dynamic getter/setter function, which is used both directly as per this
+        documentation, and indirectly, as per members of the TemplateRegion
+        itself --- each determined by the initialisation function.
+
+        If ``name`` and ``value`` are ``None``, it returns a list of the
+        contained templates.
+
+        If ``value`` is ``None``, it returns the template at index ``name``, or
+        the template named ``name``.
+
+        Otherwise, it attempts to replace the teplate ``name`` with the
+        template ``value``.
+
+        :param name: Either the index of the template, in which case it should
+          be an numeric, or the name of the template, in which case it should be
+          a string-like object. This value is compared firstly against the
+          contained indexes of ``self.templates``, and then against the name
+          members of each of the contained templates. *Defalut None*.
+        :param value: If provided, this value will replace the template found
+          via the above ``name`` parameter.
+        """
+        if name is None and value is None:
+            return self.templates
+
+        if value is None:
+            try:
+                return self.templates[name]
+            except TypeError:
+                try:
+                    return self.templates[self.index(name)]
+                except TypeError:
+                    return None
+
+        assert name is not None
+
+        try:
+            self.templates[name] = value
+        except TypeError:
+            try:
+                self.templates[self.index(name)] = value
+            except TypeError:
+                raise TemplateError("Can't find index '%s'!" % name)
+
+        return True
+
+    def as_shape (self, padding=" "):
+        """
+        This function returns a new :class:`shape.Shape`, its dimensions
+        equivalent to the width and height of this region; this shape is
+        created by iterating over each of the contained templates and
+        formatting them. If a resulting template exceeds the width of the
+        region, it is either truncated, wrapped, or hidden according to the
+        template's configuration.
+
+        :param padding: For too-short lines, this is the character used to pad
+          them. *Default " "*.
+        """
+        new_shape = shape.Shape(self.width(), self.height(), fill=padding)
+
+        messages = []
+
+        for template in self.templates:
+            if len(template) > self.width():
+                if template.length_handle == "truncate":
+                    messages.append(template.format()[:self.width()])
+                elif template.length_handle == "wrap":
+                    messages.extend(textwrap.wrap(template.format(), self.width()))
+                else:
+                    continue
+
+        for y, line in enumerate(messages):
+            if len(line) < self.width():
+                line += padding * (self.width() - len(line))
+
+            for x, char in enumerate(line):
+                new_shape[x][y] = char
+
+        return new_shape
+
+    def blit (self, bshape=None):
+        """
+        If ``bshape`` is None, this function converts the contained templates
+        into a shape and then uses parent functions of this class in order to
+        blit it onto the screen.
+
+        If ``bshape`` is not None, it acts exactly like Region.blit.
+
+        :param bshape: The shape to be blitted onto the region. By default,
+          this is ``None``, and when it is None,
+          :func:`TemplateRegion.as_shape` is called, and ``bshape`` is set
+          to this. This is then passed up to parent methods of this class.
+          *Default None*.
+        """
+        if bshape is None:
+            bshape = self.as_shape()
+
+        super(TemplateRegion, self).blit(bshape)
