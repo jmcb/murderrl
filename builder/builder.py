@@ -18,7 +18,7 @@ Attempt to create a "manor" akin to::
                            ##++##
 
 """
-import random, copy, room, manor
+import random, copy, room
 from library import shape, collection
 from library.coord import *
 from library.random_util import *
@@ -32,6 +32,90 @@ N_LAYOUT = "N-corridors"
 H_LAYOUT = "H-corridors"
 O_LAYOUT = "O-corridors"
 U_LAYOUT = "U-corridors"
+
+class BuilderCollection (collection.ShapeCollection):
+    corridors = None
+    rooms     = None
+    legs      = None
+    main_corridor = None
+
+    def __init__ (self, c=[]):
+        if c != [] and isinstance(c, BuilderCollection):
+            self.legs = c.legs
+
+        collection.ShapeCollection.__init__(self, c)
+        self.rebuild()
+
+    def copy (self):
+        my_copy = BuilderCollection(copy.copy(self._shapes))
+        my_copy.legs = copy.deepcopy(self.legs)
+        return my_copy
+
+    def rebuild (self):
+        self.corridors = []
+        self.rooms = []
+        if not self.legs:
+            self.legs = []
+        for index, sh in enumerate(self):
+            if isinstance(sh.shape, MainCorridor):
+                self.main_corridor = index
+
+            if isinstance(sh.shape, Corridor):
+                self.corridors.append(index)
+            else:
+                self.rooms.append(index)
+
+    def corridor (self, index):
+        assert index in self.corridors
+        return self[index]
+
+    def get_corridors (self):
+        return self.corridors
+
+    def get_room (self, index):
+        assert index in self.rooms
+        return self[index]
+
+    def get_rooms (self):
+        if not self.rooms:
+            return None
+        return self.rooms
+
+    def mark_leg (self, leg):
+        self.legs.append(leg)
+
+    def count_legs (self):
+        return len(self.legs)
+
+    def leg_at (self, side, placement):
+        return (side, placement) in self.legs
+
+    def get_leg (self, side, placement):
+        for leg in self.legs:
+            if leg == (side, placement):
+                return leg
+
+        return None
+
+    def _rebuild_wrap (function):
+        def wrapper (self, *args, **kwargs):
+            function(self, *args, **kwargs)
+            self.rebuild()
+        wrapper.__name__ = function.__name__
+        wrapper.__doc__ = function.__doc__ + "\n\nCalling this function automatically rebuilds the BuilderCollection index."
+        return wrapper
+
+    __setitem__ = _rebuild_wrap(collection.ShapeCollection.__setitem__)
+    append      = _rebuild_wrap(collection.ShapeCollection.append)
+    extend      = _rebuild_wrap(collection.ShapeCollection.extend)
+    insert      = _rebuild_wrap(collection.ShapeCollection.insert)
+    pop         = _rebuild_wrap(collection.ShapeCollection.pop)
+    prioritise  = _rebuild_wrap(collection.ShapeCollection.prioritise)
+    reverse     = _rebuild_wrap(collection.ShapeCollection.reverse)
+    reversed    = _rebuild_wrap(collection.ShapeCollection.reversed)
+    sort        = _rebuild_wrap(collection.ShapeCollection.sort)
+    append      = _rebuild_wrap(collection.ShapeCollection.append)
+    prioritise  = _rebuild_wrap(collection.ShapeCollection.prioritise)
 
 class Corridor (shape.Shape):
     pass
@@ -153,7 +237,7 @@ def base_builder ():
     room_height = room.Room().height
 
     my_collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collect=True)
-    m = manor.ManorCollection(my_collection)
+    m = BuilderCollection(my_collection)
 
     corridor_length = my_collection.width() - room_width * 2
     corridor = MainCorridor(shape.Row(width=corridor_length, fill="."))
@@ -266,7 +350,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     new_shape = shape.Shape(width=3, height=room.Room().height, fill="#")
     new_shape.draw_on(shape.Shape(width=1, height=room.Room().height, fill="."), offset=DIR_EAST, check_conflict=False)
 
-    base = manor.ManorCollection(base)
+    base = BuilderCollection(base)
 
     base.draw_on(new_shape, start)
     base.mark_leg(Leg(side, placement, leg=old_leg))

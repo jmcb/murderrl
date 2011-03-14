@@ -6,7 +6,7 @@ Toggle canvas vs. feature view with 't'. (Should be identical.)
 
 import curses
 
-import builder.builder
+from builder import builder, manor
 from library import viewport, coord
 import interface.console
 from interface.features import *
@@ -31,26 +31,26 @@ def main ():
     screen.init()
 
     # First, build the manor.
-    # base_manor = builder.builder.base_builder()
-    # base_manor = builder.builder.build_L()
-    base_manor = builder.builder.build_random()
+    # base_manor = manor.ManorCollection(builder.base_builder())
+    # base_manor = manor.ManorCollection(builder.build_L())
+    base_manor = manor.ManorCollection(builder.build_random())
 
     # Translate rooms and corridors into wall and floor features.
     base_manor.add_features()
     base_manor.entrance_hall = 0
     # Combine the room shapes into a canvas.
-    manor = base_manor.combine()
+    mymanor = base_manor.combine()
 
     # Draw features on canvas.
-    for pos in coord.RectangleIterator(manor.size()):
+    for pos in coord.RectangleIterator(mymanor.size()):
         feat = base_manor.get_feature(pos)
         if feat != NOTHING and feat != WALL and feat != FLOOR:
-            manor.__setitem__(pos, feat.glyph())
+            mymanor.__setitem__(pos, feat.glyph())
 
     # Initialise the view port.
-    vp = viewport.ViewPort(buffer=manor,
-                           width =min(manor.size().width, 70),
-                           height=min(manor.size().height, 20))
+    vp = viewport.ViewPort(buffer=mymanor,
+                           width =min(mymanor.size().width, 70),
+                           height=min(mymanor.size().height, 20))
 
     # Initially place the player in the centre of the entrance hall.
     ehall = base_manor.get_room(base_manor.entrance_hall)
@@ -66,7 +66,7 @@ def main ():
         screen.clear(" ")
 
         # The currently visible section of the viewport, centered on the player.
-        vp.centre(real_pos, manor.size())
+        vp.centre(real_pos, mymanor.size())
         sect = vp.sect()
 
         # Depending on the current toggle state (toggle key 't'), either draw
@@ -109,7 +109,7 @@ def main ():
         room_desc = base_manor.get_roomprop(id)
         print_line("Sect size : %s, Start coord: %s, Stop coord: %s, %s" % (sect.size(), coord.Coord(vp._left, vp._top), coord.Coord(vp._left + vp._width, vp._top + vp._height), room_desc), coord.Coord(0, 23))
 
-        print_line("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (manor.size(), real_pos + 1, last_move, type, id), coord.Coord(0, 24))
+        print_line("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (mymanor.size(), real_pos + 1, last_move, type, id), coord.Coord(0, 24))
 
         # Get a key.
         ch = screen.get(block=True)
@@ -137,7 +137,7 @@ def main ():
         elif ch == curses.KEY_DOWN:
             last_move.y = 1
             next_pos = real_pos + last_move
-            if next_pos.y >= manor.size().y:
+            if next_pos.y >= mymanor.size().y:
                 move_was_blocked = True
                 continue
             tried_move_feat = base_manor.get_feature(next_pos)
@@ -159,7 +159,7 @@ def main ():
         elif ch == curses.KEY_RIGHT:
             last_move.x = 1
             next_pos = real_pos + last_move
-            if next_pos.x >= manor.size().x:
+            if next_pos.x >= mymanor.size().x:
                 move_was_blocked = True
                 continue
             tried_move_feat = base_manor.get_feature(next_pos)

@@ -6,7 +6,7 @@ Toggle canvas vs. feature view with 't'. (Should be identical.)
 
 import curses
 
-import builder.builder
+from builder import builder, manor
 import library.viewport, library.coord
 import interface.console
 from library.feature import *
@@ -23,7 +23,7 @@ def main ():
 
     # First, build the manor.
     # base_manor = builder.manor.base_builder()
-    base_manor = builder.builder.build_random()
+    base_manor = manor.ManorCollection(builder.build_random())
 
     # Translate rooms and corridors into wall and floor features.
     base_manor.init_features()
@@ -31,7 +31,7 @@ def main ():
     base_manor.add_doors()
     base_manor.add_windows()
     # Combine the room shapes into a canvas
-    manor = base_manor.combine()
+    mymanor = base_manor.combine()
 
     # Debugging output
     print "Doors:", base_manor.doors
@@ -44,15 +44,15 @@ def main ():
     base_manor.print_corridors()
 
     # Draw features on canvas.
-    for pos in library.coord.RectangleIterator(manor.size()):
+    for pos in library.coord.RectangleIterator(mymanor.size()):
         feat = base_manor.get_feature(pos)
         if feat != NOTHING and feat != WALL and feat != FLOOR:
-            manor.__setitem__(pos, feat.glyph())
+            mymanor.__setitem__(pos, feat.glyph())
 
     # Initialise the view port.
-    vp = library.viewport.ViewPort(buffer=manor,
-                                   width =min(manor.size().width, 70),
-                                   height=min(manor.size().height, 20))
+    vp = library.viewport.ViewPort(buffer=mymanor,
+                                   width =min(mymanor.size().width, 70),
+                                   height=min(mymanor.size().height, 20))
 
     # Initialise a couple of variables.
     ppos      = library.coord.Coord(35, 10) # player (@) position in the viewport
@@ -114,7 +114,7 @@ def main ():
         if id == None:
             id   = base_manor.get_room_index(real_pos)
             type = "room"
-        put_text("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (manor.size(), real_pos, last_move, type, id), library.coord.Coord(0, 24))
+        put_text("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (mymanor.size(), real_pos, last_move, type, id), library.coord.Coord(0, 24))
 
         # Get a key.
         ch = screen.get(block=True)
@@ -137,9 +137,9 @@ def main ():
                 move_was_blocked = True
         elif ch == curses.KEY_DOWN:
             last_move.y = 1
-            if vp._top + vp._height < manor.size().y:
+            if vp._top + vp._height < mymanor.size().y:
                 vp.down(1)
-            elif real_pos.y < manor.size().y - 1:
+            elif real_pos.y < mymanor.size().y - 1:
                 ppos.y += 1
             else:
                 move_was_blocked = True
@@ -153,9 +153,9 @@ def main ():
                 move_was_blocked = True
         elif ch == curses.KEY_RIGHT:
             last_move.x = 1
-            if vp._left + vp._width < manor.size().x:
+            if vp._left + vp._width < mymanor.size().x:
                 vp.right(1)
-            elif real_pos.x < manor.size().x - 1:
+            elif real_pos.x < mymanor.size().x - 1:
                 ppos.x += 1
             else:
                 move_was_blocked = True

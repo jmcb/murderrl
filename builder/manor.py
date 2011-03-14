@@ -19,51 +19,15 @@ Attempt to create a "manor" akin to::
 
 """
 
-import random, copy, builder, room
+import random, builder, room
 from interface.features import *
-from library import shape, collection
 from library.coord import *
 from library.random_util import *
 from library.feature import *
 
-class ManorCollection (collection.ShapeCollection):
-    corridors = None
-    rooms     = None
-    legs      = None
-    main_corridor = None
-
+class ManorCollection (builder.BuilderCollection):
     def __init__ (self, c=[]):
-        if c != [] and isinstance(c, ManorCollection):
-            self.legs = c.legs
-
-        collection.ShapeCollection.__init__(self, c)
-        self.rebuild()
-
-    def copy (self):
-        my_copy = ManorCollection(copy.copy(self._shapes))
-        my_copy.legs = copy.deepcopy(self.legs)
-        return my_copy
-
-    def rebuild (self):
-        self.corridors = []
-        self.rooms = []
-        if not self.legs:
-            self.legs = []
-        for index, sh in enumerate(self):
-            if isinstance(sh.shape, builder.MainCorridor):
-                self.main_corridor = index
-
-            if isinstance(sh.shape, builder.Corridor):
-                self.corridors.append(index)
-            else:
-                self.rooms.append(index)
-
-    def corridor (self, index):
-        assert index in self.corridors
-        return self[index]
-
-    def get_corridors (self):
-        return self.corridors
+        builder.BuilderCollection.__init__(self, c)
 
     def print_corridors (self):
         """
@@ -105,15 +69,6 @@ class ManorCollection (collection.ShapeCollection):
         :``pos``: A coord. *Required*
         """
         return self.get_corridor_index(pos, False)
-
-    def get_room (self, index):
-        assert index in self.rooms
-        return self[index]
-
-    def get_rooms (self):
-        if not self.rooms:
-            return None
-        return self.rooms
 
     def print_rooms (self):
         """
@@ -831,39 +786,3 @@ class ManorCollection (collection.ShapeCollection):
             r = self.get_bedroom_id(idx2, rids)
 
         return r
-
-    def mark_leg (self, leg):
-        self.legs.append(leg)
-
-    def count_legs (self):
-        return len(self.legs)
-
-    def leg_at (self, side, placement):
-        return (side, placement) in self.legs
-
-    def get_leg (self, side, placement):
-        for leg in self.legs:
-            if leg == (side, placement):
-                return leg
-
-        return None
-
-    def _rebuild_wrap (function):
-        def wrapper (self, *args, **kwargs):
-            function(self, *args, **kwargs)
-            self.rebuild()
-        wrapper.__name__ = function.__name__
-        wrapper.__doc__ = function.__doc__ + "\n\nCalling this function automatically rebuilds the ManorCollection index."
-        return wrapper
-
-    __setitem__ = _rebuild_wrap(collection.ShapeCollection.__setitem__)
-    append      = _rebuild_wrap(collection.ShapeCollection.append)
-    extend      = _rebuild_wrap(collection.ShapeCollection.extend)
-    insert      = _rebuild_wrap(collection.ShapeCollection.insert)
-    pop         = _rebuild_wrap(collection.ShapeCollection.pop)
-    prioritise  = _rebuild_wrap(collection.ShapeCollection.prioritise)
-    reverse     = _rebuild_wrap(collection.ShapeCollection.reverse)
-    reversed    = _rebuild_wrap(collection.ShapeCollection.reversed)
-    sort        = _rebuild_wrap(collection.ShapeCollection.sort)
-    append      = _rebuild_wrap(collection.ShapeCollection.append)
-    prioritise  = _rebuild_wrap(collection.ShapeCollection.prioritise)
