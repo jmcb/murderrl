@@ -99,6 +99,9 @@ class Menu (object):
         if key == None:
             key = screen.get(block=True)
 
+        if key > 255:
+            return False
+
         mlist = self.mlist
         for i in xrange(len(mlist)):
             if mlist[i].key_matches(chr(key)):
@@ -195,6 +198,8 @@ class ScrollMenu (Menu):
         elif key == curses.KEY_DOWN:
             if self.vp._top + self.vp._height < self.canvas.size().y:
                 self.vp.down(1)
+        elif key > 255:
+            return False
         else:
             mlist = self.mlist
             for i in xrange(len(mlist)):

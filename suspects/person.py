@@ -980,7 +980,7 @@ class SuspectList (object):
                 print "try alibi %s / %s" % (str(p1), str(p2))
                 if (idx2 != self.victim and idx2 != self.murderer
                     and not p2.alibi):
-                    self.create_paired_alibi(idx1, idx2, room)
+                    self.create_paired_alibi(idx1, idx2, 0, room)
                     suspects.remove(idx2)
                     continue
                 else:
