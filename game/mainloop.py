@@ -5,7 +5,7 @@ The main game loop, where all components come together.
 
 import curses, random
 
-import builder.manor
+from builder import builder
 from library import viewport
 from library.coord import *
 from library.feature import *
@@ -37,7 +37,7 @@ class Game (object):
                    *Default random*.
         """
         # First, build the manor.
-        self.base_manor = builder.manor.builder_by_type(type)
+        self.base_manor = builder.builder_by_type(type)
 
         # Add doors and windows, etc.
         self.base_manor.add_features()

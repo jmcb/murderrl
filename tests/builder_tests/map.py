@@ -3,14 +3,14 @@
 Outputs a map of the furnished manor, annotated with room numbers and names.
 """
 
-from builder import manor
+from builder import builder
 from library import coord
 from library.feature import *
 from interface.features import *
 from suspects import person
 
 def build_manor (type):
-    m = manor.builder_by_type(type)
+    m = builder.builder_by_type(type)
 
     # Add doors and windows, etc.
     m.add_features()

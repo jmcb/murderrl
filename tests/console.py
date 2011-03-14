@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import curses
 
-import builder.manor
+import builder.builder
 import library.viewport, library.coord
 import interface.console
 
@@ -14,7 +14,7 @@ def put_text (text, spot):
 def main ():
     screen.init()
 
-    manor = builder.manor.build_U().combine()
+    manor = builder.builder.build_U().combine()
 
     vp = library.viewport.ViewPort(buffer=manor, width=60, height=15)
 

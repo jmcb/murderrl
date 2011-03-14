@@ -3,7 +3,7 @@
 unit test for manor building.
 """
 
-from builder import manor
+from builder import builder
 
 if __name__=="__main__":
 
@@ -12,19 +12,6 @@ if __name__=="__main__":
     if len(sys.argv) > 1:
         type = sys.argv[1].upper()
 
-    if type == 'L':
-        m = manor.build_L()
-    elif type == 'Z':
-        m = manor.build_Z()
-    elif type == 'N':
-        m = manor.build_N()
-    elif type == 'H':
-        m = manor.build_H()
-    elif type == 'O':
-        m = manor.build_O()
-    elif type == 'U':
-        m = manor.build_U()
-    else:
-        m = manor.base_builder()
+    m = builder.builder_by_type(type)
 
     print m.combine()

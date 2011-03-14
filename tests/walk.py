@@ -6,7 +6,7 @@ Toggle canvas vs. feature view with 't'. (Should be identical.)
 
 import curses
 
-import builder.manor
+import builder.builder
 from library import viewport, coord
 import interface.console
 from interface.features import *
@@ -31,16 +31,13 @@ def main ():
     screen.init()
 
     # First, build the manor.
-    # base_manor = builder.manor.base_builder()
-    # base_manor = builder.manor.build_L()
-    base_manor = builder.manor.build_random()
+    # base_manor = builder.builder.base_builder()
+    # base_manor = builder.builder.build_L()
+    base_manor = builder.builder.build_random()
 
     # Translate rooms and corridors into wall and floor features.
-    base_manor.init_features()
-    # Add doors along corridors.
-    base_manor.add_doors()
-    # Add doors along corridors, and windows.
-    base_manor.add_windows()
+    base_manor.add_features()
+    base_manor.entrance_hall = 0
     # Combine the room shapes into a canvas.
     manor = base_manor.combine()
 
