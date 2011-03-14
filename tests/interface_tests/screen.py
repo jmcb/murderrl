@@ -2,7 +2,7 @@
 
 import unittest
 
-from interface import screen, console
+from interface import screen, console, regions
 from library import coord, shape
 
 class RegionTest (unittest.TestCase):
@@ -23,7 +23,7 @@ class RegionTest (unittest.TestCase):
         pass
 
     def test_message_region (self):
-        message_region = screen.MessageRegion(coord.Coord(0, 0), coord.Coord(5, 5), "messages", self.screen)
+        message_region = regions.MessageRegion(coord.Coord(0, 0), coord.Coord(5, 5), "messages", self.screen)
         self.screen.region(message_region)
 
         mr = self.screen.region_by_name("messages")
