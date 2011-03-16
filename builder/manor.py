@@ -361,6 +361,7 @@ class ManorCollection (builder.BuilderCollection):
                     stopy  = starty + thisroom.size().y - 1
                     # print "room %d: (%s, %s) -> (%s, %s) -- offset: (%s, %s)" % (curr_room, startx, starty, stopx, stopy, offset.x, offset.y)
                 if (pos.x == startx or pos.x == stopx) and (pos.y == starty or pos.y == stopy):
+                    pass
                     # print "pos: (%s, %s), room start: (%s, %s), room end: (%s, %s)" % (pos.x, pos.y, startx, starty, stopx, stopy)
                 else:
                     candidates.append(pos)

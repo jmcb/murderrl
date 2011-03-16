@@ -161,7 +161,9 @@ def join_row_rooms (row, left=False, right=False, check_offset=False):
     row_collection = shape.adjoin(row_collection, last_room, top_offset=top_offset, overlap=overlap, collect=True)
     return row_collection
 
-def base_builder (top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False):
+ROOM_WIDTH_LIST = [7, 8, 9, 10, 11, 12]
+
+def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=None, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False):
     """
     Attempts to build a manor based on the style provided. It returns
     ShapeCollection and a list of Room objects.
@@ -170,11 +172,15 @@ def base_builder (top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl
                 Currently on ``ONE_CORRIDOR`` is supported. *Default
                 ONE_CORRIDOR*.
     """
-    widths = [7, 8, 9, 10, 11, 12]; # room widths
-    # top_left     = random.choice(widths)
-    # top_right    = random.choice(widths)
-    # bottom_left  = random.choice(widths)
-    # bottom_right = random.choice(widths)
+    if top_left == None:
+        top_left = random.choice(ROOM_WIDTH_LIST)
+    if top_right == None:
+        top_right = random.choice(ROOM_WIDTH_LIST)
+    if bottom_left == None:
+        bottom_left = random.choice(ROOM_WIDTH_LIST)
+    if bottom_right == None:
+        bottom_right = random.choice(ROOM_WIDTH_LIST)
+
     # tl_corr = True
     # tr_corr = True
     # bl_corr = True
@@ -223,7 +229,7 @@ def base_builder (top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl
         if len(row1) > 3 and one_chance_in(3):
             break
 
-        new_room = room.Room(width=random.choice((widths)))
+        new_room = room.Room(width=random.choice(ROOM_WIDTH_LIST))
         row1.append(new_room)
         length1 += new_room.width - 1
         print "room %s: w=%s, length1: %s" % (len(row1), new_room.width, length1)
@@ -238,7 +244,7 @@ def base_builder (top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl
         if dist_left < 14:
             new_width = dist_left
         else:
-            new_width  = random.choice(widths)
+            new_width  = random.choice(ROOM_WIDTH_LIST)
             next_width = dist_left - new_width
             if next_width < 7:
                 new_width = random.choice((6,7,8))
@@ -415,15 +421,14 @@ def build_leg (rooms_tall=2, rooms_wide=2, make_corridor=True, do_cleanup=True):
     new_rooms = collection.ShapeCollection()
 
     for row in xrange(rooms_tall):
-        rooms = []
-        for r in xrange(rooms_wide):
-            rooms.append(room.Room().as_shape())
-
         this_row = collection.ShapeCollection()
-        this_row = shape.adjoin(rooms.pop(), this_row, overlap=-1, collect=True)
 
-        for r in rooms:
-            this_row = shape.adjoin(this_row, r, overlap=-1, collect=True)
+        left_room = room.Room().as_shape()
+        this_row  = shape.adjoin(this_row, left_room, overlap=-1, collect=True)
+
+        if rooms_wide > 1:
+            right_room = room.Room().as_shape()
+            this_row   = shape.adjoin(this_row, right_room, overlap=-1, collect=True)
 
         new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collect=True)
 
@@ -441,12 +446,13 @@ def build_L (base=None, rooms=2, rooms_wide=2):
     side = random.choice([SIDE_LEFT, SIDE_RIGHT])
     placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
-    tl = (side == SIDE_LEFT and placement == PLACE_TOP)
-    tr = (side == SIDE_RIGHT and placement == PLACE_TOP)
-    bl = (side == SIDE_LEFT and placement == PLACE_BOTTOM)
-    br = (side == SIDE_RIGHT and placement == PLACE_BOTTOM)
+    tlc = (side == SIDE_LEFT and placement == PLACE_TOP)
+    trc = (side == SIDE_RIGHT and placement == PLACE_TOP)
+    blc = (side == SIDE_LEFT and placement == PLACE_BOTTOM)
+    brc = (side == SIDE_RIGHT and placement == PLACE_BOTTOM)
+
     if base is None:
-        base = base_builder(tl_corr=tl, tr_corr=tr, bl_corr=bl, br_corr=br)
+        base = base_builder(top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc)
 
     # Draw the new rooms.
     new_rooms = build_leg(rooms, rooms_wide)
@@ -466,7 +472,7 @@ def build_N (base=None):
 
 def build_H (base=None):
     if base is None:
-        base = base_builder(tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True)
+        base = base_builder(top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True)
 
     base = build_U(base, placement=PLACE_TOP)
     base = build_U(base, placement=PLACE_BOTTOM)
@@ -486,13 +492,13 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None):
     if placement is None:
         placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
-    tl = (placement == PLACE_TOP)
-    tr = tl
-    bl = not tl
-    br = bl
+    tlc = (placement == PLACE_TOP)
+    trc = tlc
+    blc = not tlc
+    brc = blc
 
     if base is None:
-        base = base_builder(tl_corr = tl, tr_corr = tr, bl_corr = bl, br_corr = br)
+        base = base_builder(top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr = tlc, tr_corr = trc, bl_corr = blc, br_corr = brc)
 
     base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
     base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement)
