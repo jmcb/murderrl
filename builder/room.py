@@ -204,7 +204,7 @@ class RoomProps (Room):
         return desc
 
     def describe_exits (self):
-        if len(self.adj_rooms) == 0:
+        if len(self.adj_room_names) == 0:
             return ""
 
         desc = "There "
