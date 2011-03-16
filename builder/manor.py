@@ -338,7 +338,7 @@ class ManorCollection (builder.BuilderCollection):
                 continue
             rooms = self.get_room_indices(pos)
             corrs = self.get_corridor_indices(pos)
-            # Make sure there's only exactly room for this wall.
+            # Make sure there's only exactly one room for this wall.
             # There also may be no other corridor except this one.
             if len(rooms) == 1 and len(corrs) == 1:
                 # print "(%s, %s) -> %s" % (pos.x, pos.y, rooms)
@@ -353,9 +353,17 @@ class ManorCollection (builder.BuilderCollection):
                         self.room_props[corrs[0]].add_adjoining_room(old_room)
                         self.doors.append(rand_coord)
                         candidates = []
-                    # print "curr. room: %s" % curr_room
-                old_room = curr_room
-                candidates.append(pos)
+                    old_room = curr_room
+                    thisroom = self.get_room(curr_room)
+                    startx = thisroom.pos().x - offset.x
+                    starty = thisroom.pos().y - offset.y
+                    stopx  = startx + thisroom.size().x - 1
+                    stopy  = starty + thisroom.size().y - 1
+                    # print "room %d: (%s, %s) -> (%s, %s) -- offset: (%s, %s)" % (curr_room, startx, starty, stopx, stopy, offset.x, offset.y)
+                if (pos.x == startx or pos.x == stopx) and (pos.y == starty or pos.y == stopy):
+                    # print "pos: (%s, %s), room start: (%s, %s), room end: (%s, %s)" % (pos.x, pos.y, startx, starty, stopx, stopy)
+                else:
+                    candidates.append(pos)
 
         # The corridor has reached an end. Pick a door spot for the last room seen.
         if len(candidates):
