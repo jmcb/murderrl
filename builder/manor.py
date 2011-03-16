@@ -677,6 +677,7 @@ class ManorCollection (builder.BuilderCollection):
 
         if len(e_hall_candidates) == 0:
             print "-------\nNo entrance hall for this manor!"
+            self.entrance_hall = 0
         else:
             self.entrance_hall = random.choice(e_hall_candidates)
             rp = self.room_props[self.entrance_hall]
