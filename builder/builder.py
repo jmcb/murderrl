@@ -123,7 +123,45 @@ class Corridor (shape.Shape):
 class MainCorridor (Corridor):
     pass
 
-def base_builder ():
+def join_row_rooms (row, left=False, right=False, check_offset=False):
+    assert(len(row) > 2)
+
+    first_room  = row[0].as_shape()
+    second_room = row[1].as_shape()
+
+    # Does some weird stuff to offset everything
+    offset_both = False
+    if check_offset and first_room.height() == second_room.height():
+        offset_both = True
+
+    # Join the first two rooms.
+    top_offset = 0
+    if check_offset:
+        top_offset = 2
+    overlap = 1
+    if left:
+        overlap = -1
+    row_collection = shape.adjoin(first_room, second_room, top_offset=top_offset, overlap=overlap, collect=True, offset_both=offset_both)
+
+    # Join the middle rooms.
+    for curr in row[2:-1]:
+        room_shape = curr.as_shape()
+        to = top_offset
+        if check_offset and (room_shape.height() == first_room.height() and not offset_both or room_shape.height() > first_room.height()):
+            to = 0
+        row_collection = shape.adjoin(row_collection, room_shape, top_offset=to, overlap=1, collect=True, offset_both=offset_both)
+
+    # Join the last room.
+    last_room = row[-1].as_shape()
+    if check_offset and (last_room.height() == first_room.height() and not offset_both or last_room.height() > first_room.height()):
+        top_offset = 0
+    overlap = 1
+    if right:
+        overlap = -1
+    row_collection = shape.adjoin(row_collection, last_room, top_offset=top_offset, overlap=overlap, collect=True)
+    return row_collection
+
+def base_builder (top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False):
     """
     Attempts to build a manor based on the style provided. It returns
     ShapeCollection and a list of Room objects.
@@ -132,117 +170,123 @@ def base_builder ():
                 Currently on ``ONE_CORRIDOR`` is supported. *Default
                 ONE_CORRIDOR*.
     """
+    widths = [7, 8, 9, 10, 11, 12]; # room widths
+    # top_left     = random.choice(widths)
+    # top_right    = random.choice(widths)
+    # bottom_left  = random.choice(widths)
+    # bottom_right = random.choice(widths)
+    # tl_corr = True
+    # tr_corr = True
+    # bl_corr = True
+    # br_corr = True
+    print "tl: %s, tr: %s, bl: %s, br: %s" % (top_left, top_right, bottom_left, bottom_right)
+    print "tl: %s, tr: %s, bl: %s, br: %s" % (tl_corr, tr_corr, bl_corr, br_corr)
     # Top row of rooms
     row1 = []
     # Corridor, then bottom row of rooms
     row2 = []
 
-    # We start with the entrance hall and add rooms on either side of it
-    # until we have a minimum of six and a maximum of ten
-    entrance_hall = room.Room()
+    max_length  = 6*12
+    # manor_width = random.randint(max_length/2, max_length)
 
-    left  = 0
-    right = 0
+    # first rooms on either row
+    height1 = 7
+    height2 = 7
+    check_overlap = False
+    if top_left < bottom_left or top_left == bottom_left and coinflip():
+        height1 += 2
+    else:
+        height2 += 2
+        check_overlap = True
 
-    row2.append(entrance_hall)
+    first = room.Room(width=top_left, height=height1)
+    row1.append(first)
+    first = room.Room(width=bottom_left, height=height2)
+    row2.append(first)
+    print "height1: %s, height2: %s" % (height1, height2)
 
-    while len(row2) <= 5:
-        # If we have six rooms, one in three chance of not adding any more
+    length1 = top_left + top_right - 2
+    if tl_corr:
+        length1 += 2
+    if tr_corr:
+        length1 += 2
+    length2 = bottom_left + bottom_right - 2
+    if bl_corr:
+        length2 += 2
+    if br_corr:
+        length2 += 2
+    print "Row 1:"
+    print "room 1: w=%s, length1: %s" % (top_left, length1)
+    while len(row1) <= 5:
+        # If we have four rooms, one in three chance of not adding any more
         # rooms.
-        if len(row2) > 4 and one_chance_in(3):
+        if len(row1) > 3 and one_chance_in(3):
             break
 
-        new_room = room.Room()
-
-        if left > right:
-            row2.append(new_room)
-            right += 1
-        elif left < right:
-            row2.insert(0, new_room)
-            left += 1
-        else:
-            side = random.randint(-1, 0)
-            if side == -1:
-                right += 1
-            else:
-                left += 1
-            row2.insert(side, new_room)
-
-    while len(row1) < len(row2):
-        new_room = room.Room()
+        new_room = room.Room(width=random.choice((widths)))
         row1.append(new_room)
+        length1 += new_room.width - 1
+        print "room %s: w=%s, length1: %s" % (len(row1), new_room.width, length1)
+    print "room %s: w=%s" % (len(row1)+1, top_right)
 
-    # Now, adjust the rooms at either end to compensate for the corridor:
-    # 1. We can adjust two rooms on the bottom level for height, 2 on the
-    #    top for width.
-    # 2. We can adjust one on the bottom and one on the top for height, and
-    #    the opposites for width.
-    # 3. We can adjust two rooms on the top level for height, 2 on the
-    #    bottom for width.
-    adjust_bottom = random.randint(0, 2)
-    top_offset = 2
-    overlap = 3
-    if adjust_bottom == 2:
-        overlap = 1
-        row2[0].height  += 2
-        row2[-1].height += 2
-        row1[0].width   += 2
-        row1[-1].width  += 2
-        row2[1].width   += 2
-        row2[-2].width  += 2
-    elif adjust_bottom == 1:
-        side_adjusted = random.randint(-1, 0)
-        side_not_adjusted = -side_adjusted-1
-        row2[side_adjusted].height     += 2
-        row1[side_not_adjusted].height += 2
-        row2[side_not_adjusted].width  += 2
-        row1[side_adjusted].width      += 2
-    elif adjust_bottom == 0:
-        overlap = 3
-        row1[0].height  += 2
-        row1[-1].height += 2
-        row2[0].width   += 2
-        row2[-1].width  += 2
-        row1[1].width   += 2
-        row1[-2].width  += 2
+    manor_width = length1
+
+    print "\nRow 2:"
+    print "room 1: w=%s, length2: %s" % (bottom_left, length2)
+    while length2 < manor_width:
+        dist_left = manor_width - length2 + 1
+        if dist_left < 14:
+            new_width = dist_left
+        else:
+            new_width  = random.choice(widths)
+            next_width = dist_left - new_width
+            if next_width < 7:
+                new_width = random.choice((6,7,8))
+        new_room = room.Room(width=new_width)
+        row2.append(new_room)
+        length2 += new_width - 1
+        print "room %s: w=%s, length2: %s" % (len(row2), new_width, length2)
+    print "room %s: w=%s" % (len(row2)+1, bottom_right)
+
+    # last rooms on either row
+    height1 = 7
+    height2 = 7
+    if top_right < bottom_right or top_right == bottom_right and coinflip():
+        height1 += 2
+        check_overlap = False
+    else:
+        height2 += 2
+        # check_overlap = True
+    print "height1: %s, height2: %s" % (height1, height2)
+
+    first = room.Room(width=top_right, height=height1)
+    row1.append(first)
+    first = room.Room(width=bottom_right, height=height2)
+    row2.append(first)
+    print "\nrow1: %s rooms, row2: %s rooms, manor width: %s" % (len(row1), len(row2), manor_width)
 
     # Now, start drawing it! YAY!
 
     # First row
-    first_room  = row1[0].as_shape()
-    second_room = row1[1].as_shape()
-    row1_collection = shape.adjoin(first_room, second_room, overlap=1, collect=True)
-    for curr in row1[2:]:
-        row1_collection = shape.adjoin(row1_collection, curr.as_shape(), overlap=1, collect=True)
+    row1_collection = join_row_rooms(row1, tl_corr, tr_corr)
 
     # second row
-    first_room  = row2[0].as_shape()
-    second_room = row2[1].as_shape()
-
-    # Does some weird stuff to offset everything
-    offset_both = False
-    if first_room.height() == second_room.height():
-        offset_both = True
-
-    row2_collection = shape.adjoin(first_room, second_room, top_offset=top_offset, overlap=1, collect=True, offset_both=offset_both)
-    for curr in row2[2:]:
-        to = top_offset
-        room_shape = curr.as_shape()
-        if room_shape.height() == first_room.height() and not offset_both or room_shape.height() > first_room.height():
-            to = 0
-        row2_collection = shape.adjoin(row2_collection, room_shape, top_offset=to, overlap=1, collect=True)
+    row2_collection = join_row_rooms(row2, bl_corr, br_corr, True)
 
     # Finally, make a corridor!
-    room_width  = room.Room().width
-    room_height = room.Room().height
-
+    overlap = 3
+    if check_overlap:
+        overlap = 1
     my_collection = shape.underneath(row1_collection, row2_collection, overlap=overlap, collect=True)
     m = BuilderCollection(my_collection)
 
-    corridor_length = my_collection.width() - room_width * 2
+    noncorr_left  = min(top_left, bottom_left)
+    noncorr_right = min(top_right, bottom_right)
+    corridor_length = my_collection.width() - noncorr_left - noncorr_right
+    print "noncorr_left: %s, noncorr_right: %s, corridor_length: %s" % (noncorr_left, noncorr_right, corridor_length)
     corridor = MainCorridor(shape.Row(width=corridor_length, fill="."))
 
-    m.append(collection.ShapeCoord(corridor, coord.Coord(room_width, room_height)))
+    m.append(collection.ShapeCoord(corridor, coord.Coord(noncorr_left, room.Room().height)))
 
     return m
 
@@ -315,10 +359,10 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP):
     stop   = coord.Coord(start)
     stop.x = corridor.width()
 
-    if side == SIDE_LEFT:
+    if side == SIDE_RIGHT:
         leg.offset(coord.Coord(stop.x-1, 0))
         y_offset = stop.x + (room.Room().width - 1)
-    elif side == SIDE_RIGHT:
+    elif side == SIDE_LEFT:
         y_offset = start.x
 
     new_corridor = Corridor(shape.Column(height=leg.height() + room.Room().height, fill="."))
@@ -394,14 +438,18 @@ def build_L (base=None, rooms=2, rooms_wide=2):
                base_builder. *Default None*.
     :``rooms``: How many rooms to build along the sides of the new axis.
     """
+    side = random.choice([SIDE_LEFT, SIDE_RIGHT])
+    placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
+
+    tl = (side == SIDE_LEFT and placement == PLACE_TOP)
+    tr = (side == SIDE_RIGHT and placement == PLACE_TOP)
+    bl = (side == SIDE_LEFT and placement == PLACE_BOTTOM)
+    br = (side == SIDE_RIGHT and placement == PLACE_BOTTOM)
     if base is None:
-        base = base_builder()
+        base = base_builder(tl_corr=tl, tr_corr=tr, bl_corr=bl, br_corr=br)
 
     # Draw the new rooms.
     new_rooms = build_leg(rooms, rooms_wide)
-
-    side = random.choice([SIDE_LEFT, SIDE_RIGHT])
-    placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
     base = attach_leg(base, new_rooms, side=side, placement=placement)
     return base
@@ -418,7 +466,7 @@ def build_N (base=None):
 
 def build_H (base=None):
     if base is None:
-        base = base_builder()
+        base = base_builder(tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True)
 
     base = build_U(base, placement=PLACE_TOP)
     base = build_U(base, placement=PLACE_BOTTOM)
@@ -431,15 +479,20 @@ def build_O (base=None):
     return base
 
 def build_U (base=None, rooms=2, rooms_wide=2, placement=None):
-    if base is None:
-        base = base_builder()
-
     # Draw the new rooms.
     new_rooms1 = build_leg(rooms, rooms_wide)
     new_rooms2 = build_leg(rooms, rooms_wide)
 
     if placement is None:
         placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
+
+    tl = (placement == PLACE_TOP)
+    tr = tl
+    bl = not tl
+    br = bl
+
+    if base is None:
+        base = base_builder(tl_corr = tl, tr_corr = tr, bl_corr = bl, br_corr = br)
 
     base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
     base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement)
