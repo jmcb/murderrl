@@ -8,7 +8,7 @@ from builder import builder
 if __name__=="__main__":
 
     import sys
-    type = ""
+    type = None
     if len(sys.argv) > 1:
         type = sys.argv[1].upper()
 

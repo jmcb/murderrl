@@ -495,7 +495,6 @@ def build_L (base=None, rooms=2, rooms_wide=2):
         left = None
 
     if base is None:
-        # base = base_builder(top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc)
         base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc)
 
     # Draw the new rooms.
@@ -518,11 +517,16 @@ def build_N (base=None):
     return base
 
 def build_H (base=None):
-    if base is None:
-        base = base_builder(top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True)
 
-    base = build_U(base, placement=PLACE_TOP)
-    base = build_U(base, placement=PLACE_BOTTOM)
+    outer = random.choice(ROOM_WIDTH_LIST) # outer leg
+    inner = random.choice(ROOM_WIDTH_LIST) # inner leg
+
+    if base is None:
+        base = base_builder(top_left=outer, top_right=outer, bottom_left=outer, bottom_right=outer, 
+        tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True)
+
+    base = build_U(base, placement=PLACE_TOP, outer=outer, inner=inner)
+    base = build_U(base, placement=PLACE_BOTTOM, outer=outer, inner=inner)
 
     return base
 
@@ -531,24 +535,44 @@ def build_O (base=None):
         base = base_builder()
     return base
 
-def build_U (base=None, rooms=2, rooms_wide=2, placement=None):
+def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None):
     # Draw the new rooms.
-    new_rooms1 = build_leg(rooms, rooms_wide, width_left=12, width_right=12)
-    new_rooms2 = build_leg(rooms, rooms_wide, width_left=12, width_right=12)
-
     if placement is None:
         placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
-    tlc = (placement == PLACE_TOP)
-    trc = tlc
-    blc = not tlc
-    brc = blc
+    if outer == None:
+        outer = random.choice(ROOM_WIDTH_LIST) # outer leg
+    if inner == None:
+        inner = random.choice(ROOM_WIDTH_LIST) # inner leg
 
     if base is None:
-        base = base_builder(top_left=12, top_right=12, bottom_left=12, bottom_right=12, tl_corr = tlc, tr_corr = trc, bl_corr = blc, br_corr = brc)
+        tlc = (placement == PLACE_TOP)
+        trc = tlc
+        blc = not tlc
+        brc = blc
 
-    base = attach_leg(base, new_rooms1, side=SIDE_LEFT, placement=placement)
-    base = attach_leg(base, new_rooms2, side=SIDE_RIGHT, placement=placement, x_offset=base.width() - 12 - 1)
+        noleg = random.choice(ROOM_WIDTH_LIST) # opposite side
+        if noleg < outer:
+            noleg = outer
+
+        if tlc: # top
+            tlw = outer
+            trw = outer
+            blw = noleg
+            brw = noleg
+        else: # bottom
+            tlw = noleg
+            trw = noleg
+            blw = outer
+            brw = outer
+
+        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc)
+
+    new_rooms_L = build_leg(rooms, rooms_wide, width_left=outer, width_right=inner)
+    new_rooms_R = build_leg(rooms, rooms_wide, width_left=inner, width_right=outer)
+
+    base = attach_leg(base, new_rooms_L, side=SIDE_LEFT, placement=placement)
+    base = attach_leg(base, new_rooms_R, side=SIDE_RIGHT, placement=placement, x_offset=base.width() - outer - 1)
     return base
 
 def builder_by_type (type = None):
