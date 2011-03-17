@@ -290,6 +290,27 @@ class Game (object):
             if self.debugging:
                 mode = "debug mode"
             print_line("Switched to %s." % mode, MSG_START)
+        elif self.did_move:
+            oldrooms = self.base_manor.get_room_indices(self.player_pos - self.last_move)
+            newrooms = self.base_manor.get_room_indices(self.player_pos)
+            curr_rid = None
+            for r in newrooms:
+                if r not in oldrooms:
+                    curr_rid = r
+                    break
+            if len(newrooms) == 0:
+                curr_rid = self.base_manor.get_corridor_index(self.player_pos + 1)
+                old_corr = self.base_manor.get_corridor_index(self.player_pos - self.last_move + 1)
+                if curr_rid == old_corr:
+                    curr_rid = None
+                else:
+                    desc = "You step out into"
+            else:
+                desc = "You enter"
+
+            # print "oldrooms: %s, newrooms: %s, curr_rid: %s" % (oldrooms, newrooms, curr_rid)
+            if curr_rid != None:
+                print_line("%s %s." % (desc, self.base_manor.get_roomprop(curr_rid).room_name(True)), MSG_START)
         elif feature_is_door(self.base_manor.get_feature(self.player_pos)):
             print_line("You see here a door.", MSG_START)
 
@@ -298,7 +319,7 @@ class Game (object):
             self.print_debugging_messages()
         else:
             curr = self.get_current_room()
-            print_line("You are currently %s %s." % (curr.prep, curr.__str__(True)), coord.Coord(0, MSG_LINE+1))
+            print_line("You are currently %s %s." % (curr.prep, curr.room_name(True)), coord.Coord(0, MSG_LINE+1))
 
     def update_screen (self):
         """

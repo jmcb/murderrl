@@ -91,10 +91,10 @@ class ManorCollection (builder.BuilderCollection):
         list = []
         for idx in self.rooms:
             curr = self.get_room(idx)
-            r = curr.size()
-            c = curr.pos()
-            if (pos.x >= c.x and pos.x <= c.x + r.x
-                and pos.y >= c.y and pos.y <= c.y + r.y):
+            start = curr.pos()
+            end   = start + curr.size() - 1
+            if (pos.x >= start.x and pos.x <= end.x
+                and pos.y >= start.y and pos.y <= end.y):
                 if single:
                     return idx
                 list.append(idx)
@@ -736,7 +736,7 @@ class ManorCollection (builder.BuilderCollection):
             rp = self.room_props[r]
             for adjr in rp.adj_rooms:
                 rp2  = self.room_props[adjr]
-                name = rp2.__str__(True)
+                name = rp2.room_name(True)
                 rp.add_adjoining_room_name(name)
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):

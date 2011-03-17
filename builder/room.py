@@ -87,14 +87,14 @@ class RoomProps (Room):
         self.prep       = prep # preposition
         self.has_data   = complete
 
-    def __str__ (self, article=False):
-        if not self.name:
-            return "buggy crawl space"
+    def __str__ (self):
+        return self.name
 
+    def room_name (self, article=False):
         if article and len(self.owners) == 0:
             return "the %s" % self.name
 
-        return self.name
+        return self
 
     def mark_as_corridor (self, is_corridor = True):
         self.is_corridor = is_corridor
