@@ -298,7 +298,7 @@ class Game (object):
             self.print_debugging_messages()
         else:
             curr = self.get_current_room()
-            print_line("You are currently %s the %s." % (curr.prep, curr.name), coord.Coord(0, MSG_LINE+1))
+            print_line("You are currently %s %s." % (curr.prep, curr.__str__(True)), coord.Coord(0, MSG_LINE+1))
 
     def update_screen (self):
         """

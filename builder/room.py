@@ -16,13 +16,8 @@ def join_strings (list):
     if len(list) == 1:
         return list[0]
 
-    result = list[0]
-    last   = list[-1]
-    for i in xrange(1,len(list)-1):
-        result += ", %s" % list[i]
-    result += " and %s" % last
-
-    return result
+    last = list.pop()
+    return "%s and %s" % (', '.join(list), last)
 
 class Room (object):
     """
@@ -92,10 +87,14 @@ class RoomProps (Room):
         self.prep       = prep # preposition
         self.has_data   = complete
 
-    def __str__ (self):
-        if self.name:
-            return self.name
-        return "buggy crawl space"
+    def __str__ (self, article=False):
+        if not self.name:
+            return "buggy crawl space"
+
+        if article and len(self.owners) == 0:
+            return "the %s" % self.name
+
+        return self.name
 
     def mark_as_corridor (self, is_corridor = True):
         self.is_corridor = is_corridor
@@ -213,7 +212,7 @@ class RoomProps (Room):
         else:
             desc += "are doors"
         assert(len(self.adj_room_names) > 0)
-        desc += " leading to the %s." % join_strings(self.adj_room_names)
+        desc += " leading to %s." % join_strings(self.adj_room_names)
 
         return desc
 

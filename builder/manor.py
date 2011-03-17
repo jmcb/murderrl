@@ -736,7 +736,7 @@ class ManorCollection (builder.BuilderCollection):
             rp = self.room_props[r]
             for adjr in rp.adj_rooms:
                 rp2  = self.room_props[adjr]
-                name = rp2.name
+                name = rp2.__str__(True)
                 rp.add_adjoining_room_name(name)
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):
