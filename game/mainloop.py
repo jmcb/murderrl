@@ -253,11 +253,9 @@ class Game (object):
         Returns the RoomProps object matching the player's current position.
         """
         # Get the current room/corridor id.
-        id = self.base_manor.get_corridor_index(self.player_pos + 1)
-        type = "corridor"
+        id = self.base_manor.get_room_index(self.player_pos)
         if id == None:
-            id   = self.base_manor.get_room_index(self.player_pos + 1)
-            type = "room"
+            id = self.base_manor.get_corridor_index(self.player_pos)
         return self.base_manor.get_roomprop(id)
 
     def print_debugging_messages (self):
@@ -301,18 +299,20 @@ class Game (object):
             if len(newrooms) == 0:
                 curr_rid = self.base_manor.get_corridor_index(self.player_pos + 1)
                 old_corr = self.base_manor.get_corridor_index(self.player_pos - self.last_move + 1)
-                if curr_rid == old_corr:
+                if len(oldrooms) == 0:
                     curr_rid = None
                 else:
                     desc = "You step out into"
             else:
                 desc = "You enter"
 
-            # print "oldrooms: %s, newrooms: %s, curr_rid: %s" % (oldrooms, newrooms, curr_rid)
+            oldcorrs = self.base_manor.get_corridor_indices(self.player_pos - self.last_move + 1)
+            newcorrs = self.base_manor.get_corridor_indices(self.player_pos + 1)
+            # print "oldrooms: %s, newrooms: %s, oldcorrs: %s, newcorrs: %s, curr_rid: %s" % (oldrooms, newrooms, oldcorrs, newcorrs, curr_rid)
             if curr_rid != None:
                 print_line("%s %s." % (desc, self.base_manor.get_roomprop(curr_rid).room_name(True)), MSG_START)
-        elif feature_is_door(self.base_manor.get_feature(self.player_pos)):
-            print_line("You see here a door.", MSG_START)
+            elif feature_is_door(self.base_manor.get_feature(self.player_pos)):
+                print_line("You see here a door.", MSG_START)
 
         if self.debugging:
             # Debugging information.

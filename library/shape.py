@@ -976,9 +976,9 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
         shape2 = shape1
         shape1 = s1
 
-    new_size = coord.Size(width=shape1.width()+shape2.width(), height=max(shape1.height(), shape2.height()))
+    new_size = coord.Size(width=shape1.width()+shape2.width()-overlap, height=max(shape1.height(), shape2.height()))
 
-    new_canvas = Shape(width=new_size.width-overlap, height=new_size.height, fill=fill)
+    new_canvas = Shape(width=new_size.width, height=new_size.height, fill=fill)
 
     if offset_both:
         first_offset = coord.Coord(0, top_offset)

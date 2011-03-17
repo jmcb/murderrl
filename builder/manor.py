@@ -323,21 +323,22 @@ class ManorCollection (builder.BuilderCollection):
         :``stop``: The corridor's end position. *Required*.
         :``offset``: A coordinate specifying how the door position needs to be shifted. *Default (0,0)*.
         """
-        print "add_doors_along_corridor(start=%s, stop=%s, offset=%s)" % (start, stop, offset)
         assert stop > start
 
         candidates = [] # All valid door spots for the current room.
         old_room   = -1 # The index of the most recent room seen.
 
-        for pos in coord.RectangleIterator(start, stop + 1):
-            if (pos.x + offset.x < 2 or pos.x + offset.x >= self.size().x - 1
-            or pos.y + offset.y < 2 or pos.y + offset.y >= self.size().y - 1):
+        for p in coord.RectangleIterator(start, stop + 1):
+            pos = p + offset
+            if (pos.x < 2 or pos.x >= self.size().x - 1
+            or pos.y < 2 or pos.y >= self.size().y - 1):
                 continue
 
-            if self.get_feature(pos + offset) != WALL:
+            if self.get_feature(pos) != WALL:
                 continue
             rooms = self.get_room_indices(pos)
-            corrs = self.get_corridor_indices(pos)
+            corrs = self.get_corridor_indices(pos - offset)
+            # print "pos: (%s), rooms: %s, corrs: %s" % (pos, rooms, corrs)
             # Make sure there's only exactly one room for this wall.
             # There also may be no other corridor except this one.
             if len(rooms) == 1 and len(corrs) == 1:
@@ -346,7 +347,7 @@ class ManorCollection (builder.BuilderCollection):
                 if old_room != curr_room:
                     # We've reached another room. Time to pick a door spot for the old room.
                     if len(candidates):
-                        rand_coord = random.choice(candidates) + offset
+                        rand_coord = random.choice(candidates)
                         print "==> pick %s" % rand_coord
                         self.features.__setitem__(rand_coord, CLOSED_DOOR)
                         self.room_props[old_room].add_adjoining_room(corrs[0])
@@ -355,11 +356,10 @@ class ManorCollection (builder.BuilderCollection):
                         candidates = []
                     old_room = curr_room
                     thisroom = self.get_room(curr_room)
-                    startx = thisroom.pos().x - offset.x
-                    starty = thisroom.pos().y - offset.y
+                    startx = thisroom.pos().x
+                    starty = thisroom.pos().y
                     stopx  = startx + thisroom.size().x - 1
                     stopy  = starty + thisroom.size().y - 1
-                    # print "room %d: (%s, %s) -> (%s, %s) -- offset: (%s, %s)" % (curr_room, startx, starty, stopx, stopy, offset.x, offset.y)
                 if (pos.x == startx or pos.x == stopx) and (pos.y == starty or pos.y == stopy):
                     pass
                     # print "pos: (%s, %s), room start: (%s, %s), room end: (%s, %s)" % (pos.x, pos.y, startx, starty, stopx, stopy)
@@ -368,11 +368,11 @@ class ManorCollection (builder.BuilderCollection):
 
         # The corridor has reached an end. Pick a door spot for the last room seen.
         if len(candidates):
-            rand_coord = random.choice(candidates) + offset
+            rand_coord = random.choice(candidates)
             print "==> pick %s" % rand_coord
             self.features.__setitem__(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
-            corrs = self.get_corridor_indices(rand_coord - offset)
+            corrs = self.get_corridor_indices(rand_coord)
             if len(corrs) > 0:
                 self.room_props[old_room].add_adjoining_room(corrs[0])
                 self.room_props[corrs[0]].add_adjoining_room(old_room)
@@ -388,9 +388,9 @@ class ManorCollection (builder.BuilderCollection):
         corr = self.corridors
         for c in corr:
             candidates = []
+            pos = self.corridor(c).pos()
             w   = self.corridor(c).width()
             h   = self.corridor(c).height()
-            pos = self.corridor(c).pos()
             print "Corridor %s: %s" % (c, self.corridor(c))
             # Depending on the corridor's orientation, check the parallel runs
             # to the left and right, or above and below the corridor.
