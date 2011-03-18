@@ -173,9 +173,18 @@ class RoomProps (Room):
     def add_window (self, dir):
         self.windows.append(dir)
 
-    def is_good_bedroom (self):
-        # May not be a passage room, needs windows.
-        return len(self.adj_rooms) == 1 and len(self.windows) > 0
+    def is_good_bedroom (self, check_windows=True, max_size=None):
+        # May not be a passage room, doesn't need to be large, needs windows.
+        if len(self.adj_rooms) > 1:
+            return False
+
+        if check_windows and len(self.windows) > 0:
+            return False
+
+        if max_size and self.width * self.height > max_size:
+            return False
+
+        return True
 
     def make_bedroom (self, owner):
         assert(len(owner) > 1)

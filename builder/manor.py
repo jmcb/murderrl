@@ -636,6 +636,7 @@ class ManorCollection (builder.BuilderCollection):
         # This is only really a problem for smallish layouts, if there
         # are many suspects. (jpeg)
         max_no_bedrooms = len(self.rooms) - 7
+        count_bedrooms  = 0
         print "-------\nallow for max. %s bedrooms" % max_no_bedrooms
 
         corrs = self.corridors[:]
@@ -644,14 +645,17 @@ class ManorCollection (builder.BuilderCollection):
             random.shuffle(corrs)
             utility = True
             for c in corrs:
-                section = "domestic"
                 if utility:
                     section = "utility"
                 elif len(owner_list) > 0:
                     section = "bedrooms"
+                else:
+                    section = "domestic"
                 print "-------\nCorridor %s is marked as %s" % (c, section)
                 corrprop = self.room_props[c]
-                for r in corrprop.adj_rooms:
+                rooms = corrprop.adj_rooms[:]
+                random.shuffle(rooms)
+                for r in rooms:
                     if r in self.corridors:
                         continue
 
@@ -664,7 +668,7 @@ class ManorCollection (builder.BuilderCollection):
                         owner = owner_list[0]
                         owner_list.remove(owner)
                         rp.make_bedroom(owner)
-                        max_no_bedrooms -= 1
+                        count_bedrooms  += 1
                         continue
 
                     rp.fill_from_database(utility)
@@ -685,18 +689,16 @@ class ManorCollection (builder.BuilderCollection):
             e_hall_candidates.append(r)
 
         if len(e_hall_candidates) == 0:
-            print "-------\nNo entrance hall for this manor!"
             self.entrance_hall = 0
         else:
             self.entrance_hall = random.choice(e_hall_candidates)
-            rp = self.room_props[self.entrance_hall]
-            rp.name = "entrance hall"
-            rp.has_data = True
-            max_no_bedrooms -= 1
-            print "-------\nentrance hall: room %s" % self.entrance_hall
+        rp = self.room_props[self.entrance_hall]
+        rp.name = "entrance hall"
+        rp.has_data = True
+        print "-------\nentrance hall: room %s" % self.entrance_hall
 
         if len(owner_list) > 0:
-            print "-------\nremaining rooms - allow for max. %s bedrooms" % max_no_bedrooms
+            print "-------\nremaining rooms - allow for max. %s bedrooms" % (max_no_bedrooms - count_bedrooms)
             rooms = self.rooms[:]
             random.shuffle(rooms)
             for r in rooms:
@@ -704,12 +706,15 @@ class ManorCollection (builder.BuilderCollection):
                 if rp.has_data:
                     continue
 
-                if (len(owner_list) > 0 and max_no_bedrooms > 0
-                and rp.is_good_bedroom()):
-                    owner = owner_list[0]
-                    owner_list.remove(owner)
-                    rp.make_bedroom(owner)
-                    max_no_bedrooms -= 1
+                if len(owner_list) > 0 and count_bedrooms < max_no_bedrooms:
+                    max_size=70
+                    if count_bedrooms < 2:
+                        max_size=None
+                    if rp.is_good_bedroom(max_size=max_size):
+                        owner = owner_list[0]
+                        owner_list.remove(owner)
+                        rp.make_bedroom(owner)
+                        count_bedrooms  += 1
 
         print "-------\nassign remaining rooms"
         rooms = self.rooms[:]
@@ -719,13 +724,16 @@ class ManorCollection (builder.BuilderCollection):
             if rp.has_data:
                 continue
 
-            if (len(owner_list) > 0 and max_no_bedrooms > 0
-            and len(rp.adj_rooms) == 1):
-                owner = owner_list[0]
-                owner_list.remove(owner)
-                rp.make_bedroom(owner)
-                max_no_bedrooms -= 1
-                continue
+            if len(owner_list) > 0 and count_bedrooms < max_no_bedrooms:
+                max_size=60
+                if count_bedrooms < 5:
+                    max_size=70
+                if rp.is_good_bedroom(check_windows=False, max_size=max_size):
+                    owner = owner_list[0]
+                    owner_list.remove(owner)
+                    rp.make_bedroom(owner)
+                    count_bedrooms += 1
+                    continue
 
             rp.fill_from_database()
 
