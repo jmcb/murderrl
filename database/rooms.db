@@ -52,11 +52,6 @@ is_passage=1
 name=hall
 is_passage=1
 %
-name=porch
-is_passage=1
-prep=on
-weight=5
-%
 name=kitchen
 weight=100
 section=utility
