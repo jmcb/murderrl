@@ -61,7 +61,7 @@ class DB_Room (object):
         :``want_utility``: If true, prefer utility room types. If false, prefer domestic room types. Otherwise, we don't care. *Default None*.
         :``debug``: If true, print debugging statements. *Default False*.
         """
-        # self.size    = size
+        self.size    = size
         self.passage = is_passage
         self.windows = has_windows
         self.utility = want_utility
@@ -79,8 +79,8 @@ class DB_Room (object):
         if self.utility != (db_room.section == "utility"):
             return False
 
-        # if self.size != None and self.size < db_room.min_size or self.size > db_room.max_size:
-            # return False
+        if self.size != None and self.size < db_room.min_size or self.size > db_room.max_size:
+            return False
 
         if self.passage and not db_room.is_passage:
             return False
