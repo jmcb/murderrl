@@ -16,8 +16,7 @@ def join_strings (list):
     if len(list) == 1:
         return list[0]
 
-    last = list.pop()
-    return "%s and %s" % (', '.join(list), last)
+    return "%s and %s" % (', '.join(list[:-1]), list[-1])
 
 class Room (object):
     """
@@ -62,7 +61,7 @@ class DB_Room (object):
         :``want_utility``: If true, prefer utility room types. If false, prefer domestic room types. Otherwise, we don't care. *Default None*.
         :``debug``: If true, print debugging statements. *Default False*.
         """
-        # self.size = size
+        # self.size    = size
         self.passage = is_passage
         self.windows = has_windows
         self.utility = want_utility
@@ -155,7 +154,7 @@ class RoomProps (Room):
         if article and len(self.owners) == 0:
             return "the %s" % self.name
 
-        return self
+        return self.name
 
     def mark_as_corridor (self, is_corridor = True):
         self.is_corridor = is_corridor

@@ -372,7 +372,7 @@ class ManorCollection (builder.BuilderCollection):
             print "==> pick %s" % rand_coord
             self.features.__setitem__(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
-            corrs = self.get_corridor_indices(rand_coord)
+            corrs = self.get_corridor_indices(rand_coord - offset)
             if len(corrs) > 0:
                 self.room_props[old_room].add_adjoining_room(corrs[0])
                 self.room_props[corrs[0]].add_adjoining_room(old_room)
