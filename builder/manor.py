@@ -421,12 +421,14 @@ class ManorCollection (builder.BuilderCollection):
         assert(len(candidates) > 0)
         door_pos = random.choice(candidates)
         rooms = self.get_room_corridor_indices(door_pos)
+        print "door_pos (%s) of rooms %s" % (door_pos, rooms)
         for i1 in xrange(len(rooms)):
             r1 = rooms[i1]
             for i2 in xrange(i1+1, len(rooms)):
                 r2 = rooms[i2]
                 rp1 = self.room_props[r1]
                 rp2 = self.room_props[r2]
+                print "connect rooms %s and %s" % (rp1.name, rp2.name)
                 rp1.add_adjoining_room(r2)
                 rp2.add_adjoining_room(r1)
 

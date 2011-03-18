@@ -76,10 +76,10 @@ class DB_Room (object):
 
         :``db_room``: The room type picked from the database. *Required*.
         """
-        if self.utility != (db_room.section == "utility"):
+        if self.utility != None and self.utility != (db_room.section == "utility"):
             return False
 
-        if self.size != None and self.size < db_room.min_size or self.size > db_room.max_size:
+        if self.size != None and (self.size < db_room.min_size or self.size > db_room.max_size):
             return False
 
         if self.passage and not db_room.is_passage:
