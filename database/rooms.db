@@ -1,4 +1,24 @@
 %
+name=ball room
+min_size=70
+%
+name=billiard room
+weight=20
+%
+name=boudoir
+%
+name=breakfast room
+min_size=60
+%
+name=business room
+%
+name=cloak room
+has_windows=0
+max_size=60
+%
+name=conservatory
+weight=20
+%
 name=dining room
 weight=100
 min_size=70
@@ -6,44 +26,14 @@ min_size=70
 name=drawing room
 weight=50
 %
-name=library
-weight=50
-%
-name=study
-weight=50
-%
-name=parlour
-weight=50
-%
-name=smoking room
-weight=20
-%
-name=billiard room
-weight=20
-%
-name=conservatory
-weight=20
-%
-name=lounge
-weight=20
-%
 name=guest room
 max_size=70
 %
-name=morning room
+name=hall
+is_passage=1
 %
-name=breakfast room
-min_size=60
-%
-name=boudoir
-%
-name=business room
-%
-name=ball room
-min_size=70
-%
-name=cloak room
-has_windows=0
+name=inglenook
+weight=5
 max_size=60
 %
 name=lavatory
@@ -51,36 +41,34 @@ weight=5
 has_windows=0
 max_size=60
 %
-name=inglenook
-weight=5
-max_size=60
+name=library
+weight=50
+%
+name=lounge
+weight=20
+%
+name=morning room
+%
+name=parlour
+weight=50
 %
 name=picture gallery
 is_passage=1
 %
-name=hall
-is_passage=1
+name=smoking room
+weight=20
+%
+name=study
+weight=50
+%
+name=attic
+section=utility
+has_windows=0
 %
 name=kitchen
 weight=100
 section=utility
 min_size=60
-%
-name=pantry
-weight=50
-section=utility
-has_windows=0
-max_size=70
-%
-name=servants' hall
-weight=50
-section=utility
-is_passage=1
-min_size=60
-%
-name=scullery
-weight=20
-section=utility
 %
 name=laundry
 weight=20
@@ -88,16 +76,28 @@ section=utility
 has_windows=0
 max_size=70
 %
-name=attic
-section=utility
-has_windows=0
-%
-name=wine cellar
+name=pantry
+weight=50
 section=utility
 has_windows=0
 max_size=70
 %
+name=scullery
+weight=20
+section=utility
+%
+name=servants' hall
+weight=50
+section=utility
+is_passage=1
+min_size=60
+%
 name=tool shed
+section=utility
+has_windows=0
+max_size=70
+%
+name=wine cellar
 section=utility
 has_windows=0
 max_size=70
