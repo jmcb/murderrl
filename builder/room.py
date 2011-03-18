@@ -47,26 +47,87 @@ class Room (object):
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
-def check_haswindows_passage (db_room):
-    return db_room.is_passage and db_room.has_windows
+class DB_Room (object):
+    """
+    A database representation of a room, used to compare actual room layout
+    with room type properties returned by the database.
+    """
+    def __init__ (self, want_utility=None, is_passage=False, size=None, has_windows=None, debug=False):
+        """
+        Initialise the room type requirements.
 
-def check_is_nowindows_passage (db_room):
-    return db_room.is_passage and not db_room.has_windows
+        :``size``: The room size, compared against minimum and maximum room size. *Default None*.
+        :``is_passage``: If true, try to pick passage rooms. *Default False*.
+        :``has_windows``: If true, try to pick a room type with windows. If None, we don't care whether it has windows or not. *Default None*.
+        :``want_utility``: If true, prefer utility room types. If false, prefer domestic room types. Otherwise, we don't care. *Default None*.
+        :``debug``: If true, print debugging statements. *Default False*.
+        """
+        # self.size = size
+        self.passage = is_passage
+        self.windows = has_windows
+        self.utility = want_utility
+        self.debug   = debug
+        if self.debug:
+            print "initialise db_room with size: %s, passage: %s, windows: %s, utility: %s" % (size, is_passage, has_windows, want_utility)
 
-def check_is_passage (db_room):
-    return db_room.is_passage
+    def check_room (self, db_room):
+        """
+        Compares a set of room properties returned by the database against the
+        defined requirements.
 
-def check_haswindows (db_room):
-    return db_room.has_windows
+        :``db_room``: The room type picked from the database. *Required*.
+        """
+        if self.utility != (db_room.section == "utility"):
+            return False
 
-def check_nowindows (db_room):
-    return not db_room.has_windows
+        # if self.size != None and self.size < db_room.min_size or self.size > db_room.max_size:
+            # return False
 
-def check_is_utility (db_room):
-    return db_room.section == "utility"
+        if self.passage and not db_room.is_passage:
+            return False
 
-def check_not_utility (db_room):
-    return db_room.section != "utility"
+        if self.windows != None and self.windows != db_room.has_windows:
+            return False
+
+        return True
+
+    def pick_room (self):
+        """
+        Pick a room type from the database that matches the requirements.
+        If no applicable room can be found, loosen the requirements one after another.
+        """
+        dbr = db.get_database("rooms")
+
+        new_room = dbr.random_pop(self.check_room)
+        if new_room == None:
+            # Loosen restrictions in order of importance.
+            if self.windows != None:
+                if self.debug:
+                    print "loosen windows restriction"
+                self.windows = None
+            elif self.size != None:
+                if self.debug:
+                    print "loosen size restriction"
+                self.size = None
+            elif self.passage:
+                if self.debug:
+                    print "loosen passage restriction"
+                self.passage = False
+            # Section checks override all other checks.
+            elif self.utility != None:
+                if self.debug:
+                    print "loosen utility restriction"
+                self.utility = None
+            else:
+                if self.debug:
+                    print "get random room"
+                return dbr.random_pop()
+
+            return self.pick_room()
+
+        if self.debug:
+            print "found room: %s" % new_room
+        return new_room
 
 class RoomProps (Room):
     def __init__ (self, name=None, start=None, width=ROOM_WIDTH, height=ROOM_HEIGHT):
@@ -140,32 +201,10 @@ class RoomProps (Room):
             self.make_bedroom(owner)
             return
 
-        dbr = db.get_database("rooms")
-        new_room = None
-        # Section checks override all other checks.
-        if utility == True:
-            new_room = dbr.random_pop(check_is_utility)
-        elif utility == False:
-            new_room = dbr.random_pop(check_not_utility)
+        db_room = DB_Room(want_utility = utility, is_passage=len(self.adj_rooms) > 1,
+        size=self.width * self.height, has_windows = len(self.windows) > 0, debug=True)
 
-        if new_room == None and len(self.adj_rooms) > 1:
-            if len(self.windows) == 0:
-                new_room = dbr.random_pop(check_is_nowindows_passage)
-            else:
-                new_room = dbr.random_pop(check_haswindows_passage)
-
-            if new_room == None:
-                new_room = dbr.random_pop(check_is_passage)
-
-        if new_room == None:
-            if len(self.windows) == 0:
-                new_room = dbr.random_pop(check_nowindows)
-            else:
-                new_room = dbr.random_pop(check_haswindows)
-
-            if new_room == None:
-                new_room = dbr.random_pop()
-
+        new_room = db_room.pick_room()
         if new_room:
             print new_room.name
             self.init_db_props(new_room.name, new_room.section, new_room.prep, True)
