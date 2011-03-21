@@ -73,7 +73,7 @@ features=fireplace,chair+
 %
 name=study
 weight=50
-features=desk,chair,fireplace?,bookshelf
+features=desk,fireplace?,bookshelf
 %
 name=attic
 section=utility

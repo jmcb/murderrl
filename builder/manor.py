@@ -944,7 +944,7 @@ class ManorCollection (builder.BuilderCollection):
                 pos = random.choice(candidates)
                 if feat.needs_wall():
                     # More tries with wall restriction.
-                    if one_chance_in(3):
+                    if one_chance_in(4):
                         tries -= 1
                     found_wall = False
                     for adj in coord.AdjacencyIterator(pos):
@@ -953,8 +953,25 @@ class ManorCollection (builder.BuilderCollection):
                             break
                     if not found_wall:
                          continue
+                elif feat == DESK:
+                    # need to place a chair
+                    if coinflip():
+                        tries -= 1
+                    chair_candidates = []
+                    for adj in coord.AdjacencyIterator(pos):
+                        if adj not in candidates:
+                            continue
+                        if feature_is_floor(self.features.__getitem__(adj)):
+                            chair_candidates.append(adj)
+                    if len(chair_candidates) == 0:
+                        continue
+                    chairpos = random.choice(chair_candidates)
+                    self.features.__setitem__(chairpos, CHAIR)
+                    candidates.remove(chairpos)
+                    rp.add_furniture_name("a chair")
                 else:
                     tries -= 1
+
                 self.features.__setitem__(pos, feat)
                 candidates.remove(pos)
                 rp.add_furniture_name("%s" % feat.name())
