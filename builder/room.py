@@ -18,6 +18,11 @@ def join_strings (list):
 
     return "%s and %s" % (', '.join(list[:-1]), list[-1])
 
+def pluralise (word):
+    if word[-1] == 'f':
+        return "%sves" % word[:-1]
+    return "%ss" % word
+
 class Room (object):
     """
     Currently a builder-only representation of a room.
@@ -173,6 +178,19 @@ class RoomProps (Room):
 
     def add_window (self, dir):
         self.windows.append(dir)
+
+    def add_furniture_name (self, name):
+        for f in xrange(len(self.furniture)):
+            if name in self.furniture[f]:
+                plural = pluralise(name)
+                # A bit of a hack!
+                if "two" in self.furniture[f]:
+                    self.furniture[f] = "some " % plural
+                else:
+                    self.furniture[f] = "two %s" % plural
+                return
+
+        self.furniture.append("a %s" % name)
 
     def is_good_bedroom (self, check_windows=True, max_size=None):
         # May not be a passage room, doesn't need to be large, needs windows.

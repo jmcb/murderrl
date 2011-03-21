@@ -24,11 +24,11 @@ STAIR_UP = TextFeature("<", Colours.WHITE, "stairs up", "A staircase leading up.
 STAIR_DOWN = TextFeature(">", Colours.WHITE, "stairs down", "A staircase leading down.", True)
 
 # Furniture
-FIREPLACE = TextFeature("]", Colours.LIGHTRED, "fireplace", "A fireplace.", False)
-HEARTH    = TextFeature("]", Colours.LIGHTRED, "hearth", "A hearth.", False)
-CUPBOARD  = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False)
-WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False)
-BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False)
+FIREPLACE = TextFeature("]", Colours.LIGHTRED, "fireplace", "A fireplace.", False, True)
+HEARTH    = TextFeature("]", Colours.LIGHTRED, "hearth", "A hearth.", False, True)
+CUPBOARD  = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False, True)
+WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False, True)
+BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False, True)
 CHAIR = TextFeature('\\', Colours.BROWN, "chair", "A chair.", True)
 TABLE = TextFeature('=', Colours.BROWN, "table", "A table.", False)
 DESK = TextFeature('=', Colours.BROWN, "desk", "A desk.", False)

@@ -755,52 +755,98 @@ class ManorCollection (builder.BuilderCollection):
     def add_furniture (self):
         for r in self.rooms:
             rp = self.room_props[r]
-            bedcount = len(rp.owners) # bedroom
+            bedcount = len(rp.owners)
             if bedcount > 0:
-                rm    = self.get_room(r)
-                start = rm.pos() + coord.Coord(1,1)
-                stop  = rm.pos() + rm.size() - coord.Coord(1,1)
-                candidates = []
-                for pos in coord.RectangleIterator(start, stop):
-                    if self.features.__getitem__(pos) != FLOOR:
+                self.add_bedroom_furniture(r, bedcount)
+
+    def add_bedroom_furniture (self, r, bedcount):
+        rm    = self.get_room(r)
+        start = rm.pos() + coord.Coord(1,1)
+        stop  = rm.pos() + rm.size() - coord.Coord(1,1)
+        rp    = self.room_props[r]
+        # First get a list of eligible positions within the room.
+        candidates = []
+        for pos in coord.RectangleIterator(start, stop):
+            if self.features.__getitem__(pos) != FLOOR:
+                continue
+
+            # Never block windows or doors with furniture.
+            allowed = True
+            for adj in coord.AdjacencyIterator(pos):
+                feat = self.features.__getitem__(adj)
+                if feature_is_door(feat) or feature_is_window(feat):
+                    allowed = False
+                    break
+            if not allowed:
+                continue
+
+            # It's a valid position.
+            candidates.append(pos)
+
+        if len(candidates) == 0:
+            return
+
+        # First, place a (double) bed, then additional furniture.
+        other_furniture = []
+        for i in range(1, bedcount+1):
+            if coinflip():
+                other_furniture.append(WARDROBE)
+        if one_chance_in(3):
+            other_furniture.append(FIREPLACE)
+        if one_chance_in(8):
+            other_furniture.append(BOOKSHELF)
+
+        for i in range(1, bedcount+1):
+            if one_chance_in(6):
+                other_furniture.append(CHAIR)
+
+        tries = 20
+        while tries > 0:
+            tries -= 1
+            pos = random.choice(candidates)
+            if bedcount > 1: # need an adjacent second bed
+                free_adj = []
+                for adj in coord.AdjacencyIterator(pos):
+                    if not adj in candidates:
                         continue
 
-                    allowed = True
-                    for adj in coord.AdjacencyIterator(pos):
-                        feat = self.features.__getitem__(adj)
-                        if feature_is_door(feat) or feature_is_window(feat):
-                            allowed = False
-                            break
-                    if not allowed:
+                    feat = self.features.__getitem__(adj)
+                    if not feature_is_floor(feat):
                         continue
+                    free_adj.append(adj)
 
-                    candidates.append(pos)
+                if len(free_adj) == 0:
+                    continue
 
-                if len(candidates) > 0:
-                    tries = 20
-                    while tries > 0:
-                        tries -= 1
-                        pos = random.choice(candidates)
-                        if bedcount > 1: # need an adjacent second bed
-                            free_adj = []
-                            for adj in coord.AdjacencyIterator(pos):
-                                if not adj in candidates:
-                                    continue
+                pos2 = random.choice(free_adj)
+                self.features.__setitem__(pos2, BED)
+                candidates.remove(pos2)
+                rp.add_furniture_name("double bed")
+            self.features.__setitem__(pos, BED)
+            candidates.remove(pos)
+            if len(rp.furniture) == 0:
+                rp.add_furniture_name("bed")
 
-                                feat = self.features.__getitem__(adj)
-                                if not feature_is_floor(feat):
-                                    continue
-                                free_adj.append(adj)
+            for feat in other_furniture:
+                if len(candidates) == 0:
+                    break
 
-                            if len(free_adj) == 0:
-                                continue
-                            pos2 = random.choice(free_adj)
-                            self.features.__setitem__(pos2, BED)
-                            rp.furniture.append("a double bed")
-                        self.features.__setitem__(pos, BED)
-                        if len(rp.furniture) == 0:
-                            rp.furniture.append("a bed")
-                        break
+                while tries > 0:
+                    tries -= 1
+                    pos = random.choice(candidates)
+                    if feat.needs_wall():
+                        found_wall = False
+                        for adj in coord.AdjacencyIterator(pos):
+                            if self.features.__getitem__(adj) == WALL:
+                                found_wall = True
+                                break
+                        if not found_wall:
+                            continue
+                    self.features.__setitem__(pos, feat)
+                    candidates.remove(pos)
+                    rp.add_furniture_name("%s" % feat.name())
+                    break
+            break
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):
         if do_chance and not one_chance_in(4):

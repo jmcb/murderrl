@@ -314,8 +314,12 @@ class Game (object):
             # print "oldrooms: %s, newrooms: %s, oldcorrs: %s, newcorrs: %s, curr_rid: %s" % (oldrooms, newrooms, oldcorrs, newcorrs, curr_rid)
             if curr_rid != None:
                 print_line("%s %s." % (desc, self.base_manor.get_roomprop(curr_rid).room_name(True)), MSG_START)
-            elif feature_is_door(self.base_manor.get_feature(self.player_pos)):
-                print_line("You see here a door.", MSG_START)
+            else:
+                feat = self.base_manor.get_feature(self.player_pos)
+                if feature_is_door(feat):
+                    print_line("You see here a door.", MSG_START)
+                elif not feature_is_floor(feat):
+                    print_line("You see here a %s." % feat.name(), MSG_START)
 
         if self.debugging:
             # Debugging information.
