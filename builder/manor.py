@@ -670,7 +670,7 @@ class ManorCollection (builder.BuilderCollection):
                         owner = owner_list[0]
                         owner_list.remove(owner)
                         rp.make_bedroom(owner)
-                        count_bedrooms  += 1
+                        count_bedrooms += 1
                         continue
 
                     rp.fill_from_database(utility)
@@ -741,6 +741,9 @@ class ManorCollection (builder.BuilderCollection):
 
         self.update_adjoining_rooms()
 
+        # Now the room types have been assigned, add the furniture.
+        self.add_furniture()
+
     def update_adjoining_rooms (self):
         for r in self.get_room_corridors():
             rp = self.room_props[r]
@@ -748,6 +751,53 @@ class ManorCollection (builder.BuilderCollection):
                 rp2  = self.room_props[adjr]
                 name = rp2.room_name(True)
                 rp.add_adjoining_room_name(name)
+
+    def add_furniture (self):
+        for r in self.rooms:
+            rp = self.room_props[r]
+            bedcount = len(rp.owners) # bedroom
+            if bedcount > 0:
+                rm    = self.get_room(r)
+                start = rm.pos() + coord.Coord(1,1)
+                stop  = rm.pos() + rm.size() - coord.Coord(1,1)
+                candidates = []
+                for pos in coord.RectangleIterator(start, stop):
+                    if self.features.__getitem__(pos) != FLOOR:
+                        continue
+
+                    allowed = True
+                    for adj in coord.AdjacencyIterator(pos):
+                        feat = self.features.__getitem__(adj)
+                        if feature_is_door(feat) or feature_is_window(feat):
+                            allowed = False
+                            break
+                    if not allowed:
+                        continue
+
+                    candidates.append(pos)
+
+                if len(candidates) > 0:
+                    tries = 20
+                    while tries > 0:
+                        tries -= 1
+                        pos = random.choice(candidates)
+                        if bedcount > 1: # need an adjacent second bed
+                            free_adj = []
+                            for adj in coord.AdjacencyIterator(pos):
+                                if not adj in candidates:
+                                    continue
+
+                                feat = self.features.__getitem__(adj)
+                                if not feature_is_floor(feat):
+                                    continue
+                                free_adj.append(adj)
+
+                            if len(free_adj) == 0:
+                                continue
+                            pos2 = random.choice(free_adj)
+                            self.features.__setitem__(pos2, BED)
+                        self.features.__setitem__(pos, BED)
+                        break
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):
         if do_chance and not one_chance_in(4):
