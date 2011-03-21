@@ -28,6 +28,27 @@ class RectangleIterator (object):
     def __repr__ (self):
         return "<RectangleIterator: %s to %s>" % (self.start_point, self.stop_point)
 
+class AdjacencyIterator (RectangleIterator):
+    def __init__ (self, center_point, diag_too = False):
+        """
+        Iterator over the neighbouring points around a given location.
+
+        :``center_point``: The central point. *Required*.
+        :``diag_too``: If true, diagonally adjacent points are included. *Default False*.
+        """
+        if diag_too:
+            self.__init__(RectangleIterator, center_point - Coord(1, 1), center_point + Coord(1, 1))
+        else:
+            self.center_point = center_point
+
+    def __iter__ (self):
+        dirs = [DIR_NORTH, DIR_EAST, DIR_SOUTH, DIR_WEST]
+        for d in dirs:
+            yield self.center_point + d
+
+    def __repr__ (self):
+        return "<AdjacencyIterator: %s>" % (self.pos)
+
 class Coord (object):
     """
     Simple representation of a co-ordinate. 0,0 is assumed to be the top-left
