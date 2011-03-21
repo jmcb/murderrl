@@ -796,7 +796,10 @@ class ManorCollection (builder.BuilderCollection):
                                 continue
                             pos2 = random.choice(free_adj)
                             self.features.__setitem__(pos2, BED)
+                            rp.furniture.append("a double bed")
                         self.features.__setitem__(pos, BED)
+                        if len(rp.furniture) == 0:
+                            rp.furniture.append("a bed")
                         break
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):

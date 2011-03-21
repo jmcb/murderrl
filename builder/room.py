@@ -140,6 +140,7 @@ class RoomProps (Room):
         self.windows        = [] # on which sides a room has windows
         self.owners         = [] # private room of one or more person(s)
         self.owner_names    = []
+        self.furniture      = []
 
     def init_db_props(self, name, section=None, prep="in", complete=False):
         self.name       = name
@@ -273,9 +274,14 @@ class RoomProps (Room):
         if len(self.owners) > 0:
             article = ""
         desc = "You are standing %s %s%s.\n\n" % (self.prep, article, self.name)
-        desc += "It is part of the manor's %s area.\n" % self.section
+        desc += "It is part of the manor's %s area.\n\n" % self.section
 
+        if len(self.furniture) == 0:
+            desc += "It is completely unfurnished.\n"
+        else:
+            desc += "You see here %s.\n" % join_strings(self.furniture)
         desc += "%s\n\n" % self.describe_windows()
+
         desc += self.describe_exits()
 
         return desc
