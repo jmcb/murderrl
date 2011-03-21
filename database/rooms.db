@@ -5,14 +5,14 @@ features=fireplace?
 %
 name=billiard room
 weight=20
-features=table,fireplace?
+features=billiard table,fireplace?
 %
 name=boudoir
 features=chair?
 %
 name=breakfast room
 min_size=60
-features=table,chair!,cupboard?,fireplace?
+features=large table,cupboard?,fireplace?
 %
 name=business room
 features=desk,chair+,fireplace?
@@ -28,7 +28,7 @@ features=tree!
 name=dining room
 weight=100
 min_size=70
-features=table,chair!,fireplace?
+features=large table,fireplace?
 %
 name=drawing room
 weight=50
@@ -58,7 +58,7 @@ weight=20
 features=fireplace,chair+
 %
 name=morning room
-features=fireplace?
+features=fireplace?,chair+
 %
 name=parlour
 weight=50
@@ -83,7 +83,7 @@ name=kitchen
 weight=100
 section=utility
 min_size=60
-features=hearth,cupboard+,table,chair+,shelf+
+features=hearth,work table,cupboard+,shelf+
 %
 name=laundry
 weight=20
@@ -108,7 +108,7 @@ weight=50
 section=utility
 is_passage=1
 min_size=60
-features=table,chair+
+features=large table
 %
 name=tool shed
 section=utility

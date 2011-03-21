@@ -180,7 +180,7 @@ class RoomProps (Room):
     def add_window (self, dir):
         self.windows.append(dir)
 
-    def add_furniture_name (self, name):
+    def add_furniture_name (self, name, allow_article=True):
         for f in xrange(len(self.furniture)):
             if name[:-1] in self.furniture[f]:
                 plural = pluralise(name)
@@ -191,7 +191,10 @@ class RoomProps (Room):
                     self.furniture[f] = "two %s" % plural
                 return
 
-        self.furniture.append("a %s" % name)
+        article = "a "
+        if not allow_article:
+            article = ""
+        self.furniture.append("%s%s" % (article, name))
 
     def is_good_bedroom (self, check_windows=True, max_size=None):
         # May not be a passage room, doesn't need to be large, needs windows.

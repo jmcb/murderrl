@@ -840,11 +840,6 @@ class ManorCollection (builder.BuilderCollection):
             break
 
     def add_room_furniture (self, r, furniture):
-        # First get a list of eligible positions within the room.
-        candidates = self.get_pos_list_within_room(r)
-        if len(candidates) == 0:
-            return
-
         furniture_list = []
         for f in furniture:
             how_many = 1
@@ -864,6 +859,10 @@ class ManorCollection (builder.BuilderCollection):
             if feat == NOTHING:
                 continue
 
+            if feature_is_large_table(feat):
+                self.add_table_and_chairs(r, feat)
+                continue
+
             furniture_list.append(feat)
             if how_many > 1:
                 if how_many == 3:
@@ -874,11 +873,68 @@ class ManorCollection (builder.BuilderCollection):
                     if one_chance_in(3):
                         furniture_list.append(feat)
 
+        # Get a list of eligible positions within the room.
+        candidates = self.get_pos_list_within_room(r)
+        if len(candidates) == 0:
+            return
+
         self.add_furniture_from_list(self.room_props[r], furniture_list, candidates)
 
+    def add_table_and_chairs (self, r, table_type):
+        rm     = self.get_room(r)
+        rp     = self.room_props[r]
+        start  = rm.pos() + coord.Coord(2,2)
+        stop   = rm.pos() + rm.size() - coord.Coord(2,2)
+
+        width  = 3
+        height = 3
+        if table_type == BILLIARD_TABLE:
+            height = 2
+
+        if rp.section == "utility":
+            if height > 2 and coinflip():
+                height -= 1
+                if one_chance_in(4):
+                    width -= 1
+        else:
+            if height > 2 and (stop.y - start.y < 2 or coinflip()):
+                height -= 1
+            if stop.x - start.x > 2 and coinflip():
+                width += 1
+
+        startx = start.x
+        starty = start.y
+        if stop.x - width > startx:
+            startx = random.randint(start.x, stop.x - width)
+        if stop.y - height > starty:
+            starty = random.randint(start.y, stop.y - height)
+
+        # Only the dining table has chairs!
+        add_chairs = (table_type == DINING_TABLE)
+        tablestart = coord.Coord(startx, starty)
+        tablestop  = coord.Coord(startx + width - 1, starty + height - 1)
+        chairstart = tablestart - coord.Coord(1,1)
+        chairstop  = tablestop  + coord.Coord(1,1)
+        for pos in coord.RectangleIterator(chairstart, chairstop + coord.Coord(1,1)):
+            feat = table_type
+            chairx = (pos.x == chairstart.x or pos.x == chairstop.x)
+            chairy = (pos.y == chairstart.y or pos.y == chairstop.y)
+            if chairx or chairy:
+                if add_chairs:
+                    if chairx and chairy:
+                        continue # skip corners
+                    else:
+                        feat = CHAIR
+                else:
+                    continue
+
+            self.features.__setitem__(pos, feat)
+
+        rp.add_furniture_name(table_type.name())
+        if add_chairs:
+            rp.add_furniture_name("some chairs", False)
+
     def add_furniture_from_list (self, rp, furniture, candidates):
-        # TODO: Table needs special casing to be larger.
-        #       Table + chairs even more so.
         tries = 20
         for feat in furniture:
             if len(candidates) == 0:
