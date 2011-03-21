@@ -758,13 +758,16 @@ class ManorCollection (builder.BuilderCollection):
             bedcount = len(rp.owners)
             if bedcount > 0:
                 self.add_bedroom_furniture(r, bedcount)
+            else:
+                furniture = rp.want_feats
+                if len(furniture) > 0:
+                    self.add_room_furniture(r, furniture)
 
-    def add_bedroom_furniture (self, r, bedcount):
+    def get_pos_list_within_room(self, r):
         rm    = self.get_room(r)
         start = rm.pos() + coord.Coord(1,1)
         stop  = rm.pos() + rm.size() - coord.Coord(1,1)
-        rp    = self.room_props[r]
-        # First get a list of eligible positions within the room.
+
         candidates = []
         for pos in coord.RectangleIterator(start, stop):
             if self.features.__getitem__(pos) != FLOOR:
@@ -783,6 +786,12 @@ class ManorCollection (builder.BuilderCollection):
             # It's a valid position.
             candidates.append(pos)
 
+        return candidates
+
+    def add_bedroom_furniture (self, r, bedcount):
+        rp = self.room_props[r]
+        # First get a list of eligible positions within the room.
+        candidates = self.get_pos_list_within_room(r)
         if len(candidates) == 0:
             return
 
@@ -827,26 +836,73 @@ class ManorCollection (builder.BuilderCollection):
             if len(rp.furniture) == 0:
                 rp.add_furniture_name("bed")
 
-            for feat in other_furniture:
-                if len(candidates) == 0:
-                    break
-
-                while tries > 0:
-                    tries -= 1
-                    pos = random.choice(candidates)
-                    if feat.needs_wall():
-                        found_wall = False
-                        for adj in coord.AdjacencyIterator(pos):
-                            if self.features.__getitem__(adj) == WALL:
-                                found_wall = True
-                                break
-                        if not found_wall:
-                            continue
-                    self.features.__setitem__(pos, feat)
-                    candidates.remove(pos)
-                    rp.add_furniture_name("%s" % feat.name())
-                    break
+            self.add_furniture_from_list(rp, other_furniture, candidates)
             break
+
+    def add_room_furniture (self, r, furniture):
+        # First get a list of eligible positions within the room.
+        candidates = self.get_pos_list_within_room(r)
+        if len(candidates) == 0:
+            return
+
+        furniture_list = []
+        for f in furniture:
+            how_many = 1
+            if f[-1] == '?':
+                if coinflip():
+                    continue
+                else:
+                    f = f[:-1]
+            elif f[-1] == '+':
+                how_many = 2
+                f = f[:-1]
+            elif f[-1] == '!':
+                how_many = 3
+                f = f[:-1]
+
+            feat = get_furniture_by_name(f)
+            if feat == NOTHING:
+                continue
+
+            furniture_list.append(feat)
+            if how_many > 1:
+                if how_many == 3:
+                    for i in xrange(2):
+                        furniture_list.append(feat)
+                # additional chances of placing more
+                for i in xrange(5):
+                    if one_chance_in(3):
+                        furniture_list.append(feat)
+
+        self.add_furniture_from_list(self.room_props[r], furniture_list, candidates)
+
+    def add_furniture_from_list (self, rp, furniture, candidates):
+        # TODO: Table needs special casing to be larger.
+        #       Table + chairs even more so.
+        tries = 20
+        for feat in furniture:
+            if len(candidates) == 0:
+                break
+
+            while tries > 0:
+                pos = random.choice(candidates)
+                if feat.needs_wall():
+                    # More tries with wall restriction.
+                    if one_chance_in(3):
+                        tries -= 1
+                    found_wall = False
+                    for adj in coord.AdjacencyIterator(pos):
+                        if self.features.__getitem__(adj) == WALL:
+                            found_wall = True
+                            break
+                    if not found_wall:
+                         continue
+                else:
+                    tries -= 1
+                self.features.__setitem__(pos, feat)
+                candidates.remove(pos)
+                rp.add_furniture_name("%s" % feat.name())
+                break
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):
         if do_chance and not one_chance_in(4):

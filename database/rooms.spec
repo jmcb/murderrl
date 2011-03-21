@@ -7,6 +7,7 @@ $min_size 0
 $max_size 100
 $weight 10
 $prep in
+$features none
 %int has_windows
 %int is_passage
 %int min_size

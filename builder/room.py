@@ -147,10 +147,11 @@ class RoomProps (Room):
         self.owner_names    = []
         self.furniture      = []
 
-    def init_db_props(self, name, section=None, prep="in", complete=False):
+    def init_db_props(self, name, section=None, prep="in", features=[], complete=False):
         self.name       = name
         self.section    = section
         self.prep       = prep # preposition
+        self.want_feats = features
         self.has_data   = complete
 
     def __str__ (self):
@@ -181,12 +182,12 @@ class RoomProps (Room):
 
     def add_furniture_name (self, name):
         for f in xrange(len(self.furniture)):
-            if name in self.furniture[f]:
+            if name[:-1] in self.furniture[f]:
                 plural = pluralise(name)
                 # A bit of a hack!
                 if "two" in self.furniture[f]:
-                    self.furniture[f] = "some " % plural
-                else:
+                    self.furniture[f] = "some %s" % plural
+                elif not "some" in self.furniture[f]:
                     self.furniture[f] = "two %s" % plural
                 return
 
@@ -213,7 +214,7 @@ class RoomProps (Room):
             owner_name = join_strings(owner_name)
         room_name  = "%s's bedroom" % owner_name
         print room_name
-        self.init_db_props(room_name, "domestic", "in", True)
+        self.init_db_props(room_name, "domestic", "in", [], True)
         if isinstance(owner_id, list):
             self.owners = owner_id
         else:
@@ -233,8 +234,10 @@ class RoomProps (Room):
 
         new_room = db_room.pick_room()
         if new_room:
-            print new_room.name
-            self.init_db_props(new_room.name, new_room.section, new_room.prep, True)
+            # print new_room.name
+            features = new_room.features.split(',')
+            print "%s: %s" % (new_room.name, features)
+            self.init_db_props(new_room.name, new_room.section, new_room.prep, features, True)
 
     def describe_window_dirs (self):
         dirs = []

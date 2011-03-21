@@ -1,16 +1,21 @@
 %
 name=ball room
 min_size=70
+features=fireplace?
 %
 name=billiard room
 weight=20
+features=table,fireplace?
 %
 name=boudoir
+features=chair?
 %
 name=breakfast room
 min_size=60
+features=table,chair!,cupboard?,fireplace?
 %
 name=business room
+features=desk,chair+,fireplace?
 %
 name=cloak room
 has_windows=0
@@ -18,16 +23,19 @@ max_size=60
 %
 name=conservatory
 weight=20
+features=tree!
 %
 name=dining room
 weight=100
 min_size=70
+features=table,chair!,fireplace?
 %
 name=drawing room
 weight=50
 %
 name=guest room
 max_size=70
+features=bed,fireplace?
 %
 name=hall
 is_passage=1
@@ -43,23 +51,29 @@ max_size=60
 %
 name=library
 weight=50
+features=bookshelf!,fireplace,chair+
 %
 name=lounge
 weight=20
+features=fireplace,chair+
 %
 name=morning room
+features=fireplace?
 %
 name=parlour
 weight=50
+features=fireplace,chair+,table?
 %
 name=picture gallery
 is_passage=1
 %
 name=smoking room
 weight=20
+features=fireplace,chair+
 %
 name=study
 weight=50
+features=desk,chair,fireplace?,bookshelf
 %
 name=attic
 section=utility
@@ -69,18 +83,21 @@ name=kitchen
 weight=100
 section=utility
 min_size=60
+features=hearth,cupboard+,table,chair+,shelf+
 %
 name=laundry
 weight=20
 section=utility
 has_windows=0
 max_size=70
+features=wardrobe?,shelf?
 %
 name=pantry
 weight=50
 section=utility
 has_windows=0
 max_size=70
+features=shelf+
 %
 name=scullery
 weight=20
@@ -91,11 +108,13 @@ weight=50
 section=utility
 is_passage=1
 min_size=60
+features=table,chair+
 %
 name=tool shed
 section=utility
 has_windows=0
 max_size=70
+features=shelf+
 %
 name=wine cellar
 section=utility

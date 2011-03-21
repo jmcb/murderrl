@@ -2,7 +2,7 @@
 """
 features, a short library of specifically defined features.
 """
-from library.feature import TextFeature
+from library.feature import *
 from library.colour import Colours
 
 # Floor-related glyphs.
@@ -29,6 +29,7 @@ HEARTH    = TextFeature("]", Colours.LIGHTRED, "hearth", "A hearth.", False, Tru
 CUPBOARD  = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False, True)
 WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False, True)
 BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False, True)
+SHELF     = TextFeature("[", Colours.BROWN, "shelf", "A shelf.", False, True)
 CHAIR = TextFeature('\\', Colours.BROWN, "chair", "A chair.", True)
 TABLE = TextFeature('=', Colours.BROWN, "table", "A table.", False)
 DESK = TextFeature('=', Colours.BROWN, "desk", "A desk.", False)
@@ -38,8 +39,15 @@ BED = TextFeature('_', Colours.BROWN, "bed", "A bed.", False)
 TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", True)
 
 Features = [FLOOR, GRASS, COBBLES, WALL, CLOSED_DOOR, OPEN_DOOR, WINDOW_V, WINDOW_H,
-STAIR_UP, STAIR_DOWN, FIREPLACE, HEARTH, CUPBOARD, WARDROBE, BOOKSHELF,
+STAIR_UP, STAIR_DOWN, FIREPLACE, HEARTH, CUPBOARD, WARDROBE, BOOKSHELF, SHELF,
 CHAIR, TABLE, DESK, BED, TREE]
+
+def get_furniture_by_name(name):
+    for f in Features:
+        if f.name() == name:
+            return f
+
+    return NOTHING
 
 def feature_is_floor (feat):
     return feat == FLOOR or feat == GRASS or feat == COBBLES
