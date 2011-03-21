@@ -17,9 +17,6 @@ from suspects import person, randname
 
 screen = interface.console.select()
 
-def feature_is_door (feat):
-    return feat == OPEN_DOOR or feat == CLOSED_DOOR
-
 # The message line.
 # Following lines may get used for debugging output.
 MSG_LINE  = 22

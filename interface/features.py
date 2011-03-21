@@ -25,10 +25,33 @@ STAIR_DOWN = TextFeature(">", Colours.WHITE, "stairs down", "A staircase leading
 
 # Furniture
 FIREPLACE = TextFeature("]", Colours.LIGHTRED, "fireplace", "A fireplace.", False)
-CUPBOARD = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False)
+HEARTH    = TextFeature("]", Colours.LIGHTRED, "hearth", "A hearth.", False)
+CUPBOARD  = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False)
+WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False)
+BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False)
 CHAIR = TextFeature('\\', Colours.BROWN, "chair", "A chair.", True)
 TABLE = TextFeature('=', Colours.BROWN, "table", "A table.", False)
 DESK = TextFeature('=', Colours.BROWN, "desk", "A desk.", False)
+BED = TextFeature('_', Colours.BROWN, "bed", "A bed.", False)
 
 # Plants, etc.
 TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", True)
+
+Features = [FLOOR, GRASS, COBBLES, WALL, CLOSED_DOOR, OPEN_DOOR, WINDOW_V, WINDOW_H,
+STAIR_UP, STAIR_DOWN, FIREPLACE, HEARTH, CUPBOARD, WARDROBE, BOOKSHELF,
+CHAIR, TABLE, DESK, BED, TREE]
+
+def feature_is_floor (feat):
+    return feat == FLOOR or feat == GRASS or feat == COBBLES
+
+def feature_is_door (feat):
+    return feat == OPEN_DOOR or feat == CLOSED_DOOR
+
+def feature_is_stairs (feat):
+    return feat == STAIRS_UP or feat == STAIRS_DOWN
+
+def feature_is_window (feat):
+    return feat == WINDOW_V or feat == WINDOW_H
+
+def feature_is_container (feat):
+    return feat == CUPBOARD or feat == WARDROBE or feat == BOOKSHELF or feat == DESK
