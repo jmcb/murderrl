@@ -178,7 +178,7 @@ class RoomProps (Room):
         if len(self.adj_rooms) > 1:
             return False
 
-        if check_windows and len(self.windows) > 0:
+        if check_windows and len(self.windows) == 0:
             return False
 
         if max_size and self.width * self.height > max_size:
