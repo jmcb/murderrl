@@ -245,14 +245,20 @@ class Game (object):
         canvas_pos = coord.Coord(self.player_pos.x - self.vp._left, self.player_pos.y - self.vp._top)
         screen.put("@", canvas_pos + 1)
 
-    def get_current_room (self):
+    def get_current_room (self, pos = None):
         """
-        Returns the RoomProps object matching the player's current position.
+        Returns the RoomProps object matching a given position.
+
+        :``pos``: A coordinate in the manor. If none, the player position is used. 
+                  *Default: none*.
         """
+        if pos == None:
+            pos = self.player_pos
+
         # Get the current room/corridor id.
-        id = self.base_manor.get_room_index(self.player_pos)
+        id = self.base_manor.get_room_index(pos)
         if id == None:
-            id = self.base_manor.get_corridor_index(self.player_pos)
+            id = self.base_manor.get_corridor_index(pos)
         return self.base_manor.get_roomprop(id)
 
     def print_debugging_messages (self):
@@ -338,11 +344,7 @@ class Game (object):
         if pos == None:
             pos = self.player_pos
 
-        # Describe current room.
-        id = self.base_manor.get_corridor_index(pos + 1)
-        if id == None:
-            id = self.base_manor.get_room_index(pos + 1)
-        room = self.base_manor.get_roomprop(id)
+        room = self.get_current_room(pos)
         room.describe()
 
     def get_command_help (self):
