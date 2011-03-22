@@ -39,7 +39,7 @@ WORK_TABLE     = TextFeature('=', Colours.BROWN, "work table", "A work table.", 
 BED = TextFeature('_', Colours.BROWN, "bed", "A bed.", False)
 
 # Plants, etc.
-TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", True)
+TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", False)
 
 Features = [FLOOR, GRASS, COBBLES, WALL, CLOSED_DOOR, OPEN_DOOR, WINDOW_V, WINDOW_H,
 STAIR_UP, STAIR_DOWN, FIREPLACE, HEARTH, CUPBOARD, WARDROBE, BOOKSHELF, SHELF,
