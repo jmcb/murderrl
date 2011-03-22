@@ -420,6 +420,7 @@ class ManorCollection (builder.BuilderCollection):
                 candidates.append(pos)
 
         assert(len(candidates) > 0)
+
         door_pos = random.choice(candidates)
         rooms = self.get_room_corridor_indices(door_pos)
         print "door_pos (%s) of rooms %s" % (door_pos, rooms)
@@ -936,11 +937,41 @@ class ManorCollection (builder.BuilderCollection):
             rp.add_furniture_name("some chairs", False)
 
     def pos_blocks_corridor (self, pos):
-        if (not self.features.__getitem__(pos + DIR_NORTH).traversable()
-        and not self.features.__getitem__(pos + DIR_SOUTH).traversable()
-        or not self.features.__getitem__(pos + DIR_EAST).traversable()
-        and not self.features.__getitem__(pos + DIR_WEST).traversable()):
-            return True
+        north = not self.features.__getitem__(pos + DIR_NORTH).traversable()
+        south = not self.features.__getitem__(pos + DIR_SOUTH).traversable()
+        if north:
+            if south:
+                return True
+
+            se = not self.features.__getitem__(pos + DIR_SOUTH + DIR_EAST).traversable()
+            sw = not self.features.__getitem__(pos + DIR_SOUTH + DIR_WEST).traversable()
+            if se or sw:
+                return True
+        elif south:
+            ne = not self.features.__getitem__(pos + DIR_NORTH + DIR_EAST).traversable()
+            nw = not self.features.__getitem__(pos + DIR_NORTH + DIR_WEST).traversable()
+            if ne or nw:
+                return True
+
+        east = not self.features.__getitem__(pos + DIR_EAST).traversable()
+        west = not self.features.__getitem__(pos + DIR_WEST).traversable()
+        if east:
+            if west:
+                return True
+
+            nw = not self.features.__getitem__(pos + DIR_WEST + DIR_NORTH).traversable()
+            sw = not self.features.__getitem__(pos + DIR_WEST + DIR_SOUTH).traversable()
+            if nw or sw:
+                return True
+        elif west:
+            if east:
+                return True
+
+            ne = not self.features.__getitem__(pos + DIR_EAST + DIR_NORTH).traversable()
+            se = not self.features.__getitem__(pos + DIR_EAST + DIR_SOUTH).traversable()
+            if ne or se:
+                return True
+
         return False
 
     def add_furniture_from_list (self, rp, furniture, candidates):
@@ -950,11 +981,14 @@ class ManorCollection (builder.BuilderCollection):
                 break
 
             while tries > 0:
+                # For restrictions, only a chance of reducing the counter.
+                reduce_tries = True
                 pos = random.choice(candidates)
                 if feat.needs_wall():
                     # More tries with wall restriction.
                     if one_chance_in(4):
                         tries -= 1
+                    reduce_tries = False
                     found_wall = False
                     for adj in coord.AdjacencyIterator(pos):
                         if self.features.__getitem__(adj) == WALL:
@@ -962,26 +996,38 @@ class ManorCollection (builder.BuilderCollection):
                             break
                     if not found_wall:
                          continue
+
                 if not feat.traversable():
+                    if reduce_tries:
+                        if one_chance_in(4):
+                            tries -= 1
+                        reduce_tries = False
                     if self.pos_blocks_corridor(pos):
                         continue
+
                 if feat == DESK:
                     # need to place a chair
-                    if coinflip():
-                        tries -= 1
+                    if reduce_tries:
+                        if coinflip():
+                            tries -= 1
+                        reduce_tries = False
+
                     chair_candidates = []
                     for adj in coord.AdjacencyIterator(pos):
                         if adj not in candidates:
                             continue
                         if feature_is_floor(self.features.__getitem__(adj)):
                             chair_candidates.append(adj)
+
                     if len(chair_candidates) == 0:
                         continue
+
                     chairpos = random.choice(chair_candidates)
                     self.features.__setitem__(chairpos, CHAIR)
                     candidates.remove(chairpos)
                     rp.add_furniture_name("a chair")
-                else:
+
+                if reduce_tries:
                     tries -= 1
 
                 self.features.__setitem__(pos, feat)
