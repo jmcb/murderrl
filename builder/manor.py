@@ -275,10 +275,10 @@ class ManorCollection (builder.BuilderCollection):
                 # If we've reached the manor boundary, this is a wall.
                 if (pos.x == 0 or pos.x == self.size().x -1
                     or pos.y == 0 or pos.y == self.size().y - 1):
-                    self.features.__setitem__(pos, WALL)
+                    self.set_feature(pos, WALL)
                 # Corridors overwrite walls previously set by rooms.
                 elif is_corridor:
-                    self.features.__setitem__(pos, FLOOR)
+                    self.set_feature(pos, FLOOR)
                     # print pos
                     # Depending on the corridor orientation, mark the
                     # adjacent non-corridor squares as walls.
@@ -289,7 +289,7 @@ class ManorCollection (builder.BuilderCollection):
                         adjacent = (DIR_WEST, DIR_EAST)
                     for dir in adjacent:
                         pos2 = pos + dir
-                        # self.features.__setitem__(pos2, WALL)
+                        # self.set_feature(pos2, WALL)
                         if pos2 <= 0 or pos2 >= self.size():
                             continue
                         corridx = self.get_corridor_indices(pos2)
@@ -300,15 +300,15 @@ class ManorCollection (builder.BuilderCollection):
                         # else:
                             # print
                         if len(corridx) == 0:
-                            self.features.__setitem__(pos2, WALL)
+                            self.set_feature(pos2, WALL)
                 # The room boundary is always a wall.
                 elif (pos.x == start.x or pos.x == stop.x - 1
                     or pos.y == start.y or pos.y == stop.y - 1):
-                    self.features.__setitem__(pos, WALL)
+                    self.set_feature(pos, WALL)
                 # Otherwise, we are inside the room.
                 # Mark as floor but don't overwrite previously placed walls.
                 elif self.get_feature(pos) != WALL:
-                    self.features.__setitem__(pos, FLOOR)
+                    self.set_feature(pos, FLOOR)
 
     def get_feature (self, pos):
         """
@@ -321,6 +321,19 @@ class ManorCollection (builder.BuilderCollection):
             return NOTHING
 
         return self.features.__getitem__(pos)
+
+    def set_feature (self, pos, feat):
+        """
+        Sets the feature at a given position of the feature grid.
+
+        :``pos``: A coordinate within the manor. *Required*.
+        :``feat``: The feature to set. *Required*.
+        """
+        if pos < DIR_NOWHERE or pos >= self.size():
+            print "Invalid coord %s in manor of size %s" % (pos, self.size())
+            return NOTHING
+
+        return self.features.__setitem__(pos, feat)
 
     def add_doors_along_corridor (self, start, stop, offset = DIR_NOWHERE):
         """
@@ -351,7 +364,7 @@ class ManorCollection (builder.BuilderCollection):
             # not be adjacent to each other.
             has_adj_door = False
             for adj in coord.AdjacencyIterator(pos):
-                if feature_is_door(self.features.__getitem__(adj)):
+                if feature_is_door(self.get_feature(adj)):
                     has_adj_door = True
             if has_adj_door:
                 continue
@@ -369,7 +382,7 @@ class ManorCollection (builder.BuilderCollection):
                     if len(candidates):
                         rand_coord = random.choice(candidates)
                         print "==> pick %s" % rand_coord
-                        self.features.__setitem__(rand_coord, CLOSED_DOOR)
+                        self.set_feature(rand_coord, CLOSED_DOOR)
                         self.room_props[old_room].add_adjoining_room(corrs[0])
                         self.room_props[corrs[0]].add_adjoining_room(old_room)
                         self.doors.append(rand_coord)
@@ -390,7 +403,7 @@ class ManorCollection (builder.BuilderCollection):
         if len(candidates):
             rand_coord = random.choice(candidates)
             print "==> pick %s" % rand_coord
-            self.features.__setitem__(rand_coord, CLOSED_DOOR)
+            self.set_feature(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
             corrs = self.get_corridor_indices(rand_coord - offset)
             if len(corrs) > 0:
@@ -554,7 +567,7 @@ class ManorCollection (builder.BuilderCollection):
         for pos in coord.RectangleIterator(start, stop + 1):
             count += 1
             if full_window or count < midpost or count > midpost + width:
-                self.features.__setitem__(pos, window)
+                self.set_feature(pos, window)
 
     def add_windows (self):
         """
@@ -648,7 +661,7 @@ class ManorCollection (builder.BuilderCollection):
             # rooms get 2-3 doors.
             for d in door_candidates:
                 print "==> add door at pos %s" % d
-                self.features.__setitem__(d, OPEN_DOOR)
+                self.set_feature(d, OPEN_DOOR)
                 self.doors.append(d)
 
                 # Update door-less rooms.
@@ -798,13 +811,13 @@ class ManorCollection (builder.BuilderCollection):
 
         candidates = []
         for pos in coord.RectangleIterator(start, stop):
-            if self.features.__getitem__(pos) != FLOOR:
+            if self.get_feature(pos) != FLOOR:
                 continue
 
             # Never block windows or doors with furniture.
             allowed = True
             for adj in coord.AdjacencyIterator(pos):
-                feat = self.features.__getitem__(adj)
+                feat = self.get_feature(adj)
                 if feature_is_door(feat) or feature_is_window(feat):
                     allowed = False
                     break
@@ -847,7 +860,7 @@ class ManorCollection (builder.BuilderCollection):
                     if not adj in candidates:
                         continue
 
-                    feat = self.features.__getitem__(adj)
+                    feat = self.get_feature(adj)
                     if not feature_is_floor(feat):
                         continue
                     free_adj.append(adj)
@@ -856,10 +869,10 @@ class ManorCollection (builder.BuilderCollection):
                     continue
 
                 pos2 = random.choice(free_adj)
-                self.features.__setitem__(pos2, BED)
+                self.set_feature(pos2, BED)
                 candidates.remove(pos2)
                 rp.add_furniture_name("double bed")
-            self.features.__setitem__(pos, BED)
+            self.set_feature(pos, BED)
             candidates.remove(pos)
             if len(rp.furniture) == 0:
                 rp.add_furniture_name("bed")
@@ -956,45 +969,45 @@ class ManorCollection (builder.BuilderCollection):
                 else:
                     continue
 
-            self.features.__setitem__(pos, feat)
+            self.set_feature(pos, feat)
 
         rp.add_furniture_name(table_type.name())
         if add_chairs:
             rp.add_furniture_name("some chairs", False)
 
     def pos_blocks_corridor (self, pos):
-        north = not self.features.__getitem__(pos + DIR_NORTH).traversable()
-        south = not self.features.__getitem__(pos + DIR_SOUTH).traversable()
+        north = not self.get_feature(pos + DIR_NORTH).traversable()
+        south = not self.get_feature(pos + DIR_SOUTH).traversable()
         if north:
             if south:
                 return True
 
-            se = not self.features.__getitem__(pos + DIR_SOUTH + DIR_EAST).traversable()
-            sw = not self.features.__getitem__(pos + DIR_SOUTH + DIR_WEST).traversable()
+            se = not self.get_feature(pos + DIR_SOUTH + DIR_EAST).traversable()
+            sw = not self.get_feature(pos + DIR_SOUTH + DIR_WEST).traversable()
             if se or sw:
                 return True
         elif south:
-            ne = not self.features.__getitem__(pos + DIR_NORTH + DIR_EAST).traversable()
-            nw = not self.features.__getitem__(pos + DIR_NORTH + DIR_WEST).traversable()
+            ne = not self.get_feature(pos + DIR_NORTH + DIR_EAST).traversable()
+            nw = not self.get_feature(pos + DIR_NORTH + DIR_WEST).traversable()
             if ne or nw:
                 return True
 
-        east = not self.features.__getitem__(pos + DIR_EAST).traversable()
-        west = not self.features.__getitem__(pos + DIR_WEST).traversable()
+        east = not self.get_feature(pos + DIR_EAST).traversable()
+        west = not self.get_feature(pos + DIR_WEST).traversable()
         if east:
             if west:
                 return True
 
-            nw = not self.features.__getitem__(pos + DIR_WEST + DIR_NORTH).traversable()
-            sw = not self.features.__getitem__(pos + DIR_WEST + DIR_SOUTH).traversable()
+            nw = not self.get_feature(pos + DIR_WEST + DIR_NORTH).traversable()
+            sw = not self.get_feature(pos + DIR_WEST + DIR_SOUTH).traversable()
             if nw or sw:
                 return True
         elif west:
             if east:
                 return True
 
-            ne = not self.features.__getitem__(pos + DIR_EAST + DIR_NORTH).traversable()
-            se = not self.features.__getitem__(pos + DIR_EAST + DIR_SOUTH).traversable()
+            ne = not self.get_feature(pos + DIR_EAST + DIR_NORTH).traversable()
+            se = not self.get_feature(pos + DIR_EAST + DIR_SOUTH).traversable()
             if ne or se:
                 return True
 
@@ -1017,7 +1030,7 @@ class ManorCollection (builder.BuilderCollection):
                     reduce_tries = False
                     found_wall = False
                     for adj in coord.AdjacencyIterator(pos):
-                        if self.features.__getitem__(adj) == WALL:
+                        if self.get_feature(adj) == WALL:
                             found_wall = True
                             break
                     if not found_wall:
@@ -1042,21 +1055,21 @@ class ManorCollection (builder.BuilderCollection):
                     for adj in coord.AdjacencyIterator(pos):
                         if adj not in candidates:
                             continue
-                        if feature_is_floor(self.features.__getitem__(adj)):
+                        if feature_is_floor(self.get_feature(adj)):
                             chair_candidates.append(adj)
 
                     if len(chair_candidates) == 0:
                         continue
 
                     chairpos = random.choice(chair_candidates)
-                    self.features.__setitem__(chairpos, CHAIR)
+                    self.set_feature(chairpos, CHAIR)
                     candidates.remove(chairpos)
                     rp.add_furniture_name("a chair")
 
                 if reduce_tries:
                     tries -= 1
 
-                self.features.__setitem__(pos, feat)
+                self.set_feature(pos, feat)
                 candidates.remove(pos)
                 rp.add_furniture_name("%s" % feat.name())
                 break

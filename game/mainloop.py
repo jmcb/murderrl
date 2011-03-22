@@ -214,7 +214,7 @@ class Game (object):
             if pos >= self.base_manor.features.size():
                 continue
             real_coord = pos + coord.Coord(self.vp._left, self.vp._top)
-            char = self.base_manor.features.__getitem__(real_coord).glyph()
+            char = self.base_manor.get_feature(real_coord).glyph()
             screen.put(char,pos+1)
 
     def draw_canvas (self):
