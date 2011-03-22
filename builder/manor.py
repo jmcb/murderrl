@@ -415,14 +415,20 @@ class ManorCollection (builder.BuilderCollection):
         """
         candidates = []
         for pos in coord.RectangleIterator(start, stop + 1):
-            if (self.get_feature(pos) == WALL
-            and self.get_feature(pos + offset) != WALL):
+            if (self.get_feature(pos) != WALL
+            or self.get_feature(pos + offset) == WALL):
+                continue
+
+            # Make sure this wall connects to another room.
+            rooms = self.get_room_indices(pos)
+            if len(rooms) > 1:
                 candidates.append(pos)
 
-        assert(len(candidates) > 0)
+        if len(candidates) == 0:
+            return None
 
         door_pos = random.choice(candidates)
-        rooms = self.get_room_corridor_indices(door_pos)
+        rooms = self.get_room_indices(door_pos)
         print "door_pos (%s) of rooms %s" % (door_pos, rooms)
         for i1 in xrange(len(rooms)):
             r1 = rooms[i1]
@@ -615,7 +621,8 @@ class ManorCollection (builder.BuilderCollection):
                     dpos = self.pick_door_along_wall(coord.Coord(start.x + 1, start.y), coord.Coord(stop.x - 2, start.y), DIR_NORTH)
                 elif dd == DIR_SOUTH:
                     dpos = self.pick_door_along_wall(coord.Coord(start.x + 1, stop.y - 1), coord.Coord(stop.x - 2, stop.y - 1), DIR_SOUTH)
-                door_candidates.append(dpos)
+                if dpos != None:
+                    door_candidates.append(dpos)
 
             # Adding doors to all applicable walls guarantees that
             # all rooms are fully connected, but does mean that some
