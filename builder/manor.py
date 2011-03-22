@@ -935,6 +935,14 @@ class ManorCollection (builder.BuilderCollection):
         if add_chairs:
             rp.add_furniture_name("some chairs", False)
 
+    def pos_blocks_corridor (self, pos):
+        if (not self.features.__getitem__(pos + DIR_NORTH).traversable()
+        and not self.features.__getitem__(pos + DIR_SOUTH).traversable()
+        or not self.features.__getitem__(pos + DIR_EAST).traversable()
+        and not self.features.__getitem__(pos + DIR_WEST).traversable()):
+            return True
+        return False
+
     def add_furniture_from_list (self, rp, furniture, candidates):
         tries = 20
         for feat in furniture:
@@ -954,7 +962,10 @@ class ManorCollection (builder.BuilderCollection):
                             break
                     if not found_wall:
                          continue
-                elif feat == DESK:
+                if not feat.traversable():
+                    if self.pos_blocks_corridor(pos):
+                        continue
+                if feat == DESK:
                     # need to place a chair
                     if coinflip():
                         tries -= 1
