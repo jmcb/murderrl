@@ -103,7 +103,7 @@ class ShapeCollection (object):
 
     def combine (self):
         """
-        Converts a collection into a single Shape by taking drawing all ShapeCoords
+        Converts a collection into a single Shape by drawing all ShapeCoords
         onto an automatically shaped canvas.
 
         Doesn't currently provide error checking. Should.

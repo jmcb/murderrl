@@ -993,7 +993,10 @@ def adjoin (shape1, shape2, overlap=0, top_offset=0, fill=None, join_left=False,
                 y = top_offset
             collect.append(collection.ShapeCoord(shape1, coord.Coord(max(collect.width(), 0), y)))
         if isinstance(shape2, collection.ShapeCollection):
-            shape2.offset(coord.Coord(shape1.width()-overlap, top_offset))
+            new_coord = coord.Coord(shape1.width()-overlap, top_offset)
+            if shape1.width() < 0:
+                new_coord = coord.Coord(0, 0)
+            shape2.offset(new_coord)
             collect.extend(shape2)
         else:
             collect.append(collection.ShapeCoord(shape2, coord.Coord(shape1.width()-overlap, top_offset)))
@@ -1054,8 +1057,9 @@ def underneath (shape1, shape2, left_offset=0, overlap=0, fill=None, join_top=Fa
             collect = shape1.copy()
         else:
             collect = cl_class()
-            shape1_offset.height += collect.height()
-            shape2_offset.height += collect.height()
+            if collect.height() > 0:
+                shape1_offset.y += collect.height()
+                shape2_offset.y += collect.height()
             collect.append(collection.ShapeCoord(shape1, shape1_offset))
 
         if isinstance(shape2, collection.ShapeCollection):

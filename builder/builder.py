@@ -163,7 +163,15 @@ def join_row_rooms (row, left=False, right=False, check_offset=False):
 
 ROOM_WIDTH_LIST = [7, 8, 9, 10, 11, 12]
 
-def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=None, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False):
+def random_room_height ():
+    height = 7
+    if coinflip():
+        height += 1
+    elif one_chance_in(3):
+        height -= 1
+    return height
+
+def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=None, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False,top_height=None, bottom_height=None):
     """
     Attempts to build a manor based on the style provided. It returns
     ShapeCollection and a list of Room objects.
@@ -192,12 +200,20 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
     # Corridor, then bottom row of rooms
     row2 = []
 
-    max_length  = 6*12
+    max_length  = 6*12 # currently unused
     # manor_width = random.randint(max_length/2, max_length)
 
+    # Decide the row heights.
+    if top_height == None:
+        top_height = random_room_height()
+    if bottom_height == None:
+        bottom_height = random_room_height()
+
+    print "top_height: %s, bottom_height: %s" % (top_height, bottom_height)
+
     # first rooms on either row
-    height1 = 7
-    height2 = 7
+    height1 = top_height
+    height2 = bottom_height
     check_overlap = False
     if top_left < bottom_left or top_left == bottom_left and coinflip():
         height1 += 2
@@ -209,7 +225,7 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
     row1.append(first)
     first = room.Room(width=bottom_left, height=height2)
     row2.append(first)
-    print "height1: %s, height2: %s" % (height1, height2)
+    # print "first rooms: height1=%s, height2=%s" % (height1, height2)
 
     length1 = top_left + top_right - 2
     if tl_corr:
@@ -229,7 +245,7 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
         if len(row1) > 3 and one_chance_in(3):
             break
 
-        new_room = room.Room(width=random.choice(ROOM_WIDTH_LIST))
+        new_room = room.Room(width=random.choice(ROOM_WIDTH_LIST), height=top_height)
         row1.append(new_room)
         length1 += new_room.width - 1
         print "room %s: w=%s, length1: %s" % (len(row1), new_room.width, length1)
@@ -248,27 +264,27 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
             next_width = dist_left - new_width
             if next_width < 7:
                 new_width = random.choice((6,7,8))
-        new_room = room.Room(width=new_width)
+        new_room = room.Room(width=new_width, height=bottom_height)
         row2.append(new_room)
         length2 += new_width - 1
         print "room %s: w=%s, length2: %s" % (len(row2), new_width, length2)
     print "room %s: w=%s" % (len(row2)+1, bottom_right)
 
     # last rooms on either row
-    height1 = 7
-    height2 = 7
+    height1 = top_height
+    height2 = bottom_height
     if top_right < bottom_right or top_right == bottom_right and coinflip():
         height1 += 2
         check_overlap = False
     else:
         height2 += 2
         # check_overlap = True
-    print "height1: %s, height2: %s" % (height1, height2)
+    # print "last rooms: height1=%s, height2=%s" % (height1, height2)
 
-    first = room.Room(width=top_right, height=height1)
-    row1.append(first)
-    first = room.Room(width=bottom_right, height=height2)
-    row2.append(first)
+    last = room.Room(width=top_right, height=height1)
+    row1.append(last)
+    last = room.Room(width=bottom_right, height=height2)
+    row2.append(last)
     print "\nrow1: %s rooms, row2: %s rooms, manor width: %s" % (len(row1), len(row2), manor_width)
 
     # Now, start drawing it! YAY!
@@ -292,7 +308,7 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
     # print "noncorr_left: %s, noncorr_right: %s, corridor_length: %s" % (noncorr_left, noncorr_right, corridor_length)
     corridor = MainCorridor(shape.Row(width=corridor_length, fill="."))
 
-    m.append(collection.ShapeCoord(corridor, coord.Coord(noncorr_left, room.Room().height)))
+    m.append(collection.ShapeCoord(corridor, coord.Coord(noncorr_left, top_height)))
 
     return m
 
@@ -334,7 +350,7 @@ class Leg (object):
         elif isinstance(other, tuple):
             return cmp(self.placement, other)
 
-def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None):
+def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, corr_offset = None, x_offset = None):
     """
     Take a result of base_builder() and attach a leg.
 
@@ -374,7 +390,9 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
         x_offset = start.x
     print "vert_offset: %s, x_offset: %s, no_vert_offset: %s" % (vert_offset, x_offset, no_vert_offset)
 
-    ncorr_height = leg.height() + room.Room().height - 1
+    if corr_offset == None:
+        corr_offset = room.Room().height
+    ncorr_height = leg.height() + corr_offset - 1
     new_corridor = Corridor(shape.Column(height=ncorr_height, fill="."))
 
     corridor_offset = None
@@ -388,7 +406,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
                 left_offset = base.width()-leg.width()
             base = shape.underneath(base, leg, left_offset=left_offset, overlap=1, collect=True)
         new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
-        corridor_offset = coord.Coord(x_offset, vert_offset - room.Room().height + 1)
+        corridor_offset = coord.Coord(x_offset, vert_offset - corr_offset + 1)
         base.append(new_corridor, corridor_offset)
     elif placement == PLACE_TOP:
         if no_vert_offset:
@@ -406,7 +424,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
     if placement == PLACE_TOP:
         start = coord.Coord(corridor_offset.x - 1, leg.height() - 1)
     elif placement == PLACE_BOTTOM:
-        start = coord.Coord(corridor_offset.x - 1, vert_offset - room.Room().height + 1)
+        start = coord.Coord(corridor_offset.x - 1, vert_offset - corr_offset + 1)
 
     base = BuilderCollection(base)
     base.mark_leg(Leg(side, placement, leg=old_leg))
@@ -424,26 +442,45 @@ def build_leg (rooms_tall=2, rooms_wide=2, width_left=12, width_right=12, make_c
     """
     assert rooms_wide >= 1 and rooms_wide <= 2
     assert rooms_tall >= 1
-    new_rooms = collection.ShapeCollection()
+    leg_rooms = collection.ShapeCollection()
 
     if width_left == None:
         width_left = random.choice(ROOM_WIDTH_LIST)
     if width_right == None:
         width_right = random.choice(ROOM_WIDTH_LIST)
 
-    for row in xrange(rooms_tall):
-        this_row = collection.ShapeCollection()
+    heights = []
+    for r in xrange(rooms_tall):
+        heights.append(7)
 
-        left_room = room.Room(width=width_left).as_shape()
-        this_row  = shape.adjoin(this_row, left_room, overlap=-1, collect=True)
+    for column in xrange(rooms_wide):
+        this_col = collection.ShapeCollection()
 
-        if rooms_wide > 1:
-            right_room = room.Room(width=width_right).as_shape()
-            this_row   = shape.adjoin(this_row, right_room, overlap=-1, collect=True)
+        width = width_left
+        if column > 0:
+            width = width_right
 
-        new_rooms = shape.underneath(this_row, new_rooms, overlap=1, collect=True)
+        height_list = heights[:]
+        if len(heights) > 1 and one_chance_in(5):
+            indices = range(len(height_list))
+            small = random.choice(indices)
+            indices.remove(small)
+            large = random.choice(indices)
+            height_list[small] -= 1
+            height_list[large] += 2
+        else:
+            large = random.choice(xrange(len(height_list)))
+            height_list[large] += 1
 
-    return new_rooms
+        for row in xrange(rooms_tall):
+            new_room = room.Room(width=width,height=height_list[row]).as_shape()
+            # print "new_room height: %s, this_col height: %s" % (new_room.height(), this_col.height())
+            this_col = shape.underneath(new_room, this_col, offset_second=False, overlap=1, collect=True)
+
+        # print "leg_rooms width: %s, this_col width: %s" % (leg_rooms.width(), this_col.width())
+        leg_rooms = shape.adjoin(leg_rooms, this_col, overlap=-1, collect=True)
+
+    return leg_rooms
 
 def build_L (base=None, rooms=2, rooms_wide=2):
     """
@@ -490,8 +527,16 @@ def build_L (base=None, rooms=2, rooms_wide=2):
             right = brw
         left = None
 
+    tht = None
+    bht = None
+    corr_offset = random_room_height()
+    if placement == PLACE_TOP:
+        tht = corr_offset
+    else:
+        bht = corr_offset
+
     if base is None:
-        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc)
+        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc,top_height=tht, bottom_height=bht)
 
     # Draw the new rooms.
     new_rooms = build_leg(rooms, rooms_wide, width_left=left, width_right=right)
@@ -499,7 +544,7 @@ def build_L (base=None, rooms=2, rooms_wide=2):
     offset = None
     if side == SIDE_RIGHT:
         offset = base.width() - right - 1
-    base = attach_leg(base, new_rooms, side=side, placement=placement, x_offset=offset)
+    base = attach_leg(base, new_rooms, side=side, placement=placement, corr_offset=corr_offset, x_offset=offset)
     return base
 
 def build_Z (base=None):
@@ -517,12 +562,15 @@ def build_H (base=None):
     outer = random.choice(ROOM_WIDTH_LIST) # outer leg
     inner = random.choice(ROOM_WIDTH_LIST) # inner leg
 
+    tht = random_room_height()
+    bht = random_room_height()
+
     if base is None:
         base = base_builder(top_left=outer, top_right=outer, bottom_left=outer, bottom_right=outer, 
-        tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True)
+        tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True, top_height=tht, bottom_height=bht)
 
-    base = build_U(base, placement=PLACE_TOP, outer=outer, inner=inner)
-    base = build_U(base, placement=PLACE_BOTTOM, outer=outer, inner=inner)
+    base = build_U(base, placement=PLACE_TOP, outer=outer, inner=inner, corr_offset=tht)
+    base = build_U(base, placement=PLACE_BOTTOM, outer=outer, inner=inner, corr_offset=bht)
 
     return base
 
@@ -531,7 +579,7 @@ def build_O (base=None):
         base = base_builder()
     return base
 
-def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None):
+def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None, corr_offset=None):
     # Draw the new rooms.
     if placement is None:
         placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
@@ -540,6 +588,16 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
         outer = random.choice(ROOM_WIDTH_LIST) # outer leg
     if inner == None:
         inner = random.choice(ROOM_WIDTH_LIST) # inner leg
+
+    tht = None
+    bht = None
+    if corr_offset == None:
+        corr_offset = random_room_height()
+
+    if placement == PLACE_TOP:
+        tht = corr_offset
+    else:
+        bht = corr_offset
 
     if base is None:
         tlc = (placement == PLACE_TOP)
@@ -562,13 +620,13 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
             blw = outer
             brw = outer
 
-        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc)
+        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc, top_height=tht, bottom_height=bht)
 
     new_rooms_L = build_leg(rooms, rooms_wide, width_left=outer, width_right=inner)
     new_rooms_R = build_leg(rooms, rooms_wide, width_left=inner, width_right=outer)
 
-    base = attach_leg(base, new_rooms_L, side=SIDE_LEFT, placement=placement)
-    base = attach_leg(base, new_rooms_R, side=SIDE_RIGHT, placement=placement, x_offset=base.width() - outer - 1)
+    base = attach_leg(base, new_rooms_L, side=SIDE_LEFT, placement=placement, corr_offset=corr_offset)
+    base = attach_leg(base, new_rooms_R, side=SIDE_RIGHT, placement=placement, corr_offset=corr_offset, x_offset=base.width() - outer - 1)
     return base
 
 def builder_by_type (type = None):
