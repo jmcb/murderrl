@@ -622,6 +622,21 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
 
         base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc, top_height=tht, bottom_height=bht)
 
+    leg_width = outer + inner + 1
+    distance  = base.width() - 2 * leg_width
+    print "base width=%s, outer=%s, inner=%s, leg width=%s, distance=%s" % (base.width(), outer, inner, leg_width, base.width() - 2*leg_width)
+    if distance < 5 and distance != -1:
+        if distance % 2 == 0 or base.width() % 2 == 0:
+            if distance < 0:
+                inner -= 2 + (-distance)
+            inner -= 2
+        else:
+            inner = base.width()/2 - outer
+
+        leg_width = outer + inner + 1
+        distance  = base.width() - 2 * leg_width
+        print "base width=%s, outer=%s, inner=%s, leg width=%s, distance=%s" % (base.width(), outer, inner, leg_width, base.width() - 2*leg_width)
+
     new_rooms_L = build_leg(rooms, rooms_wide, width_left=outer, width_right=inner)
     new_rooms_R = build_leg(rooms, rooms_wide, width_left=inner, width_right=outer)
 
