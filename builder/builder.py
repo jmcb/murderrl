@@ -289,7 +289,7 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
     noncorr_left  = min(top_left, bottom_left)
     noncorr_right = min(top_right, bottom_right)
     corridor_length = my_collection.width() - noncorr_left - noncorr_right
-    print "noncorr_left: %s, noncorr_right: %s, corridor_length: %s" % (noncorr_left, noncorr_right, corridor_length)
+    # print "noncorr_left: %s, noncorr_right: %s, corridor_length: %s" % (noncorr_left, noncorr_right, corridor_length)
     corridor = MainCorridor(shape.Row(width=corridor_length, fill="."))
 
     m.append(collection.ShapeCoord(corridor, coord.Coord(noncorr_left, room.Room().height)))
@@ -374,7 +374,8 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
         x_offset = start.x
     print "vert_offset: %s, x_offset: %s, no_vert_offset: %s" % (vert_offset, x_offset, no_vert_offset)
 
-    new_corridor = Corridor(shape.Column(height=leg.height() + room.Room().height, fill="."))
+    ncorr_height = leg.height() + room.Room().height - 1
+    new_corridor = Corridor(shape.Column(height=ncorr_height, fill="."))
 
     corridor_offset = None
 
@@ -387,7 +388,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
                 left_offset = base.width()-leg.width()
             base = shape.underneath(base, leg, left_offset=left_offset, overlap=1, collect=True)
         new_corridor[coord.Coord(0, new_corridor.height()-1)] = "#"
-        corridor_offset = coord.Coord(x_offset, vert_offset - room.Room().height)
+        corridor_offset = coord.Coord(x_offset, vert_offset - room.Room().height + 1)
         base.append(new_corridor, corridor_offset)
     elif placement == PLACE_TOP:
         if no_vert_offset:
@@ -396,7 +397,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
             left_offset = 0
             if side == SIDE_RIGHT:
                 left_offset = leg.width()-base.width()
-                print "leg width (%s) - base width (%s) = left_offset (%s)" % (leg.width(), base.width(), left_offset)
+                # print "leg width (%s) - base width (%s) = left_offset (%s)" % (leg.width(), base.width(), left_offset)
             base = shape.underneath(leg, base, left_offset=left_offset, overlap=1, collect=True)
         new_corridor[POS_ORIGIN] = "#"
         corridor_offset = coord.Coord(x_offset, 0)
@@ -407,12 +408,7 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, x_offset = None)
     elif placement == PLACE_BOTTOM:
         start = coord.Coord(corridor_offset.x - 1, vert_offset - room.Room().height + 1)
 
-    new_shape = shape.Shape(width=3, height=room.Room().height, fill="#")
-    new_shape.draw_on(shape.Shape(width=1, height=room.Room().height, fill="."), offset=DIR_EAST, check_conflict=False)
-
     base = BuilderCollection(base)
-
-    base.draw_on(new_shape, start)
     base.mark_leg(Leg(side, placement, leg=old_leg))
 
     return base
