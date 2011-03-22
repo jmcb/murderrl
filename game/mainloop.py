@@ -275,7 +275,7 @@ class Game (object):
 
         print_line("Sect size : %s, Start coord: %s, Stop coord: %s, %s" % (self.sect.size(), coord.Coord(self.vp._left, self.vp._top), coord.Coord(self.vp._left + self.vp._width, self.vp._top + self.vp._height), room_desc), coord.Coord(0, MSG_LINE+1))
 
-        print_line("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (self.canvas.size(), self.player_pos + 1, self.last_move, type, id), coord.Coord(0, MSG_LINE+2))
+        print_line("Manor size: %s, Player coord: %s, last_move: %s, %s id: %s" % (self.canvas.size(), self.player_pos, self.last_move, type, id), coord.Coord(0, MSG_LINE+2))
 
     def draw_messages (self):
         """
