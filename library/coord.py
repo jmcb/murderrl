@@ -44,7 +44,10 @@ class AdjacencyIterator (RectangleIterator):
     def __iter__ (self):
         dirs = [DIR_NORTH, DIR_EAST, DIR_SOUTH, DIR_WEST]
         for d in dirs:
-            yield self.center_point + d
+            pos = self.center_point + d
+            if pos < POS_ORIGIN:
+                continue
+            yield pos
 
     def __repr__ (self):
         return "<AdjacencyIterator: %s>" % (self.pos)

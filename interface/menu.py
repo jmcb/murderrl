@@ -56,15 +56,18 @@ class Menu (object):
     """
     A representation of a menu entry, built up of a list of type Entry[].
     """
-    def __init__ (self, title = None):
+    def __init__ (self, title = None, do_loop=True):
         """
         Initialize the menu.
         The menu itself, represented by ``mlist``, is initially empty.
 
         :``title``: A header for the menu display. *Default none*.
+        :``do_loop``: If true, repeats the menu until an invalid key is pressed.
+                      Otherwise, stops once an action is triggered. *Default true*.
         """
-        self.mlist = []
-        self.title = title
+        self.mlist   = []
+        self.title   = title
+        self.do_loop = do_loop
 
     def add_entry (self, entry):
         """
@@ -108,7 +111,7 @@ class Menu (object):
                 fulldesc = mlist[i].activate()
                 if fulldesc:
                     print_screen(fulldesc)
-                return True
+                return self.do_loop
 
         return False
 
@@ -207,7 +210,7 @@ class ScrollMenu (Menu):
                     fulldesc = mlist[i].activate()
                     if fulldesc:
                         print_screen(fulldesc)
-                    return True
+                    return self.do_loop
             return False
 
         return True

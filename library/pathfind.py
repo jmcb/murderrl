@@ -17,9 +17,9 @@ class Grid (object):
         self.grid = []
         self._width  = size.x
         self._height = size.y
-        for row in xrange(size.x):
+        for row in xrange(size.y):
             row = []
-            for column in xrange(size.y):
+            for column in xrange(size.x):
                 row.append(value)
             self.grid.append(row)
 
@@ -79,9 +79,8 @@ class Pathfind (object):
         """
         assert(start < grid.size() and target < grid.size())
         self.fgrid     = grid
-        # Yes, they are swapped. Makes for easier backtracking.
-        self.start     = target
-        self.target    = start
+        self.start     = start
+        self.target    = target
         self.dgrid     = DistanceGrid(self.fgrid.size(), INFINITY)
         self.pgrid     = PrevGrid(self.fgrid.size())
 

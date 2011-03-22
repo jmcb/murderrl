@@ -6,16 +6,16 @@ The main game loop, where all components come together.
 import curses, random
 
 from builder import builder, manor
-from library import viewport
+from library import viewport, pathfind
 from library.coord import *
 from library.feature import *
 from library.random_util import *
-import interface.console
+from interface import console, menu
 from interface.features import *
 from interface.output import *
 from suspects import person, randname
 
-screen = interface.console.select()
+screen = console.select()
 
 # The message line.
 # Following lines may get used for debugging output.
@@ -185,7 +185,9 @@ class Game (object):
 
         self.game_start  = True    # Game just started.
         self.debugging   = False   # debugging mode
+        self.message     = None    # A message displayed for one turn.
         self.dir_running = DIR_NOWHERE # Direction we are running (if any).
+        self.travel_path = []
         self.init_command_parameters()
 
     def init_command_parameters (self):
@@ -245,12 +247,12 @@ class Game (object):
         canvas_pos = coord.Coord(self.player_pos.x - self.vp._left, self.player_pos.y - self.vp._top)
         screen.put("@", canvas_pos + 1)
 
-    def get_current_room (self, pos = None):
+    def get_current_room_id (self, pos = None):
         """
-        Returns the RoomProps object matching a given position.
+        Returns the room id a given position belongs to.
 
         :``pos``: A coordinate in the manor. If none, the player position is used. 
-                  *Default: none*.
+                  *Default None*.
         """
         if pos == None:
             pos = self.player_pos
@@ -259,6 +261,20 @@ class Game (object):
         id = self.base_manor.get_room_index(pos)
         if id == None:
             id = self.base_manor.get_corridor_index(pos)
+        return id
+
+    def get_current_room (self, pos = None):
+        """
+        Returns the RoomProps object matching a given position.
+
+        :``pos``: A coordinate in the manor. If none, the player position is used. 
+                  *Default None*.
+        """
+        if pos == None:
+            pos = self.player_pos
+
+        # Get the current room/corridor id.
+        id = self.get_current_room_id(pos)
         return self.base_manor.get_roomprop(id)
 
     def print_debugging_messages (self):
@@ -281,7 +297,10 @@ class Game (object):
         """
         Writes game messages into the message area.
         """
-        if self.game_start:
+        if self.message != None:
+            print_line(self.message, MSG_START)
+            self.message = None
+        elif self.game_start:
             print_line(self.get_welcome_message(), MSG_START)
             self.game_start = False
         elif self.move_was_blocked:
@@ -351,6 +370,47 @@ class Game (object):
         room = self.get_current_room(pos)
         room.describe()
 
+    def start_travel (self, room_id):
+        if self.get_current_room_id() == room_id:
+            self.message = "You are already here."
+            return
+
+        if self.base_manor.room_props[room_id].is_corridor:
+            corr = self.base_manor.corridor(room_id)
+            target_pos = corr.pos() + coord.Coord(corr.width()/2, corr.height()/2)
+        else:
+            room = self.base_manor.get_room(room_id)
+            target_pos = room.pos() + coord.Coord(room.size().x/2, room.size().y/2)
+
+        path = pathfind.Pathfind(self.base_manor.features, self.player_pos, target_pos).get_path()
+        if path != None:
+            self.travel_path = path
+        else:
+            self.message = "The requested path couldn't be found."
+
+    def cmd_travel_menu (self):
+        m = menu.ScrollMenu("Travel where?", False)
+        rprops  = self.base_manor.room_props
+        curr_id = self.get_current_room_id()
+        keyval  = ord('a')
+        rlist   = self.base_manor.get_room_corridors()[:]
+        print rlist
+        rlist.sort(cmp=lambda a, b: cmp(rprops[a].name, rprops[b].name))
+        for i in rlist:
+            key = chr(keyval)
+            name = rprops[i].name
+            if i == curr_id:
+                name += " (current location)"
+            e = menu.Entry(key, name, self.start_travel, i)
+            m.add_entry(e)
+
+            if key == 'z':
+                keyval = ord('A')
+            else:
+                keyval += 1
+        m.do_menu()
+        # self.update_screen()
+
     def get_command_help (self):
         """
         Returns a string of command keys and their explanation.
@@ -360,7 +420,8 @@ class Game (object):
         help += "r followed by a direction: start running in that direction\n\n"
         help += "d: describe current room\n"
         help += "h: display this screen\n"
-        help += "t: toggle between canvas view (default) and feature grid\n\n"
+        help += "t: travel to another room\n"
+        help += "D: toggle between normal and debug mode\n\n"
         help += "Any other key exits the program."
         return help
 
@@ -430,10 +491,13 @@ class Game (object):
             # Reset last_move.
             self.last_move = DIR_NOWHERE
             self.did_move  = False
-            if self.was_running:
+            if self.was_running or len(self.travel_path) > 0:
                 # No running into wall messages.
                 self.move_was_blocked = False
                 self.dir_running      = DIR_NOWHERE
+                self.travel_path      = []
+        else:
+            self.did_move = True
 
     def handle_commands (self):
         """
@@ -442,9 +506,12 @@ class Game (object):
         want to exit the loop.
         """
         curr_pos = self.player_pos
-
-        # Get a key.
-        if self.dir_running == DIR_NOWHERE:
+        if len(self.travel_path) > 0:
+            # self.player_pos = self.travel_path.pop()
+            next_pos = self.travel_path.pop()
+            self.last_move = next_pos - curr_pos
+        elif self.dir_running == DIR_NOWHERE:
+            # Get a key.
             ch = screen.get(block=True)
 
             if ch > 0 and ch <= 256:
@@ -457,6 +524,8 @@ class Game (object):
                 elif chr(ch) == 'r':
                     self.cmd_start_running()
                 elif chr(ch) == 't':
+                    self.cmd_travel_menu()
+                elif chr(ch) == 'D':
                     # Toggle debugging mode on and off.
                     self.debugging  = not self.debugging
                     self.did_switch = True
@@ -481,7 +550,7 @@ class Game (object):
         Run the actual game loop. Returns if we encounter an invalid keypress.
         """
         while True:
-            if self.dir_running == DIR_NOWHERE:
+            if self.dir_running == DIR_NOWHERE and len(self.travel_path) == 0:
                 self.update_screen()
 
             # Reinitialise the relevant variables.
