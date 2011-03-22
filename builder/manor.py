@@ -50,8 +50,8 @@ class ManorCollection (builder.BuilderCollection):
         list = []
         for idx in self.corridors:
             corr = self.corridor(idx)
-            r = corr.size()
             c = corr.pos()
+            r = corr.size() - 1
             if (pos.x >= c.x and pos.x <= c.x + r.x
                 and pos.y >= c.y and pos.y <= c.y + r.y):
                 if single:
@@ -323,6 +323,7 @@ class ManorCollection (builder.BuilderCollection):
         :``stop``: The corridor's end position. *Required*.
         :``offset``: A coordinate specifying how the door position needs to be shifted. *Default (0,0)*.
         """
+        # print "add_doors_along_corridors(start=(%s), stop=(%s), offset=(%s))" % (start, stop, offset)
         assert stop > start
 
         candidates = [] # All valid door spots for the current room.
@@ -391,7 +392,7 @@ class ManorCollection (builder.BuilderCollection):
             pos = self.corridor(c).pos()
             w   = self.corridor(c).width()
             h   = self.corridor(c).height()
-            print "Corridor %s: %s" % (c, self.corridor(c))
+            # print "Corridor %s: %s" % (c, self.corridor(c))
             # Depending on the corridor's orientation, check the parallel runs
             # to the left and right, or above and below the corridor.
             # Walls to the left and top of a corridor position are not
@@ -399,10 +400,10 @@ class ManorCollection (builder.BuilderCollection):
             # to add doors on those sides as well.
             if w > 1: # vertical corridor
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y), DIR_NORTH)
-                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y + h), coord.Coord(pos.x + w, pos.y + h))
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y + h), DIR_SOUTH)
             else: # horizontal corridor
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), DIR_WEST)
-                self.add_doors_along_corridor(coord.Coord(pos.x + w, pos.y), coord.Coord(pos.x + w, pos.y + h))
+                self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y + h), DIR_EAST)
 
     def pick_door_along_wall (self, start, stop, offset):
         """

@@ -266,10 +266,10 @@ class Game (object):
         Prints a variety of parameters in the message area. (Only in debug mode.)
         """
         # Get the current room/corridor id.
-        id = self.base_manor.get_corridor_index(self.player_pos + 1)
+        id = self.base_manor.get_corridor_index(self.player_pos)
         type = "corridor"
         if id == None:
-            id   = self.base_manor.get_room_index(self.player_pos + 1)
+            id   = self.base_manor.get_room_index(self.player_pos)
             type = "room"
         room_desc = self.base_manor.get_roomprop(id)
 
@@ -300,8 +300,8 @@ class Game (object):
                     curr_rid = r
                     break
             if len(newrooms) == 0:
-                curr_rid = self.base_manor.get_corridor_index(self.player_pos + 1)
-                old_corr = self.base_manor.get_corridor_index(self.player_pos - self.last_move + 1)
+                curr_rid = self.base_manor.get_corridor_index(self.player_pos)
+                old_corr = self.base_manor.get_corridor_index(self.player_pos - self.last_move)
                 if len(oldrooms) == 0:
                     curr_rid = None
                 else:
@@ -309,8 +309,8 @@ class Game (object):
             else:
                 desc = "You enter"
 
-            oldcorrs = self.base_manor.get_corridor_indices(self.player_pos - self.last_move + 1)
-            newcorrs = self.base_manor.get_corridor_indices(self.player_pos + 1)
+            oldcorrs = self.base_manor.get_corridor_indices(self.player_pos - self.last_move)
+            newcorrs = self.base_manor.get_corridor_indices(self.player_pos)
             # print "oldrooms: %s, newrooms: %s, oldcorrs: %s, newcorrs: %s, curr_rid: %s" % (oldrooms, newrooms, oldcorrs, newcorrs, curr_rid)
             if curr_rid != None:
                 print_line("%s %s." % (desc, self.base_manor.get_roomprop(curr_rid).room_name(True)), MSG_START)
@@ -416,7 +416,7 @@ class Game (object):
                     or self.debugging and not self.tried_move_feat.traversable()):
                         self.dir_running = DIR_NOWHERE
                     else:
-                        in_corr = (self.base_manor.get_corridor_index(curr_pos + 1) != None)
+                        in_corr = (self.base_manor.get_corridor_index(curr_pos) != None)
                         dirs = (DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST)
                         for d in dirs:
                             if d == self.dir_running or DIR_NOWHERE - d == self.dir_running:
