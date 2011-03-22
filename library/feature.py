@@ -74,7 +74,17 @@ class TextFeature (Feature):
 NOTHING = TextFeature(" ", None, "nothingness", "Empty space.", False)
 
 class FeatureGrid (object):
+    """
+    A grid of Features at various positions.
+    """
     def __init__ (self, width, height, feat = NOTHING):
+        """
+        Create a new FeatureGrid.
+
+        :``width``: The width of the grid. *Required*.
+        :``height``: The height of the grid. *Required*.
+        :``feat``: The default feature used to initialise the grid. *Default NOTHING*.
+        """
         self.grid = []
         self._width  = width
         self._height = height
@@ -85,21 +95,38 @@ class FeatureGrid (object):
             self.grid.append(row)
 
     def size (self):
+        """
+        Returns the size of the grid.
+        """
         return coord.Coord(self._width, self._height)
 
     def __getitem__ (self, pos):
+        """
+        Returns the Feature at a given position.
+
+        :``pos``: A position within the grid. *Required*.
+        """
         # assert isinstance(pos, coord.Coord)
         assert (pos.y < self._height)
         assert (pos.x < self._width)
         return self.grid[pos.y][pos.x]
 
     def __setitem__ (self, pos, feat):
+        """
+        Updates the Feature at a given position.
+
+        :``pos``: A position within the grid. *Required*.
+        :``feat``: The new feature for this position. *Required*.
+        """
         # assert isinstance(pos, coord.Coord)
         assert (pos.y < self._height)
         assert (pos.x < self._width)
         self.grid[pos.y][pos.x] = feat
 
     def draw (self):
+        """
+        Prints the feature glyphs onto the screen. Debugging method.
+        """
         canvas = []
         for x in xrange(self._height):
             row = []

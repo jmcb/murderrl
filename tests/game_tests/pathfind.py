@@ -4,7 +4,14 @@ from library import coord, feature, pathfind
 from interface.features import *
 
 class PathfindTest (object):
+    """
+    A unit test for testing pathfinding.
+    """
     def __init__ (self):
+        """
+        Creates a fixed feature grid and a couple of coordinates within it,
+        then runs pathfinding tests for some pairs of coordinates.
+        """
         self.init_fgrid()
         self.fgrid.draw()
         self.counter_wrong = 0
@@ -26,11 +33,18 @@ class PathfindTest (object):
         self.pathfind_test(E, D, True)
 
     def evaluate (self):
+        """
+        Compares the counters for correct and incorrect pathfinding results
+        and outputs the results.
+        """
         print "counter right: %s" % self.counter_right
         print "counter wrong: %s" % self.counter_wrong
         return self.counter_wrong == 0
 
     def init_fgrid (self):
+        """
+        Creates a FeatureGrid object with fixed traversability properties
+        
         ##########
         #B...#D#E#
         #..#...#.#
@@ -41,6 +55,7 @@ class PathfindTest (object):
         ###.####.#
         #A#......#
         ##########
+        """
         self.fgrid = feature.FeatureGrid(10, 10, WALL)
         for pos in coord.RectangleIterator(coord.Coord(1,1), coord.Coord(9,9)):
             self.fgrid.__setitem__(pos, FLOOR)
@@ -61,6 +76,14 @@ class PathfindTest (object):
         self.fgrid.__setitem__(coord.Coord(1,8), FLOOR)
 
     def pathfind_test (self, start, stop, expected):
+        """
+        Checks whether there's a path from start to stop in fgrid, and
+        compares the result with the expected result handed in.
+
+        :``start``: The starting position within the grid. *Required*.
+        :``stop``: The path's target position within the grid. *Required*.
+        :``expected``: Whether we expect the pathfinding to be successful or not. *Required*.
+        """
         result = pathfind.Pathfind(self.fgrid, start, stop).path_exists()
         if result:
             print "A path between %s and %s exists." % (start, stop)
