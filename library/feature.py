@@ -74,14 +74,14 @@ class TextFeature (Feature):
 NOTHING = TextFeature(" ", None, "nothingness", "Empty space.", False)
 
 class FeatureGrid (object):
-    def __init__ (self, width, height):
+    def __init__ (self, width, height, feat = NOTHING):
         self.grid = []
         self._width  = width
         self._height = height
         for row in xrange(height):
             row = []
             for column in xrange(width):
-                row.append(NOTHING)
+                row.append(feat)
             self.grid.append(row)
 
     def size (self):
@@ -99,3 +99,11 @@ class FeatureGrid (object):
         assert (pos.x < self._width)
         self.grid[pos.y][pos.x] = feat
 
+    def draw (self):
+        canvas = []
+        for x in xrange(self._height):
+            row = []
+            for y in xrange(self._width):
+                glyph = self.__getitem__(coord.Coord(y, x)).glyph()
+                row.append(glyph)
+            print ''.join(row)
