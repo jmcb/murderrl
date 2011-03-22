@@ -806,8 +806,8 @@ class ManorCollection (builder.BuilderCollection):
 
     def get_pos_list_within_room(self, r):
         rm    = self.get_room(r)
-        start = rm.pos() + coord.Coord(1,1)
-        stop  = rm.pos() + rm.size() - coord.Coord(1,1)
+        start = rm.pos() + 1
+        stop  = rm.pos() + rm.size() - 1
 
         candidates = []
         for pos in coord.RectangleIterator(start, stop):
@@ -924,8 +924,8 @@ class ManorCollection (builder.BuilderCollection):
     def add_table_and_chairs (self, r, table_type):
         rm     = self.get_room(r)
         rp     = self.room_props[r]
-        start  = rm.pos() + coord.Coord(2,2)
-        stop   = rm.pos() + rm.size() - coord.Coord(2,2)
+        start  = rm.pos() + 2
+        stop   = rm.pos() + rm.size() - 2
 
         width  = 3
         height = 3
@@ -954,9 +954,9 @@ class ManorCollection (builder.BuilderCollection):
         add_chairs = (table_type == DINING_TABLE)
         tablestart = coord.Coord(startx, starty)
         tablestop  = coord.Coord(startx + width - 1, starty + height - 1)
-        chairstart = tablestart - coord.Coord(1,1)
-        chairstop  = tablestop  + coord.Coord(1,1)
-        for pos in coord.RectangleIterator(chairstart, chairstop + coord.Coord(1,1)):
+        chairstart = tablestart - 1
+        chairstop  = tablestop  + 1
+        for pos in coord.RectangleIterator(chairstart, chairstop + 1):
             if self.features.__getitem__(pos) != FLOOR:
                 continue
 
