@@ -957,6 +957,9 @@ class ManorCollection (builder.BuilderCollection):
         chairstart = tablestart - coord.Coord(1,1)
         chairstop  = tablestop  + coord.Coord(1,1)
         for pos in coord.RectangleIterator(chairstart, chairstop + coord.Coord(1,1)):
+            if self.features.__getitem__(pos) != FLOOR:
+                continue
+
             feat = table_type
             chairx = (pos.x == chairstart.x or pos.x == chairstop.x)
             chairy = (pos.y == chairstart.y or pos.y == chairstop.y)
