@@ -146,17 +146,25 @@ class ManorCollection (builder.BuilderCollection):
         corr  = self.corridor(idx)
         start = corr.pos()
         stop  = start + coord.Coord(corr.width(), corr.height())
+        m_end = self.size()
+        print "corridor %s" % idx
+        print "start=(%s), stop=(%s)" % (start, stop)
+        print "manor size=(%s), 1/4 -> (%s), 3/4 -> (%s)" % (m_end, coord.Coord(m_end.x/4, m_end.y/4), coord.Coord(3*m_end.x/4, 3*m_end.y/4))
 
         dir_horizontal = ""
-        if start.y < self.size().y/4:
-            dir_horizontal += "north"
-        elif stop.y > 3*self.size().y/4:
-            dir_horizontal += "south"
-        dir_vertical = ""
-        if start.x < self.size().x/4:
-            dir_vertical += "west"
-        elif stop.x > 3*self.size().x/4:
-            dir_vertical += "east"
+        if start.y < max(5, m_end.y/4):
+            dir_horizontal = "north"
+        elif stop.y > min(3*m_end.y/4, m_end.y - 5):
+            dir_horizontal = "south"
+        else:
+            dir_horizontal = ""
+
+        if start.x < max(5, m_end.x/4):
+            dir_vertical = "west"
+        elif stop.x > min(3*m_end.x/4, m_end.x - 5):
+            dir_vertical = "east"
+        else:
+            dir_vertical = ""
 
         # only one other corridor
         if len(self.corridors) == 2:
@@ -337,6 +345,17 @@ class ManorCollection (builder.BuilderCollection):
 
             if self.get_feature(pos) != WALL:
                 continue
+
+            # If a room is adjacent to both the main and a leg corridor,
+            # both of them may place doors. This is okay, but they should
+            # not be adjacent to each other.
+            has_adj_door = False
+            for adj in coord.AdjacencyIterator(pos):
+                if feature_is_door(self.features.__getitem__(adj)):
+                    has_adj_door = True
+            if has_adj_door:
+                continue
+
             rooms = self.get_room_indices(pos)
             corrs = self.get_corridor_indices(pos - offset)
             # print "pos: (%s), rooms: %s, corrs: %s" % (pos, rooms, corrs)
