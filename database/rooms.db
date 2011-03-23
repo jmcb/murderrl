@@ -5,6 +5,7 @@ features=fireplace?
 %
 name=billiard room
 weight=20
+min_size=60
 features=billiard table,fireplace?
 %
 name=boudoir

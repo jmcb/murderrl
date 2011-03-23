@@ -382,7 +382,7 @@ class ManorCollection (builder.BuilderCollection):
                     # We've reached another room. Time to pick a door spot for the old room.
                     if len(candidates):
                         rand_coord = random.choice(candidates)
-                        print "==> pick %s" % rand_coord
+                        # print "==> pick %s" % rand_coord
                         self.set_feature(rand_coord, CLOSED_DOOR)
                         self.room_props[old_room].add_adjoining_room(corrs[0])
                         self.room_props[corrs[0]].add_adjoining_room(old_room)
@@ -968,10 +968,12 @@ class ManorCollection (builder.BuilderCollection):
         rp     = self.room_props[r]
         start  = rm.pos() + 2
         stop   = rm.pos() + rm.size() - 2
+        room_width  = rm.size().x - 2
+        room_height = rm.size().y - 2
 
         width  = 3
         height = 3
-        if table_type == BILLIARD_TABLE:
+        if table_type == BILLIARD_TABLE or room_height < 5:
             height = 2
 
         if rp.section == "utility":
@@ -985,11 +987,22 @@ class ManorCollection (builder.BuilderCollection):
             if stop.x - start.x > 2 and coinflip():
                 width += 1
 
+        if width != height and (room_height > room_width or room_height == room_width and coinflip()):
+            tmp    = width
+            width  = height
+            height = tmp
+
+        print "table width=%s, height=%s, room size: (%s), section: (%s)" % (width, height, rm.size(), stop - start)
+        if width > stop.x - start.x:
+            width = stop.x - start.x
+        if height > stop.y - start.y:
+            height = stop.y - start.y
+
         startx = start.x
         starty = start.y
-        if stop.x - width > startx:
+        if width < stop.x - startx:
             startx = random.randint(start.x, stop.x - width)
-        if stop.y - height > starty:
+        if height < stop.y - starty:
             starty = random.randint(start.y, stop.y - height)
 
         # Only the dining table has chairs!
