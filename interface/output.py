@@ -5,15 +5,16 @@ from library.colour import Colours
 
 screen = console.select()
 
-def print_line (text, pos = POS_ORIGIN):
+def print_line (text, pos = POS_ORIGIN, col = Colours.LIGHTGRAY):
     """
     Prints a line of text beginning at the coordinate pos.
 
     :``text``: The text to be printed. *Required*.
     :``pos``: The starting coord (of type ``Coord``) for printing. *Default (0,0)*.
+    :``col``: The output colour. *Default lightgray*.
     """
     for ind, char in enumerate(text):
-        screen.put(char, Coord(pos.x+ind, pos.y), Colours.LIGHTGRAY)
+        screen.put(char, Coord(pos.x+ind, pos.y), col)
 
 def print_text (text, pos = POS_ORIGIN, max_columns = 70):
     """

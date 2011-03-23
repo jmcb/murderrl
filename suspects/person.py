@@ -138,13 +138,13 @@ class Person (object):
         """
         self.rel.append((idx, type))
 
-    def set_alibi (self, rid, rname, witness = -1):
+    def set_alibi (self, rid, rname, witness = None):
         """
         Provides this person with an alibi.
 
         :``rid``: A room index. *Required*.
         :``rname``: A room name. *Required*.
-        :``witness``: Suspect list index of another person. *Default -1*.
+        :``witness``: Suspect list index of another person. *Default None*.
         """
         self.alibi = Alibi(rid, rname, witness)
 
@@ -155,7 +155,7 @@ class Person (object):
         if not self.alibi:
             return False
 
-        if self.alibi.witness == -1:
+        if self.alibi.witness == None:
             return False
 
         return True
@@ -275,7 +275,7 @@ class Person (object):
         for r in self.rel:
             if r[1] == type:
                return r[0]
-        return -1
+        return None
 
     def is_relative (self, other_idx, type):
         """
@@ -440,7 +440,7 @@ class SuspectList (object):
         for i in xrange(self.no_of_suspects()):
             if s[i] == p:
                 return i
-        return -1
+        return None
 
     def get_suspect (self, idx):
         """
@@ -714,7 +714,7 @@ class SuspectList (object):
         """
         Randomly pick the victim. Staff are excluded.
         """
-        idx = -1
+        idx = None
         while idx < 0 or self.get_suspect(idx).is_servant():
             idx = random.randint(0, self.no_of_suspects()-1)
         self.victim = idx
@@ -723,7 +723,7 @@ class SuspectList (object):
         """
         Randomly pick the murderer.
         """
-        idx = -1
+        idx = None
         while idx < 0 or self.is_victim(idx):
             idx = random.randint(0, self.no_of_suspects()-1)
         self.murderer = idx
@@ -1134,7 +1134,7 @@ class SuspectList (object):
             name1 = curr.get_fullname()
             print "%s (%s, %s)" % (name1, idx1, curr.role)
             idx2  = curr.get_relative(REL_SPOUSE)
-            if idx2 == -1:
+            if idx2 == None:
                 owner_list.append((idx1, name1))
             else:
                 if idx2 in people:

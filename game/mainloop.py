@@ -278,6 +278,14 @@ class Game (object):
         id = self.get_current_room_id(pos)
         return self.base_manor.get_roomprop(id)
 
+    def print_message (self, text):
+        """
+        Prints a message in the customary message line.
+
+        :``text``: The message to be printed.
+        """
+        print_line(text, MSG_START)
+
     def print_debugging_messages (self):
         """
         Prints a variety of parameters in the message area. (Only in debug mode.)
@@ -299,13 +307,13 @@ class Game (object):
         Writes game messages into the message area.
         """
         if self.message != None:
-            print_line(self.message, MSG_START)
+            self.print_message(self.message)
             self.message = None
         elif self.game_start:
-            print_line(self.get_welcome_message(), MSG_START)
+            self.print_message(self.get_welcome_message())
             self.game_start = False
         elif self.move_was_blocked:
-            print_line("Ouch! You bump into a %s!" % self.tried_move_feat.name(), MSG_START)
+            self.print_message("Ouch! You bump into a %s!" % self.tried_move_feat.name())
         elif self.did_switch:
             mode = "canvas view"
             if self.debugging:
@@ -333,13 +341,13 @@ class Game (object):
             newcorrs = self.base_manor.get_corridor_indices(self.player_pos)
             # print "oldrooms: %s, newrooms: %s, oldcorrs: %s, newcorrs: %s, curr_rid: %s" % (oldrooms, newrooms, oldcorrs, newcorrs, curr_rid)
             if curr_rid != None:
-                print_line("%s %s." % (desc, self.base_manor.get_roomprop(curr_rid).room_name(True)), MSG_START)
+                self.print_message("%s %s." % (desc, self.base_manor.get_roomprop(curr_rid).room_name(True)))
             else:
                 feat = self.base_manor.get_feature(self.player_pos)
                 if feature_is_door(feat):
-                    print_line("You see here a door.", MSG_START)
+                    self.print_message("You see here a door.")
                 elif not feature_is_floor(feat):
-                    print_line("You see here a %s." % feat.name(), MSG_START)
+                    self.print_message("You see here a %s." % feat.name())
 
         if self.debugging:
             # Debugging information.
