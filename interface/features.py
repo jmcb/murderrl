@@ -25,7 +25,7 @@ STAIR_DOWN = TextFeature(">", Colours.WHITE, "stairs down", "A staircase leading
 
 # Furniture
 FIREPLACE = TextFeature("]", Colours.YELLOW, "fireplace", "A fireplace.", False, True)
-HEARTH    = TextFeature("]", Colours.RED, "hearth", "A hearth.", False, True)
+HEARTH    = TextFeature("]", Colours.YELLOW, "hearth", "A hearth.", False, True)
 CUPBOARD  = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False, True)
 WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False, True)
 BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False, True)
@@ -42,6 +42,9 @@ BED = TextFeature('_', Colours.WHITE, "bed", "A bed.", False)
 
 # Plants, etc.
 TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", False)
+
+# Corpse of the victim, immovable item -> might as well be a feature
+BODY = TextFeature("X", Colours.RED, "body", "The victim's body.", True)
 
 Features = [FLOOR, GRASS, COBBLES, WALL, CLOSED_DOOR, OPEN_DOOR, WINDOW_V, WINDOW_H,
 STAIR_UP, STAIR_DOWN, FIREPLACE, HEARTH, CUPBOARD, WARDROBE, BOOKSHELF, SHELF,

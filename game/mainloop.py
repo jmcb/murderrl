@@ -43,6 +43,8 @@ class Game (object):
 
         self.add_alibis()
 
+        self.add_victim_body()
+
         # Combine the room shapes into a canvas.
         self.canvas = self.base_manor.combine()
 
@@ -174,6 +176,43 @@ class Game (object):
                 sl.get_suspect(s).set_alibi(r, rprops[r].name)
             else:
                 print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
+
+    def add_victim_body (self):
+        sl = self.suspect_list
+        murder_room = sl.get_victim().alibi.rid
+        free_places = self.base_manor.get_pos_list_within_room(murder_room)
+
+        candidates = []
+        for c in free_places:
+            if feature_is_floor(self.base_manor.get_feature(c)):
+                candidates.append(c)
+
+        assert(len(candidates) > 0)
+
+        victim_name = sl.get_victim().get_name()
+        feat = BODY
+        feat._name = "the mangled body of %s" % victim_name
+        feat._has_article = True
+        body_pos = random.choice(candidates)
+        self.base_manor.features.__setitem__(body_pos, feat)
+        rp = self.base_manor.room_props[murder_room]
+
+        features = self.base_manor.get_nearby_interesting_feature(body_pos)
+
+        nearby_feat = ""
+        if len(features) > 0:
+            if CLOSED_DOOR in features or OPEN_DOOR in features:
+                if len(rp.adj_rooms) > 1:
+                    nearby_feat = "one of the doors"
+                else:
+                    nearby_feat = "the door"
+            elif WINDOW_V in features or WINDOW_H in features:
+                nearby_feat = "the window"
+            else:
+                nearby_feat = "the %s" % features[0].name(False)
+            nearby_feat = " near %s" % nearby_feat
+
+        rp.description += "You see here %s%s." % (feat.name(), nearby_feat)
 
     def initialise_parameters (self):
         """
@@ -351,7 +390,7 @@ class Game (object):
                 if feature_is_door(feat):
                     self.print_message("You see here a door.")
                 elif not feature_is_floor(feat):
-                    self.print_message("You see here a %s." % feat.name())
+                    self.print_message("You see here %s." % feat.name())
 
         if self.debugging:
             # Debugging information.

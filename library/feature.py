@@ -26,13 +26,16 @@ class Feature (object):
         self._description = description
         self._traversable = traversable
         self._needs_wall  = needs_wall
+        self._has_article = False
 
     def traversable (self):
         return self._traversable
 
     passable = property(lambda self: self.traversable)
 
-    def name (self):
+    def name (self, needs_article=False):
+        if needs_article and not self._has_article:
+            return "a %s" % self._name
         return self._name
 
     def description (self):

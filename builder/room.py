@@ -146,6 +146,7 @@ class RoomProps (Room):
         self.owners         = [] # private room of one or more person(s)
         self.owner_names    = []
         self.furniture      = []
+        self.description    = ""
 
     def init_db_props(self, name, section=None, prep="in", features=[], complete=False):
         self.name       = name
@@ -309,6 +310,9 @@ class RoomProps (Room):
         desc += "%s\n\n" % self.describe_windows()
 
         desc += self.describe_exits()
+
+        if self.description != "":
+            desc += "\n\n%s" % self.description
 
         return desc
 

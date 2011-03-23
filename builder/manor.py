@@ -851,7 +851,7 @@ class ManorCollection (builder.BuilderCollection):
                 if len(furniture) > 0:
                     self.add_room_furniture(r, furniture)
 
-    def get_pos_list_within_room(self, r):
+    def get_pos_list_within_room (self, r):
         """
         Returns a list of floor coordinates within a room that are not
         directly adjacent to a door or window.
@@ -881,6 +881,44 @@ class ManorCollection (builder.BuilderCollection):
             candidates.append(pos)
 
         return candidates
+
+    def get_nearby_interesting_feature (self, curr):
+        """
+        Returns a list of interesting features nearby a given position.
+
+        :``curr``: The current position in the manor. *Required*.
+        """
+        curr_room = self.get_room_index(curr)
+        adj_features  = []
+        features = []
+        for pos in coord.RectangleIterator(curr - 2, curr + 3):
+            if pos == curr:
+                continue
+
+            if pos.x < 0 or pos.x >= self.size().x or pos.y < 0 or pos.y >= self.size().y:
+                continue
+
+            nearby_feat = self.get_feature(pos)
+            # Skip boring features.
+            if nearby_feat == NOTHING or nearby_feat == WALL:
+                continue
+
+            # Make sure we stay within the same room.
+            if self.get_room_index(pos) != curr_room:
+                continue
+
+            if feature_is_door(nearby_feat) or not nearby_feat.traversable():
+                if (pos.x >= curr.x - 1 and pos.y >= curr.y - 1
+                and pos.x <= curr.x + 1 and pos.y <= curr.y + 1):
+                    adj_features.append(nearby_feat)
+                else:
+                    features.append(nearby_feat)
+
+        # If there are any directly adjacent features, return those.
+        if len(adj_features) > 0:
+            return adj_features
+        # ... otherwise, the list of nearby features.
+        return features
 
     def add_bedroom_furniture (self, r, bedcount=1):
         """
