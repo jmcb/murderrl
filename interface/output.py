@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from library.coord import *
 from interface import console
+from library.colour import Colours
 
 screen = console.select()
 
@@ -12,7 +13,7 @@ def print_line (text, pos = POS_ORIGIN):
     :``pos``: The starting coord (of type ``Coord``) for printing. *Default (0,0)*.
     """
     for ind, char in enumerate(text):
-        screen.put(char, Coord(pos.x+ind, pos.y))
+        screen.put(char, Coord(pos.x+ind, pos.y), Colours.LIGHTGRAY)
 
 def print_text (text, pos = POS_ORIGIN, max_columns = 70):
     """

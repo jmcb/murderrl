@@ -11,21 +11,21 @@ GRASS = TextFeature(".", Colours.GREEN, "grass", "Grass.", True)
 COBBLES = TextFeature(",", Colours.BROWN, "cobbles", "Cobblestones.", True)
 
 # Wall-related glyphs.
-WALL = TextFeature("#", Colours.WHITE, "wall", "A wall.", False)
+WALL = TextFeature("#", Colours.LIGHTGRAY, "wall", "A wall.", False)
 # For simplicity's sake, doors are currently considered traversable even
 # when closed. Opening doors is implied, okay? (jpeg)
-CLOSED_DOOR = TextFeature("+", Colours.WHITE, "closed door", "A closed door.", True)
-OPEN_DOOR = TextFeature("'", Colours.WHITE, "open door", "An open door.", True)
-WINDOW_V = TextFeature("|", Colours.WHITE, "window", "A window.", False)
-WINDOW_H = TextFeature("-", Colours.WHITE, "window", "A window.", False)
+CLOSED_DOOR = TextFeature("+", Colours.LIGHTGRAY, "closed door", "A closed door.", True)
+OPEN_DOOR = TextFeature("'", Colours.LIGHTGRAY, "open door", "An open door.", True)
+WINDOW_V = TextFeature("|", Colours.LIGHTCYAN, "window", "A window.", False)
+WINDOW_H = TextFeature("-", Colours.LIGHTCYAN, "window", "A window.", False)
 
 # Stairs.
 STAIR_UP = TextFeature("<", Colours.WHITE, "stairs up", "A staircase leading up.", True)
 STAIR_DOWN = TextFeature(">", Colours.WHITE, "stairs down", "A staircase leading down.", True)
 
 # Furniture
-FIREPLACE = TextFeature("]", Colours.LIGHTRED, "fireplace", "A fireplace.", False, True)
-HEARTH    = TextFeature("]", Colours.LIGHTRED, "hearth", "A hearth.", False, True)
+FIREPLACE = TextFeature("]", Colours.YELLOW, "fireplace", "A fireplace.", False, True)
+HEARTH    = TextFeature("]", Colours.RED, "hearth", "A hearth.", False, True)
 CUPBOARD  = TextFeature("[", Colours.BROWN, "cupboard", "A cupboard.", False, True)
 WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False, True)
 BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False, True)
@@ -36,7 +36,7 @@ DESK  = TextFeature('=', Colours.BROWN, "desk", "A desk.", False)
 DINING_TABLE   = TextFeature('=', Colours.BROWN, "large table", "A large table.", False)
 BILLIARD_TABLE = TextFeature('=', Colours.GREEN, "billiard table", "A billiard table.", False)
 WORK_TABLE     = TextFeature('=', Colours.BROWN, "work table", "A work table.", False)
-BED = TextFeature('_', Colours.BROWN, "bed", "A bed.", False)
+BED = TextFeature('_', Colours.WHITE, "bed", "A bed.", False)
 
 # Plants, etc.
 TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", False)

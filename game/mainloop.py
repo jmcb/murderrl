@@ -217,7 +217,8 @@ class Game (object):
                 continue
             real_coord = pos + coord.Coord(self.vp._left, self.vp._top)
             char = self.base_manor.get_feature(real_coord).glyph()
-            screen.put(char,pos+1)
+            col  = self.base_manor.get_feature(real_coord).colour()
+            screen.put(char, pos+1, col)
 
     def draw_canvas (self):
         """
@@ -226,7 +227,7 @@ class Game (object):
         for pos, char in self.sect:
             if char == None:
                 char = " "
-            screen.put(char, pos+1)
+            screen.put(char, pos+1, Colours.LIGHTGRAY)
 
     def draw_viewport (self):
         """
@@ -245,7 +246,7 @@ class Game (object):
 
         # Draw the player.
         canvas_pos = coord.Coord(self.player_pos.x - self.vp._left, self.player_pos.y - self.vp._top)
-        screen.put("@", canvas_pos + 1)
+        screen.put("@", canvas_pos + 1, Colours.YELLOW)
 
     def get_current_room_id (self, pos = None):
         """
