@@ -225,9 +225,13 @@ class Game (object):
         Draws the section of the viewport that's currently visible onto the screen.
         """
         for pos, char in self.sect:
+            col = Colours.LIGHTGRAY
             if char == None:
                 char = " "
-            screen.put(char, pos+1, Colours.LIGHTGRAY)
+            elif char != "#" and char != ".":
+                real_coord = pos + coord.Coord(self.vp._left, self.vp._top)
+                col = self.base_manor.get_feature(real_coord).colour()
+            screen.put(char, pos+1, col)
 
     def draw_viewport (self):
         """
