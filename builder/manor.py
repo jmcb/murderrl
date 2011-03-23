@@ -403,7 +403,7 @@ class ManorCollection (builder.BuilderCollection):
         # The corridor has reached an end. Pick a door spot for the last room seen.
         if len(candidates):
             rand_coord = random.choice(candidates)
-            print "==> pick %s" % rand_coord
+            # print "==> pick %s" % rand_coord
             self.set_feature(rand_coord, CLOSED_DOOR)
             self.doors.append(rand_coord)
             corrs = self.get_corridor_indices(rand_coord - offset)
@@ -449,7 +449,7 @@ class ManorCollection (builder.BuilderCollection):
         candidates = []
         for pos in coord.RectangleIterator(start, stop + 1):
             if (self.get_feature(pos) != WALL
-            or self.get_feature(pos + offset) == WALL):
+            or self.get_feature(pos + offset) != FLOOR):
                 continue
 
             # Make sure this wall connects to another room.
@@ -671,6 +671,31 @@ class ManorCollection (builder.BuilderCollection):
                     if r not in door_rooms:
                         door_rooms.append(r)
 
+    def assign_adjacent_rooms (self, rid):
+        """
+        Tries to fill the neighbour rooms of a given room with the same
+        section type (utility or domestic), so matching rooms are neatly
+        grouped together.
+
+        :``rid``: The room id of a room that's already got a type assigned. *Required*.
+        """
+        rp = self.room_props[rid]
+        utility = (rp.section == "utility")
+        # print "Room %s of type %s" % (rp.name, rp.section)
+        for adj in rp.adj_rooms:
+            if adj in self.get_corridors():
+                # print "adjacent room %s is corridor" % adj
+                continue
+
+            arp = self.room_props[adj]
+            if arp.has_data:
+                # print "adjacent room %s already filled" % arp.name
+                continue
+
+            print "fill room %s from database" % adj
+            if arp.fill_from_database(utility):
+                self.assign_adjacent_rooms(adj)
+
     def init_room_names (self, list = None):
         """
         Sets room names for all rooms within the manor.
@@ -720,9 +745,11 @@ class ManorCollection (builder.BuilderCollection):
                         owner_list.remove(owner)
                         rp.make_bedroom(owner)
                         count_bedrooms += 1
+                        self.assign_adjacent_rooms(r)
                         continue
 
-                    rp.fill_from_database(utility)
+                    if rp.fill_from_database(utility):
+                        self.assign_adjacent_rooms(r)
 
                 utility = False
 
@@ -765,7 +792,8 @@ class ManorCollection (builder.BuilderCollection):
                         owner = owner_list[0]
                         owner_list.remove(owner)
                         rp.make_bedroom(owner)
-                        count_bedrooms  += 1
+                        count_bedrooms += 1
+                        self.assign_adjacent_rooms(r)
 
         print "-------\nassign remaining rooms"
         rooms = self.rooms[:]
@@ -784,9 +812,11 @@ class ManorCollection (builder.BuilderCollection):
                     owner_list.remove(owner)
                     rp.make_bedroom(owner)
                     count_bedrooms += 1
+                    self.assign_adjacent_rooms(r)
                     continue
 
-            rp.fill_from_database()
+            if rp.fill_from_database():
+                self.assign_adjacent_rooms(r)
 
         self.update_adjoining_rooms()
 

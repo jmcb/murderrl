@@ -242,6 +242,8 @@ class RoomProps (Room):
             print "%s: %s" % (new_room.name, features)
             self.init_db_props(new_room.name, new_room.section, new_room.prep, features, True)
 
+        return new_room != None
+
     def describe_window_dirs (self):
         dirs = []
         for d in self.windows:
