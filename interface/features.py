@@ -31,11 +31,13 @@ WARDROBE  = TextFeature("[", Colours.BROWN, "wardrobe", "A wardrobe.", False, Tr
 BOOKSHELF = TextFeature("[", Colours.BROWN, "bookshelf", "A bookshelf.", False, True)
 SHELF     = TextFeature("[", Colours.BROWN, "shelf", "A shelf.", False, True)
 CHAIR = TextFeature('\\', Colours.BROWN, "chair", "A chair.", True)
+STOOL = TextFeature('\\', Colours.BROWN, "stool", "A stool.", True)
 TABLE = TextFeature('=', Colours.BROWN, "table", "A table.", False)
 DESK  = TextFeature('=', Colours.BROWN, "desk", "A desk.", False)
 DINING_TABLE   = TextFeature('=', Colours.BROWN, "large table", "A large table.", False)
 BILLIARD_TABLE = TextFeature('=', Colours.GREEN, "billiard table", "A billiard table.", False)
 WORK_TABLE     = TextFeature('=', Colours.BROWN, "work table", "A work table.", False)
+PIANO          = TextFeature('=', Colours.WHITE, "piano", "A grand piano.", False)
 BED = TextFeature('_', Colours.WHITE, "bed", "A bed.", False)
 
 # Plants, etc.
@@ -43,7 +45,7 @@ TREE = TextFeature("&", Colours.GREEN, "tree", "A tree.", False)
 
 Features = [FLOOR, GRASS, COBBLES, WALL, CLOSED_DOOR, OPEN_DOOR, WINDOW_V, WINDOW_H,
 STAIR_UP, STAIR_DOWN, FIREPLACE, HEARTH, CUPBOARD, WARDROBE, BOOKSHELF, SHELF,
-CHAIR, TABLE, DINING_TABLE, BILLIARD_TABLE, WORK_TABLE, DESK, BED, TREE]
+CHAIR, STOOL, TABLE, DINING_TABLE, BILLIARD_TABLE, WORK_TABLE, DESK, PIANO, BED, TREE]
 
 def get_furniture_by_name(name):
     for f in Features:
@@ -68,4 +70,4 @@ def feature_is_large_table (feat):
     return feat == WORK_TABLE or feat == DINING_TABLE or feat == BILLIARD_TABLE
 
 def feature_is_container (feat):
-    return feat == CUPBOARD or feat == WARDROBE or feat == BOOKSHELF or feat == DESK
+    return feat == CUPBOARD or feat == WARDROBE or feat == BOOKSHELF or feat == SHELF or feat == DESK

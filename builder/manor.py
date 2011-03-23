@@ -1163,7 +1163,8 @@ class ManorCollection (builder.BuilderCollection):
                     if self.pos_blocks_corridor(pos):
                         continue
 
-                if feat == DESK:
+                secondary_feat_name = None
+                if feat == DESK or feat == PIANO:
                     # need to place a chair
                     if reduce_tries:
                         if coinflip():
@@ -1181,9 +1182,13 @@ class ManorCollection (builder.BuilderCollection):
                         continue
 
                     chairpos = random.choice(chair_candidates)
-                    self.set_feature(chairpos, CHAIR)
+                    if feat == DESK:
+                        chair = CHAIR
+                    else:
+                        chair = STOOL
+                    self.set_feature(chairpos, chair)
                     candidates.remove(chairpos)
-                    rp.add_furniture_name("a chair")
+                    secondary_feat_name = chair.name()
 
                 if reduce_tries:
                     tries -= 1
@@ -1191,6 +1196,8 @@ class ManorCollection (builder.BuilderCollection):
                 self.set_feature(pos, feat)
                 candidates.remove(pos)
                 rp.add_furniture_name("%s" % feat.name())
+                if secondary_feat_name != None:
+                    rp.add_furniture_name(secondary_feat_name)
                 break
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):

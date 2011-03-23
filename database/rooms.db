@@ -1,7 +1,7 @@
 %
 name=ball room
 min_size=70
-features=fireplace?
+features=piano?,fireplace?
 %
 name=billiard room
 weight=20
@@ -67,6 +67,7 @@ features=fireplace,chair+,table?
 %
 name=picture gallery
 is_passage=1
+features=chair?
 %
 name=smoking room
 weight=20
