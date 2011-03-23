@@ -362,7 +362,7 @@ class Game (object):
         Describes the room a given position belongs to.
 
         :``pos``: A coordinate in the manor. If none, the player position is used. 
-                  *Default: none*.
+                  *Default None*.
         """
         if pos == None:
             pos = self.player_pos
@@ -370,31 +370,43 @@ class Game (object):
         room = self.get_current_room(pos)
         room.describe()
 
+    def pos_in_room (self, pos):
+        """
+        A helper method to check whether travel has reached the target room.
+
+        :``pos``: A coordinate along the path. *Required*.
+        """
+        curr_room = self.get_current_room_id(pos)
+        return curr_room == self.travel_target_room
+
     def start_travel (self, room_id):
+        """
+        Calculate a path to another room and store it, so travel can then
+        follow it.
+
+        :``room_id``: The room id of the target room. *Required*.
+        """
         if self.get_current_room_id() == room_id:
             self.message = "You are already here."
             return
 
-        if self.base_manor.room_props[room_id].is_corridor:
-            corr = self.base_manor.corridor(room_id)
-            target_pos = corr.pos() + coord.Coord(corr.width()/2, corr.height()/2)
-        else:
-            room = self.base_manor.get_room(room_id)
-            target_pos = room.pos() + coord.Coord(room.size().x/2, room.size().y/2)
-
-        path = pathfind.Pathfind(self.base_manor.features, self.player_pos, target_pos).get_path()
+        self.travel_target_room = room_id
+        path = pathfind.Pathfind(self.base_manor.features, self.player_pos, None, self.pos_in_room).get_path()
         if path != None:
             self.travel_path = path
         else:
             self.message = "The requested path couldn't be found."
 
     def cmd_travel_menu (self):
+        """
+        Offers the player a choice of rooms within the manor. Picking one
+        of them initialises travel.
+        """
         m = menu.ScrollMenu("Travel where?", False)
         rprops  = self.base_manor.room_props
         curr_id = self.get_current_room_id()
         keyval  = ord('a')
         rlist   = self.base_manor.get_room_corridors()[:]
-        print rlist
         rlist.sort(cmp=lambda a, b: cmp(rprops[a].name, rprops[b].name))
         for i in rlist:
             key = chr(keyval)

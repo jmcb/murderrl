@@ -69,18 +69,24 @@ class Pathfind (object):
     """
     An object to handle pathfinding calculations.
     """
-    def __init__ (self, grid, start, target):
+    def __init__ (self, grid, start, target=None, target_condition=None):
         """
         Create a new Pathfind object.
 
         :``grid``: A FeatureGrid representation of the map. *Required*.
         :``start``: The starting coordinate. *Required*.
-        :``target``: The target coordinate for the path. *Required*.
+        :``target``: The target coordinate for the path. *Default None*.
+        :``target_condition``: A method taking a Coord parameter, and an
+                   alternative condition for finding a valid targt. *Default None*.
+                   At least one of ``target`` and ``target_condition`` needs
+                   to be valid.
         """
         assert(start < grid.size() and target < grid.size())
+        assert(target != None or target_condition != None)
         self.fgrid     = grid
         self.start     = start
         self.target    = target
+        self.target_condition = target_condition
         self.dgrid     = DistanceGrid(self.fgrid.size(), INFINITY)
         self.pgrid     = PrevGrid(self.fgrid.size())
 
@@ -119,6 +125,21 @@ class Pathfind (object):
             next = self.pgrid.__getvalue__(next)
         return path
 
+    def check_target (self, pos):
+        """
+        Returns whether the target has been reached or an alternative
+        target condition has been met.
+
+        :``pos``: The coordinate that is currently being looked at. *Required*.
+        """
+        if pos == self.target:
+            return True
+
+        if self.target_condition != None and self.target_condition(pos):
+            return True
+
+        return False
+
     def add_neighbours (self, curr, include_diagonals=False):
         """
         Checks all neighbouring squares of a given position and, if they
@@ -144,8 +165,12 @@ class Pathfind (object):
                 self.dgrid.__setvalue__(pos, new_dist)
                 self.pgrid.__setvalue__(pos, curr)
                 self.nlist.append(pos)
-            if pos == self.target:
+
+            if self.check_target(pos):
+                if self.target == None:
+                    self.target = pos
                 return True
+
         return False
 
     def pathfind (self):
