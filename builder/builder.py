@@ -123,7 +123,18 @@ class Corridor (shape.Shape):
 class MainCorridor (Corridor):
     pass
 
-def join_row_rooms (row, left=False, right=False, check_offset=False):
+def join_row_rooms (row, left_corr=False, right_corr=False, check_offset=False):
+    """
+    Given a list of rooms, joins them together as a ShapeCollection.
+
+    :``row``: A list of Room objects that should be placed in a row. *Required*.
+    :``left_corr``: If true, leaves a gap between the first and second rooms
+            to make space for a corridor. *Default False*.
+    :``right_corr``: If true, leaves a gap between the last and second-last rooms
+            to make space for a corridor. *Default False*.
+    :``check_offset``: If true, compares the room heights to see if they
+            need to be offset from the top. *Default False*.
+    """
     assert(len(row) > 2)
 
     first_room  = row[0].as_shape()
@@ -139,7 +150,7 @@ def join_row_rooms (row, left=False, right=False, check_offset=False):
     if check_offset:
         top_offset = 2
     overlap = 1
-    if left:
+    if left_corr:
         overlap = -1
     row_collection = shape.adjoin(first_room, second_room, top_offset=top_offset, overlap=overlap, collect=True, offset_both=offset_both)
 
@@ -156,7 +167,7 @@ def join_row_rooms (row, left=False, right=False, check_offset=False):
     if check_offset and (last_room.height() == first_room.height() and not offset_both or last_room.height() > first_room.height()):
         top_offset = 0
     overlap = 1
-    if right:
+    if right_corr:
         overlap = -1
     row_collection = shape.adjoin(row_collection, last_room, top_offset=top_offset, overlap=overlap, collect=True)
     return row_collection
@@ -164,6 +175,9 @@ def join_row_rooms (row, left=False, right=False, check_offset=False):
 ROOM_WIDTH_LIST = [7, 8, 9, 10, 11, 12]
 
 def random_room_height ():
+    """
+    Returns a random value for the height of a room.
+    """
     height = 7
     if coinflip():
         height += 1
@@ -173,12 +187,19 @@ def random_room_height ():
 
 def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=None, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False,top_height=None, bottom_height=None):
     """
-    Attempts to build a manor based on the style provided. It returns
-    ShapeCollection and a list of Room objects.
+    Attempts to build a basic rectangular manor. It returns ShapeCollection 
+    and a list of Room objects.
 
-    :``style``: One of ``ONE_CORRIDOR``, ``L_CORRIDOR`` or ``Z_CORRIDOR``.
-                Currently on ``ONE_CORRIDOR`` is supported. *Default
-                ONE_CORRIDOR*.
+    :``top_left``: The width of the top left room. Random, if none. *Default None*.
+    :``top_right``: The width of the top right room. Random, if none. *Default None*.
+    :``bottom_left``: The width of the bottom left room. Random, if none. *Default None*.
+    :``bottom_right``: The width of the bottom right room. Random, if none. *Default None*.
+    :``tl_corr``: If true, leaves a gap for a corridor between the top-left two rooms. *Default False*.
+    :``tr_corr``: If true, leaves a gap for a corridor between the top-right two rooms. *Default False*.
+    :``bl_corr``: If true, leaves a gap for a corridor between the bottom-left two rooms. *Default False*.
+    :``br_corr``: If true, leaves a gap for a corridor between the bottom-right two rooms. *Default False*.
+    :``top_height``: The height of the top row rooms. Random, if none. *Default None*.
+    :``bottom_height``: The height of the bottom row rooms. Random, if none. *Default None*.
     """
     if top_left == None:
         top_left = random.choice(ROOM_WIDTH_LIST)
@@ -333,6 +354,10 @@ PLACE_TOP    = Placement("top", "bottom", 0)
 PLACE_BOTTOM = Placement("top", "bottom", 1)
 
 class Leg (object):
+    """
+    The representation of a manor leg (or "wing") that is attached to the
+    base manor.
+    """
     def __init__ (self, h_placement, v_placement, width=None, height=None, leg=None):
         assert not (leg is None and width is None and height is None)
 
@@ -356,8 +381,12 @@ def attach_leg (base, leg, side=SIDE_LEFT, placement=PLACE_TOP, corr_offset = No
 
     :``base``: The base shape collection.
     :``leg``: The leg shape collection.
-    :``side``: Which side the leg should be placed on. *Default SIDE_LEFT*.
-    :``placement``: Whether the leg should be placed above or below. *Default PLACE_TOP*.
+    :``side``: Which side the leg should be placed on. *Default ``SIDE_LEFT``*.
+    :``placement``: Whether the leg should be placed above or below. *Default ``PLACE_TOP``*.
+    :``corr_offset``: A number by which to vertically offset the corridor placement.
+                If none, uses the default room height. *Default None*.
+    :``x_offset``: A number by which to horizontally offset the corridor placement.
+                *Default None*.
     """
     assert not base.leg_at(side, placement)
 
@@ -437,6 +466,8 @@ def build_leg (rooms_tall=2, rooms_wide=2, width_left=12, width_right=12, make_c
 
     :``rooms_tall``: How many rooms tall to make the leg. *Default 2*.
     :``rooms_wide``: How many rooms wide to make the leg. *Max 2. Default 2*.
+    :``width_left``: The width of the leftmost rooms. *Default 12*.
+    :``width_right``: The width of the rightmost rooms. *Default 12*.
     :``make_corridor``: Include a corridor when building. *Default True*.
     :``do_cleanup``: Perform corridor, etc, clean-up when built. *Default True*.
     """
@@ -489,7 +520,8 @@ def build_L (base=None, rooms=2, rooms_wide=2):
 
     :``base``: The base shape collection. If None, a new base will be built from
                base_builder. *Default None*.
-    :``rooms``: How many rooms to build along the sides of the new axis.
+    :``rooms``: How many rooms to build along the sides of the new axis. *Default 2*.
+    :``rooms_wide``: How many rooms wide to make the leg. *Max 2. Default 2*.
     """
     side = random.choice([SIDE_LEFT, SIDE_RIGHT])
     placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
@@ -548,17 +580,51 @@ def build_L (base=None, rooms=2, rooms_wide=2):
     return base
 
 def build_Z (base=None):
+    """
+    Modifies the results of base_builder() to result in an L shape in any
+    orientation. Not implemented.
+    Currently just returns the base builder results.
+
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    """
     if base is None:
         base = base_builder()
     return base
 
 def build_N (base=None):
+    """
+    Modifies the results of base_builder() to result in an L shape in any
+    orientation. Not implemented.
+    Currently just returns the base builder results.
+
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    """
+    if base is None:
+        base = base_builder()
+    return base
+
+def build_O (base=None):
+    """
+    Modifies the results of base_builder() to result in an L shape in any
+    orientation. Not implemented.
+    Currently just returns the base builder results.
+
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    """
     if base is None:
         base = base_builder()
     return base
 
 def build_H (base=None):
+    """
+    Modifies the results of base_builder() to result in an H-shaped layout.
 
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    """
     outer = random.choice(ROOM_WIDTH_LIST) # outer leg
     inner = random.choice(ROOM_WIDTH_LIST) # inner leg
 
@@ -569,18 +635,25 @@ def build_H (base=None):
         base = base_builder(top_left=outer, top_right=outer, bottom_left=outer, bottom_right=outer, 
         tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True, top_height=tht, bottom_height=bht)
 
-    base = build_U(base, placement=PLACE_TOP, outer=outer, inner=inner, corr_offset=tht)
-    base = build_U(base, placement=PLACE_BOTTOM, outer=outer, inner=inner, corr_offset=bht)
+    base = build_U(base, placement=PLACE_TOP, outer=outer, inner=inner, room_height=tht)
+    base = build_U(base, placement=PLACE_BOTTOM, outer=outer, inner=inner, room_height=bht)
 
     return base
 
-def build_O (base=None):
-    if base is None:
-        base = base_builder()
-    return base
+def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None, room_height=None):
+    """
+    Modifies the results of base_builder() to result in an U-shaped layout.
 
-def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None, corr_offset=None):
-    # Draw the new rooms.
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    :``rooms``: How many rooms to build along the sides of the new axis. *Default 2*.
+    :``rooms_wide``: How many rooms wide to make the leg. *Max 2. Default 2*.
+    :``placement``: The vertical orientation of the manor legs. Random, if none. *Default None*.
+    :``inner``: The width of the inner manor legs' rooms. Random, if none. *Default None*.
+    :``outer``: The width of the outer manor legs' rooms. Random, if none. *Default None*.
+    :``room_height``: The height of the base manor rooms on the side facing the legs.
+                Random, if none. *Default None*.
+    """
     if placement is None:
         placement = random.choice([PLACE_TOP, PLACE_BOTTOM])
 
@@ -591,13 +664,13 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
 
     tht = None
     bht = None
-    if corr_offset == None:
-        corr_offset = random_room_height()
+    if room_height == None:
+        room_height = random_room_height()
 
     if placement == PLACE_TOP:
-        tht = corr_offset
+        tht = room_height
     else:
-        bht = corr_offset
+        bht = room_height
 
     if base is None:
         tlc = (placement == PLACE_TOP)
@@ -640,11 +713,21 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
     new_rooms_L = build_leg(rooms, rooms_wide, width_left=outer, width_right=inner)
     new_rooms_R = build_leg(rooms, rooms_wide, width_left=inner, width_right=outer)
 
-    base = attach_leg(base, new_rooms_L, side=SIDE_LEFT, placement=placement, corr_offset=corr_offset)
-    base = attach_leg(base, new_rooms_R, side=SIDE_RIGHT, placement=placement, corr_offset=corr_offset, x_offset=base.width() - outer - 1)
+    base = attach_leg(base, new_rooms_L, side=SIDE_LEFT, placement=placement, corr_offset=room_height)
+    base = attach_leg(base, new_rooms_R, side=SIDE_RIGHT, placement=placement, corr_offset=room_height, x_offset=base.width() - outer - 1)
     return base
 
 def builder_by_type (type = None):
+    """
+    Creates and returns a manor of a given layout type.
+
+    :``type``: The layout type in a character representation. *Default None*.
+               ``B``: base manor.
+               ``L``: L-shaped layout.
+               ``U``: L-shaped layout.
+               ``H``: L-shaped layout.
+               ``None``: random layout.
+    """
     if type == None:
         return build_random()
     if type == 'B':
@@ -666,20 +749,26 @@ def builder_by_type (type = None):
         return base_builder()
 
 def build_random (base=None):
-	l_list = [L_LAYOUT, Z_LAYOUT, N_LAYOUT, H_LAYOUT, O_LAYOUT, U_LAYOUT]
-	layout = random.choice(l_list)
+    """
+    Creates and returns a manor of a random layout type.
 
-	if layout == L_LAYOUT:
-		return build_L(base)
-	elif layout == Z_LAYOUT:
-		return build_Z(base)
-	elif layout == N_LAYOUT:
-		return build_N(base)
-	elif layout == H_LAYOUT:
-		return build_H(base)
-	elif layout == O_LAYOUT:
-		return build_O(base)
-	elif layout == U_LAYOUT:
-		return build_U(base)
-	else:
-		return base_builder()
+    :``base``: The base shape collection. If None, a new base will be built from
+               base_builder. *Default None*.
+    """
+    l_list = [L_LAYOUT, Z_LAYOUT, N_LAYOUT, H_LAYOUT, O_LAYOUT, U_LAYOUT]
+    layout = random.choice(l_list)
+
+    if layout == L_LAYOUT:
+        return build_L(base)
+    elif layout == Z_LAYOUT:
+        return build_Z(base)
+    elif layout == N_LAYOUT:
+        return build_N(base)
+    elif layout == H_LAYOUT:
+        return build_H(base)
+    elif layout == O_LAYOUT:
+        return build_O(base)
+    elif layout == U_LAYOUT:
+        return build_U(base)
+    else:
+        return base_builder()

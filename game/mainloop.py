@@ -83,8 +83,8 @@ class Game (object):
         force_adj_corr = (sid == self.suspect_list.murderer)
         r = self.base_manor.pick_room_for_suspect(rids, sid, None, force_adj_corr)
 
-        if r == -1:
-            return -1
+        if r == None:
+            return None
 
         self.suspect_list.get_suspect(sid).set_alibi(r, self.base_manor.room_props[r].name)
         return r
@@ -104,7 +104,7 @@ class Game (object):
 
         # First, pick the murder room (stored as victim's "alibi").
         r = self.add_alibi_for_suspect(sl.victim, rids)
-        if r == -1:
+        if r == None:
             print "Found no murder room! Exit early."
             return False
 
@@ -117,7 +117,7 @@ class Game (object):
             rids.remove(adj)
 
         r = self.add_alibi_for_suspect(sl.murderer, rids)
-        if r != -1:
+        if r != None:
             print "Alibi room for murderer: %s (%s, %s)" % (rprops[r].name, r, sl.get_murderer().get_name())
             sl.get_murderer().set_alibi(r, rprops[r].name)
             rids.remove(r)
@@ -145,7 +145,7 @@ class Game (object):
                 if idx2 in sids:
                     sids.remove(idx2)
                     r = m.pick_room_for_suspect(rids, idx1, idx2)
-                    if r == -1:
+                    if r == None:
                         return False
                     print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
                     sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
@@ -155,7 +155,7 @@ class Game (object):
             idx2 = random.choice(sids)
             sids.remove(idx2)
             r = m.pick_room_for_suspect(rids, idx1, idx2)
-            if r != -1:
+            if r != None:
                 print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
                 rids.remove(r)
                 sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
@@ -168,7 +168,7 @@ class Game (object):
         # The remaining suspects don't have a witness.
         for s in sids:
             r = self.add_alibi_for_suspect(s, rids)
-            if r != -1:
+            if r != None:
                 print "%s (%s) for %s" % (rprops[r].name, r, sl.get_suspect(s).get_name())
                 rids.remove(r)
                 sl.get_suspect(s).set_alibi(r, rprops[r].name)

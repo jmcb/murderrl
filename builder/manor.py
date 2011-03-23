@@ -67,7 +67,7 @@ class ManorCollection (builder.BuilderCollection):
         Returns a list of indices of all corridors a coordinate belongs to,
         or None if it's outside the manor.
 
-        :``pos``: A coord. *Required*
+        :``pos``: A coord. *Required*.
         """
         return self.get_corridor_index(pos, False)
 
@@ -85,7 +85,7 @@ class ManorCollection (builder.BuilderCollection):
         it's outside the manor.
         If it's part of the overlap region, the first index is returned.
 
-        :``pos``: A coord. *Required*
+        :``pos``: A coord. *Required*.
         :``single``: If true, returns the first index encountered.
                      Otherwise, a list containing all matching indices. *Default true*.
         """
@@ -315,7 +315,7 @@ class ManorCollection (builder.BuilderCollection):
         """
         Returns the feature for the given position.
 
-        :``pos``: A coordinate within the manor. *Required*
+        :``pos``: A coordinate within the manor. *Required*.
         """
         if pos < DIR_NOWHERE or pos >= self.size():
             print "Invalid coord %s in manor of size %s" % (pos, self.size())
@@ -672,6 +672,13 @@ class ManorCollection (builder.BuilderCollection):
                         door_rooms.append(r)
 
     def init_room_names (self, list = None):
+        """
+        Sets room names for all rooms within the manor.
+
+        :``list``: List of people's names that need a bedroom. *Default None*.
+                   If this list is non-empty and as long as there are enough
+                   available rooms, tries to assign bedrooms, in order.
+        """
         owner_list = []
         if list != None:
             owner_list = list
@@ -787,6 +794,11 @@ class ManorCollection (builder.BuilderCollection):
         self.add_furniture()
 
     def update_adjoining_rooms (self):
+        """
+        For each room or corridor within the manor, traverses the list of
+        adjoining rooms/corridors and adds their names to the list of
+        adjoining room names.
+        """
         for r in self.get_room_corridors():
             rp = self.room_props[r]
             for adjr in rp.adj_rooms:
@@ -795,6 +807,10 @@ class ManorCollection (builder.BuilderCollection):
                 rp.add_adjoining_room_name(name)
 
     def add_furniture (self):
+        """
+        Places furniture within the manor. Specialcases bedrooms and
+        otherwise uses the database definitions.
+        """
         for r in self.rooms:
             rp = self.room_props[r]
             bedcount = len(rp.owners)
@@ -806,6 +822,12 @@ class ManorCollection (builder.BuilderCollection):
                     self.add_room_furniture(r, furniture)
 
     def get_pos_list_within_room(self, r):
+        """
+        Returns a list of floor coordinates within a room that are not
+        directly adjacent to a door or window.
+
+        :``r``: The room id. *Required*.
+        """
         rm    = self.get_room(r)
         start = rm.pos() + 1
         stop  = rm.pos() + rm.size() - 1
@@ -830,7 +852,13 @@ class ManorCollection (builder.BuilderCollection):
 
         return candidates
 
-    def add_bedroom_furniture (self, r, bedcount):
+    def add_bedroom_furniture (self, r, bedcount=1):
+        """
+        Places additional furniture in bedrooms.
+
+        :``r``: The room id. *Required*.
+        :``bedcount``: The number of beds placed. *Default 1*.
+        """
         rp = self.room_props[r]
         # First get a list of eligible positions within the room.
         candidates = self.get_pos_list_within_room(r)
@@ -882,6 +910,12 @@ class ManorCollection (builder.BuilderCollection):
             break
 
     def add_room_furniture (self, r, furniture):
+        """
+        Places furniture within a room.
+
+        :``r``: The room id. *Required*.
+        :``furniture``: A list of strings defining the furniture to be placed. *Required*.
+        """
         furniture_list = []
         for f in furniture:
             how_many = 1
@@ -923,6 +957,13 @@ class ManorCollection (builder.BuilderCollection):
         self.add_furniture_from_list(self.room_props[r], furniture_list, candidates)
 
     def add_table_and_chairs (self, r, table_type):
+        """
+        Places a table and, depending on the table type, possibly chairs
+        within a given room.
+
+        :``r``: The room id. *Required*.
+        :``table_type``: TextFeature representation of the table type. *Required*.
+        """
         rm     = self.get_room(r)
         rp     = self.room_props[r]
         start  = rm.pos() + 2
@@ -980,9 +1021,22 @@ class ManorCollection (builder.BuilderCollection):
             rp.add_furniture_name("some chairs", False)
 
     def stays_in_room (self, pos):
+        """
+        Returns whether the current position lies in the same room as a
+        previously defined room variable.
+        Used to restrict pathfinding within a single room.
+
+        :``pos``: A coordinate within the manor. *Required*.
+        """
         return self.get_room_index(pos) == self.curr_room
 
     def pos_blocks_corridor (self, pos):
+        """
+        Returns whether placing an intraversable feature at a given position
+        would block the path to any currently traversable place in a room.
+
+        :``pos``: A coordinate within the manor. *Required*.
+        """
         # Temporarily mark the position intraversable to check if this
         # would block any paths, but remember the original feature.
         old_feat = self.get_feature(pos)
@@ -1028,12 +1082,19 @@ class ManorCollection (builder.BuilderCollection):
         return (not found)
 
     def add_furniture_from_list (self, rp, furniture, candidates):
+        """
+        Places furniture from a list of features within a given room.
+
+        :``rp``: The RoomProps representation of the current room. *Required*.
+        :``furniture``: A list of TextFeatures representing the furniture to be placed. *Required*.
+        :``candidates``: A list of free coordinates within the room. *Required*.
+        """
         tries = 20
         for feat in furniture:
             if len(candidates) == 0:
                 break
 
-            # print "Trying to place %s in %s" % (feat.name(), rp.name)
+            print "Trying to place %s in %s" % (feat.name(), rp.name)
             while tries > 0:
                 # For restrictions, only a chance of reducing the counter.
                 reduce_tries = True
@@ -1090,8 +1151,17 @@ class ManorCollection (builder.BuilderCollection):
                 break
 
     def get_bedroom_id (self, owner, rids = None, do_chance = True):
+        """
+        Given a person id, returns the their bedroom's room index.
+
+        :``owner``: A person from the suspect list. *Required*.
+        :``rids``: A list of available room indices. If none, all rooms are
+                   considered available. *Default None*.
+        :``do_chance``: If true, there's a 75% chance of returning early
+                   without checking for the bedroom index. *Default True*.
+        """
         if do_chance and not one_chance_in(4):
-            return -1
+            return None
 
         if rids == None:
             rids = self.rooms
@@ -1099,11 +1169,21 @@ class ManorCollection (builder.BuilderCollection):
         for r in rids:
             if owner in rp[r].owners:
                 return r
-        return -1
+
+        return None
 
     def pick_random_public_room (self, rids = None, force_adj_corr = False):
+        """
+        Returns a random non-bedroom room index.
+
+        :``rids``: A list of available room indices. If none, all rooms are
+                   considered available. *Default None*.
+        :``force_adj_corr``: If true, only consider rooms that have an
+                   adjoining corridor. *Default False*.
+        """
         if rids == None:
             rids = self.rooms
+
         rp = self.room_props
         candidates = []
         for r in rids:
@@ -1118,28 +1198,40 @@ class ManorCollection (builder.BuilderCollection):
 
             if len(rp[r].owners) == 0:
                 candidates.append(r)
+
         if len(candidates) == 0:
-            return -1
+            return None
+
         return random.choice(candidates)
 
     def pick_room_for_suspect (self, rids, idx1, idx2 = None, force_adj_corr = False):
+        """
+        Given a suspect id or pair of suspect ids, returns the index of a
+        room for their current location.
+
+        :``rids``: A list of available room indices. *Required*.
+        :``idx1``: An index from the suspect list. *Required*.
+        :``idx2``: Another person's suspect index. *Default None*.
+        :``force_adj_corr``: If true, only consider rooms that have an
+                   adjoining corridor. *Default False*.
+        """
         rp = self.room_props
         r = self.get_bedroom_id(idx1, rids)
-        if r != -1:
+        if r != None:
             return r
 
         if idx2 != None:
             r = self.get_bedroom_id(idx2, rids)
-            if r != -1:
+            if r != None:
                 return r
 
         r = self.pick_random_public_room(rids, force_adj_corr)
-        if r != -1:
+        if r != None:
             return r
 
         # Try for bedrooms again.
         r = self.get_bedroom_id(idx1, rids)
-        if r != -1:
+        if r != None:
             return r
 
         if idx2 != None:
