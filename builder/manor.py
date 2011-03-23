@@ -24,6 +24,7 @@ from interface.features import *
 from library.coord import *
 from library.random_util import *
 from library.feature import *
+from library import pathfind
 
 class ManorCollection (builder.BuilderCollection):
     def __init__ (self, c=[]):
@@ -978,43 +979,53 @@ class ManorCollection (builder.BuilderCollection):
         if add_chairs:
             rp.add_furniture_name("some chairs", False)
 
+    def stays_in_room (self, pos):
+        return self.get_room_index(pos) == self.curr_room
+
     def pos_blocks_corridor (self, pos):
-        north = not self.get_feature(pos + DIR_NORTH).traversable()
-        south = not self.get_feature(pos + DIR_SOUTH).traversable()
-        if north:
-            if south:
-                return True
+        # Temporarily mark the position intraversable to check if this
+        # would block any paths, but remember the original feature.
+        old_feat = self.get_feature(pos)
+        self.features.__setitem__(pos, NOTHING)
 
-            se = not self.get_feature(pos + DIR_SOUTH + DIR_EAST).traversable()
-            sw = not self.get_feature(pos + DIR_SOUTH + DIR_WEST).traversable()
-            if se or sw:
-                return True
-        elif south:
-            ne = not self.get_feature(pos + DIR_NORTH + DIR_EAST).traversable()
-            nw = not self.get_feature(pos + DIR_NORTH + DIR_WEST).traversable()
-            if ne or nw:
-                return True
+        # Store the current room in a helper variable.
+        self.curr_room = self.get_room_index(pos)
 
-        east = not self.get_feature(pos + DIR_EAST).traversable()
-        west = not self.get_feature(pos + DIR_WEST).traversable()
-        if east:
-            if west:
-                return True
+        found = True
+        north = pos + DIR_NORTH
+        south = pos + DIR_SOUTH
+        east  = pos + DIR_EAST
+        west  = pos + DIR_WEST
+        north_trav = self.get_feature(north).traversable()
+        south_trav = self.get_feature(south).traversable()
+        if north_trav and south_trav:
+            found = pathfind.Pathfind(self.features, north, south, None, self.stays_in_room).path_exists()
+            if not found:
+                print "pos (%s) blocks N/S path" % pos
+        if found:
+            east_trav = self.get_feature(east).traversable()
+            west_trav = self.get_feature(west).traversable()
+            if east_trav and west_trav:
+                found = pathfind.Pathfind(self.features, east, west, None, self.stays_in_room).path_exists()
+                if not found:
+                    print "pos (%s) blocks E/W path" % pos
+            if found and north_trav != south_trav and east_trav != west_trav:
+                if north_trav:
+                    if east_trav:
+                        found = pathfind.Pathfind(self.features, north, east, None, self.stays_in_room).path_exists()
+                    else:
+                        found = pathfind.Pathfind(self.features, north, west, None, self.stays_in_room).path_exists()
+                else:
+                    if east_trav:
+                        found = pathfind.Pathfind(self.features, south, east, None, self.stays_in_room).path_exists()
+                    else:
+                        found = pathfind.Pathfind(self.features, south, west, None, self.stays_in_room).path_exists()
+                if not found:
+                    print "pos (%s) blocks diagonal path" % pos
 
-            nw = not self.get_feature(pos + DIR_WEST + DIR_NORTH).traversable()
-            sw = not self.get_feature(pos + DIR_WEST + DIR_SOUTH).traversable()
-            if nw or sw:
-                return True
-        elif west:
-            if east:
-                return True
-
-            ne = not self.get_feature(pos + DIR_EAST + DIR_NORTH).traversable()
-            se = not self.get_feature(pos + DIR_EAST + DIR_SOUTH).traversable()
-            if ne or se:
-                return True
-
-        return False
+        # Reset to original feature.
+        self.features.__setitem__(pos, old_feat)
+        return (not found)
 
     def add_furniture_from_list (self, rp, furniture, candidates):
         tries = 20
@@ -1022,6 +1033,7 @@ class ManorCollection (builder.BuilderCollection):
             if len(candidates) == 0:
                 break
 
+            # print "Trying to place %s in %s" % (feat.name(), rp.name)
             while tries > 0:
                 # For restrictions, only a chance of reducing the counter.
                 reduce_tries = True

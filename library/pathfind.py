@@ -69,7 +69,7 @@ class Pathfind (object):
     """
     An object to handle pathfinding calculations.
     """
-    def __init__ (self, grid, start, target=None, target_condition=None):
+    def __init__ (self, grid, start, target=None, target_condition=None, pos_condition=None):
         """
         Create a new Pathfind object.
 
@@ -80,15 +80,19 @@ class Pathfind (object):
                    alternative condition for finding a valid targt. *Default None*.
                    At least one of ``target`` and ``target_condition`` needs
                    to be valid.
+        :``pos_condition``: A method taking a Coord parameter. Used to limit
+                   coordinates considered for the path beyond the basic
+                   traversability checks. *Default None*.
         """
         assert(start < grid.size() and target < grid.size())
         assert(target != None or target_condition != None)
-        self.fgrid     = grid
-        self.start     = start
-        self.target    = target
-        self.target_condition = target_condition
-        self.dgrid     = DistanceGrid(self.fgrid.size(), INFINITY)
-        self.pgrid     = PrevGrid(self.fgrid.size())
+        self.fgrid  = grid
+        self.start  = start
+        self.target = target
+        self.dgrid  = DistanceGrid(self.fgrid.size(), INFINITY)
+        self.pgrid  = PrevGrid(self.fgrid.size())
+        self.target_condition    = target_condition
+        self.check_pos_condition = pos_condition
 
     def path_exists (self):
         """
@@ -153,6 +157,9 @@ class Pathfind (object):
         for pos in coord.AdjacencyIterator(curr, include_diagonals):
             if not self.fgrid.__getitem__(pos).traversable():
                 continue
+            if self.check_pos_condition and not self.check_pos_condition(pos):
+                continue
+
             new_dist = self.dgrid.__getvalue__(curr) + 1
             if pos in self.nlist:
                 if self.dgrid.__getvalue__(pos) > new_dist:
