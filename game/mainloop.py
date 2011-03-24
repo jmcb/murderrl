@@ -69,7 +69,7 @@ class Game (object):
         self.add_suspects()
 
         self.add_alibis()
-
+        self.suspect_list.add_hair_colours()
         self.add_victim_body()
 
         # Combine the room shapes into a canvas.
@@ -540,6 +540,26 @@ class Game (object):
         m.do_menu()
         # self.update_screen()
 
+    def cmd_display_suspect_list (self):
+        """
+        Display the suspects in a menu. Choosing one of them displays a
+        description.
+        """
+        m  = menu.Menu("List of suspects")
+        sl = self.suspect_list
+        e  = menu.Entry('x', "Victim: " + sl.get_victim().get_name(), sl.get_suspect_description, sl.victim, sl.get_victim().first[0].lower())
+        m.add_entry(e)
+
+        # Sort the list by name.
+        list = range(0, sl.no_of_suspects())
+        list.sort(cmp=lambda a, b: cmp(sl.get_suspect(a).first, sl.get_suspect(b).first))
+        for i in list:
+            if not sl.is_victim(i):
+                p = sl.get_suspect(i)
+                e = menu.Entry(p.first[0].lower(), p, sl.get_suspect_description, i)
+                m.add_entry(e)
+        m.do_menu()
+
     def init_command_list (self):
         """
         Initialise the list of commands.
@@ -548,6 +568,7 @@ class Game (object):
         self.commands.append(Command("r", self.cmd_start_running, "start running in that direction\n", " followed by a direction"))
         self.commands.append(Command("d", self.cmd_describe_room, "describe current room"))
         self.commands.append(Command("h", self.cmd_display_command_help, "display this screen"))
+        self.commands.append(Command("s", self.cmd_display_suspect_list, "display the list of suspects"))
         self.commands.append(Command("t", self.cmd_travel_menu, "travel to another room"))
         self.commands.append(Command("x", self.cmd_describe_feature, "examine current feature"))
         self.commands.append(Command("D", self.cmd_toggle_debug_mode, "toggle between normal and debug mode"))
