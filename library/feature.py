@@ -11,7 +11,7 @@ class Feature (object):
     _description = None
     _traversable = False
 
-    def __init__ (self, name, description, traversable=False, needs_wall=False):
+    def __init__ (self, name, description=None, traversable=False, needs_wall=False, is_container=False):
         """
         Create a new feature. 
 
@@ -21,12 +21,15 @@ class Feature (object):
                    upon examination.
         :``traversable``: If True, this glyph is traversable. *Default False*.
         :``needs_wall``: If True, may only be placed adjacent to a wall. *Default False*.
+        :``is_container``: If True, searching may provide a clue. *Default False*.
         """
         self._name = name
-        self._description = description
-        self._traversable = traversable
-        self._needs_wall  = needs_wall
-        self._has_article = False
+        if description == None:
+            description = "A %s." % name
+        self._description  = description
+        self._traversable  = traversable
+        self._needs_wall   = needs_wall
+        self._is_container = is_container
 
     def traversable (self):
         return self._traversable
@@ -44,6 +47,9 @@ class Feature (object):
     def needs_wall (self):
         return self._needs_wall
 
+    def is_container (self):
+        return self._is_container
+
 class TextFeature (Feature):
     """
     A representation of an agnostic ``Feature`` as text. This includes a
@@ -51,7 +57,7 @@ class TextFeature (Feature):
     """
     _glyph = None
     _colour = None
-    def __init__ (self, glyph=None, colour=None, name="", description="", traversable=False, needs_wall=False):
+    def __init__ (self, glyph=None, colour=None, name="", description="", traversable=False, needs_wall=False, is_container=False):
         """
         Create a new TextFeature.
 
@@ -63,16 +69,37 @@ class TextFeature (Feature):
         :``traversable``: Whether or not this glyph can be traversed by the
                           player or non-player characters. *Default False*.
         :``needs_wall``: If True, may only be placed adjacent to a wall. *Default False*.
+        :``is_container``: If True, searching may provide a clue. *Default False*.
         """
-        self._glyph = glyph
+        self._glyph  = glyph
         self._colour = colour
-        Feature.__init__(self, name=name, description=description, traversable=traversable, needs_wall=needs_wall)
+        self._has_article = False
+        Feature.__init__(self, name=name, description=description, traversable=traversable, needs_wall=needs_wall, is_container=False)
 
     def glyph (self):
         return self._glyph
 
     def colour (self):
         return self._colour
+
+    def derived_feature (self, name=None, desc=None, glyph=None, colour=None, traversable=None, needs_wall=None, is_container=None):
+        if name == None:
+            name = self.name()
+        if desc == None:
+            desc = "A %s." % name
+        if glyph == None:
+            glyph = self.glyph()
+        if colour == None:
+            colour = self.colour()
+        if traversable == None:
+            traversable = self.traversable()
+        if needs_wall == None:
+            needs_wall = self.needs_wall()
+        if is_container == None:
+            is_container = self.is_container()
+
+        new_feat = TextFeature(glyph, colour, name, desc, traversable, needs_wall, is_container)
+        return new_feat
 
 NOTHING = TextFeature(" ", None, "nothingness", "Empty space.", False)
 
