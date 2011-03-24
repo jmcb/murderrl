@@ -177,6 +177,28 @@ class Game (object):
             else:
                 print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
 
+    def describe_body (self, p):
+        if coinflip():
+            name = p.get_name()
+            if one_chance_in(4):
+                return "%s has been viciously stabbed." % name
+            elif one_chance_in(3):
+                return "%s's throat has been sliced cleanly." % name
+            elif coinflip():
+                return "%s has been strangled." % name
+            else:
+                return "%s's head has been bashed into a bloody pulp." % name
+        else:
+            pronoun = "he"
+            if p.gender == 'f':
+                pronoun = "she"
+            if one_chance_in(3):
+                return "Unseeing eyes wide open, %s is staring at you accusingly." % pronoun
+            elif coinflip():
+                return "Despite the gaping chest wound, %s looks surprisingly peaceful." % pronoun
+            else:
+                return "If it weren't for all the blood, you might think %s was sleeping." % pronoun
+
     def add_victim_body (self):
         sl = self.suspect_list
         murder_room = sl.get_victim().alibi.rid
@@ -191,7 +213,8 @@ class Game (object):
 
         victim_name = sl.get_victim().get_name()
         name = "the mangled body of %s" % victim_name
-        description = name[0].upper() + name[1:] + "."
+        description = self.describe_body(sl.get_victim())
+        description = description[0].upper() + description[1:]
         feat = BODY.derived_feature(name, description, has_article=True)
 
         body_pos = random.choice(candidates)
