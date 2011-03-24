@@ -190,9 +190,10 @@ class Game (object):
         assert(len(candidates) > 0)
 
         victim_name = sl.get_victim().get_name()
-        feat = BODY
-        feat._name = "the mangled body of %s" % victim_name
-        feat._has_article = True
+        name = "the mangled body of %s" % victim_name
+        description = name[0].upper() + name[1:] + "."
+        feat = BODY.derived_feature(name, description, has_article=True)
+
         body_pos = random.choice(candidates)
         self.base_manor.features.__setitem__(body_pos, feat)
         rp = self.base_manor.room_props[murder_room]
@@ -390,7 +391,7 @@ class Game (object):
                 if feature_is_door(feat):
                     self.print_message("You see here a door.")
                 elif not feature_is_floor(feat):
-                    self.print_message("You see here %s." % feat.name())
+                    self.print_message("You see here %s." % feat.name(True))
 
         if self.debugging:
             # Debugging information.
@@ -421,6 +422,19 @@ class Game (object):
 
         room = self.get_current_room(pos)
         room.describe()
+
+    def cmd_describe_feature (self, pos = None):
+        """
+        Describes the room a given position belongs to.
+
+        :``pos``: A coordinate in the manor. If none, the player position is used. 
+                  *Default None*.
+        """
+        if pos == None:
+            pos = self.player_pos
+
+        feat = self.base_manor.get_feature(pos)
+        self.message = feat.description()
 
     def pos_in_room (self, pos):
         """
@@ -485,6 +499,7 @@ class Game (object):
         help += "d: describe current room\n"
         help += "h: display this screen\n"
         help += "t: travel to another room\n"
+        help += "x: examine current feature\n"
         help += "D: toggle between normal and debug mode\n\n"
         help += "Any other key exits the program."
         return help
@@ -589,6 +604,8 @@ class Game (object):
                     self.cmd_start_running()
                 elif chr(ch) == 't':
                     self.cmd_travel_menu()
+                elif chr(ch) == 'x':
+                    self.cmd_describe_feature()
                 elif chr(ch) == 'D':
                     # Toggle debugging mode on and off.
                     self.debugging  = not self.debugging

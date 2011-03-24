@@ -36,9 +36,7 @@ class Feature (object):
 
     passable = property(lambda self: self.traversable)
 
-    def name (self, needs_article=False):
-        if needs_article and not self._has_article:
-            return "a %s" % self._name
+    def name (self):
         return self._name
 
     def description (self):
@@ -57,7 +55,7 @@ class TextFeature (Feature):
     """
     _glyph = None
     _colour = None
-    def __init__ (self, glyph=None, colour=None, name="", description="", traversable=False, needs_wall=False, is_container=False):
+    def __init__ (self, glyph=None, colour=None, name="", description=None, traversable=False, needs_wall=False, is_container=False, has_article=False):
         """
         Create a new TextFeature.
 
@@ -68,12 +66,13 @@ class TextFeature (Feature):
         :``description``: The description of this feature. *Default empty*.
         :``traversable``: Whether or not this glyph can be traversed by the
                           player or non-player characters. *Default False*.
-        :``needs_wall``: If True, may only be placed adjacent to a wall. *Default False*.
-        :``is_container``: If True, searching may provide a clue. *Default False*.
+        :``needs_wall``: If true, may only be placed adjacent to a wall. *Default False*.
+        :``is_container``: If true, searching may provide a clue. *Default False*.
+        :``has_article``: If false, add an article to the name. *Default False*.
         """
         self._glyph  = glyph
         self._colour = colour
-        self._has_article = False
+        self._has_article = has_article
         Feature.__init__(self, name=name, description=description, traversable=traversable, needs_wall=needs_wall, is_container=False)
 
     def glyph (self):
@@ -82,7 +81,12 @@ class TextFeature (Feature):
     def colour (self):
         return self._colour
 
-    def derived_feature (self, name=None, desc=None, glyph=None, colour=None, traversable=None, needs_wall=None, is_container=None):
+    def name (self, needs_article=False):
+        if needs_article and not self._has_article:
+            return "a %s" % self._name
+        return self._name
+
+    def derived_feature (self, name=None, desc=None, glyph=None, colour=None, traversable=None, needs_wall=None, is_container=None, has_article=None):
         if name == None:
             name = self.name()
         if desc == None:
@@ -97,9 +101,10 @@ class TextFeature (Feature):
             needs_wall = self.needs_wall()
         if is_container == None:
             is_container = self.is_container()
+        if has_article == None:
+            has_article = self._has_article
 
-        new_feat = TextFeature(glyph, colour, name, desc, traversable, needs_wall, is_container)
-        return new_feat
+        return TextFeature(glyph, colour, name, desc, traversable, needs_wall, is_container, has_article)
 
 NOTHING = TextFeature(" ", None, "nothingness", "Empty space.", False)
 
