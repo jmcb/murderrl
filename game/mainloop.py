@@ -15,6 +15,33 @@ from interface.features import *
 from interface.output import *
 from suspects import person, randname
 
+class Command (object):
+    """
+    The representation of a command.
+    """
+    def __init__ (self, key, action, description, key_suffix=""):
+        """
+        Initialise a new command.
+
+        :``key``: The character to trigger the command. *Required*.
+        :``action``: The command method that is executed when the key is pressed. *Required*.
+        :``description``: The command's description in the command help. *Required*.
+        :``key_suffix``: A description that's suffixed to the key in the command help. *Default none*.
+        """
+        self.key         = key
+        self.action      = action
+        self.description = description
+        self.key_suffix  = key_suffix
+
+    def describe_command (self):
+        """
+        Returns the command's description, including the key.
+        """
+        return "%s%s: %s\n" % (self.key, self.key_suffix, self.description)
+
+    def execute_command (self):
+        self.action()
+
 screen = console.select()
 
 # The message line.
@@ -246,6 +273,7 @@ class Game (object):
         ehall = self.base_manor.get_room(self.base_manor.entrance_hall)
         self.player_pos = coord.Coord(ehall.pos().x + ehall.size().x/2, ehall.pos().y + ehall.size().y/2)
 
+        self.init_command_list()
         self.game_start  = True    # Game just started.
         self.debugging   = False   # debugging mode
         self.message     = None    # A message displayed for one turn.
@@ -512,20 +540,34 @@ class Game (object):
         m.do_menu()
         # self.update_screen()
 
-    def get_command_help (self):
+    def init_command_list (self):
+        """
+        Initialise the list of commands.
+        """
+        self.commands = []
+        self.commands.append(Command("r", self.cmd_start_running, "start running in that direction\n", " followed by a direction"))
+        self.commands.append(Command("d", self.cmd_describe_room, "describe current room"))
+        self.commands.append(Command("h", self.cmd_display_command_help, "display this screen"))
+        self.commands.append(Command("t", self.cmd_travel_menu, "travel to another room"))
+        self.commands.append(Command("x", self.cmd_describe_feature, "examine current feature"))
+        self.commands.append(Command("D", self.cmd_toggle_debug_mode, "toggle between normal and debug mode"))
+
+    def cmd_display_command_help (self):
         """
         Returns a string of command keys and their explanation.
         """
         help  = "Command help\n\n"
         help += "Use the arrow keys for movement.\n\n"
-        help += "r followed by a direction: start running in that direction\n\n"
-        help += "d: describe current room\n"
-        help += "h: display this screen\n"
-        help += "t: travel to another room\n"
-        help += "x: examine current feature\n"
-        help += "D: toggle between normal and debug mode\n\n"
-        help += "Any other key exits the program."
-        return help
+        for cmd in self.commands:
+            help += cmd.describe_command()
+        help += "\nAny other key exits the program."
+
+        print_screen(help)
+
+    def cmd_toggle_debug_mode (self):
+        # Toggle debugging mode on and off.
+        self.debugging  = not self.debugging
+        self.did_switch = True
 
     def handle_movement_keys (self, ch):
         """
@@ -618,22 +660,15 @@ class Game (object):
 
             if ch > 0 and ch <= 256:
                 self.did_move = False
-                if chr(ch) == 'd':
-                    self.cmd_describe_room()
-                elif chr(ch) == 'h':
-                    # Print command help.
-                    print_screen(self.get_command_help())
-                elif chr(ch) == 'r':
-                    self.cmd_start_running()
-                elif chr(ch) == 't':
-                    self.cmd_travel_menu()
-                elif chr(ch) == 'x':
-                    self.cmd_describe_feature()
-                elif chr(ch) == 'D':
-                    # Toggle debugging mode on and off.
-                    self.debugging  = not self.debugging
-                    self.did_switch = True
-                else: # exit the game
+                found_key = False
+                # Try for a command with a matching key.
+                for cmd in self.commands:
+                    if chr(ch) == cmd.key:
+                        found_key = True
+                        cmd.execute_command()
+
+                if not found_key:
+                    # exit the game
                     return False
             else:
                 # Move the player (@) via the arrow keys.
