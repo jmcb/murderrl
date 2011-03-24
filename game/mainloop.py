@@ -280,6 +280,7 @@ class Game (object):
         self.dir_running = DIR_NOWHERE # Direction we are running (if any).
         self.travel_path = []
         self.init_command_parameters()
+        self.quit_game   = False
 
     def init_command_parameters (self):
         """
@@ -560,12 +561,44 @@ class Game (object):
                 m.add_entry(e)
         m.do_menu()
 
+    def cmd_accuse_murderer (self):
+        """
+        Display a list of suspects in a menu to accuse one of them as the murderer.
+        """
+        m = menu.Menu("Accuse whom?", False)
+        sl = self.suspect_list
+        # Sort the list by name.
+        list = range(0, sl.no_of_suspects())
+        list.sort(cmp=lambda a, b: cmp(sl.get_suspect(a).first, sl.get_suspect(b).first))
+        for i in list:
+            if not sl.is_victim(i):
+                p = sl.get_suspect(i)
+                e = menu.Entry(p.first[0].lower(), p, self.accuse_suspect, i)
+                m.add_entry(e)
+        m.do_menu()
+
+    def accuse_suspect (self, sidx):
+        """
+        Check whether a given suspect index matches that of a murderer and
+        ends the game.
+
+        :``sidx``: Suspect index. *Required*.
+        """
+        if sidx == self.suspect_list.murderer:
+            self.message = "Congratulations! You've found the murderer!"
+        else:
+            self.message = "Sorry, you picked the wrong person."
+        self.update_screen()
+        screen.get(block=True)
+        self.quit_game = True
+
     def init_command_list (self):
         """
         Initialise the list of commands.
         """
         self.commands = []
         self.commands.append(Command("r", self.cmd_start_running, "start running in that direction\n", " followed by a direction"))
+        self.commands.append(Command("a", self.cmd_accuse_murderer, "accuse a suspect of being the murderer and end the game"))
         self.commands.append(Command("d", self.cmd_describe_room, "describe current room"))
         self.commands.append(Command("h", self.cmd_display_command_help, "display this screen"))
         self.commands.append(Command("s", self.cmd_display_suspect_list, "display the list of suspects"))
@@ -717,4 +750,7 @@ class Game (object):
             self.init_command_parameters()
 
             if not self.handle_commands():
+                return
+
+            if self.quit_game:
                 return
