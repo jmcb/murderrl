@@ -1,5 +1,5 @@
-%
 # Common names. (TODO: Increase weights.)
+%
 Albert
 %
 Andrew
@@ -29,6 +29,7 @@ Thomas
 William
 %
 # Rare names.
+%
 Aaron
 %
 Abel
@@ -118,6 +119,8 @@ Hugo
 Jack
 %
 Jeremy
+%
+Jonathan
 %
 Joseph
 %

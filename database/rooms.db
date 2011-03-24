@@ -1,3 +1,4 @@
+# Domestic rooms.
 %
 name=ball room
 min_size=70
@@ -76,6 +77,8 @@ features=fireplace,chair+
 name=study
 weight=50
 features=desk,fireplace?,bookshelf
+%
+# Utility rooms.
 %
 name=attic
 section=utility
