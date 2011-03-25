@@ -51,6 +51,31 @@ class Room (object):
     def __repr__ (self):
         return "<Room width=%s,height=%s,name=%s,start=%s,stop=%s>" % (self.width,self.height,self.name,self.start,self.stop)
 
+class RoomWallIterator (object):
+    def __init__ (self, start_point, size):
+        """
+        Iterator over the borders of a room.
+
+        :``start_point``: The room's top left corner. *Required*.
+        :``size``: The size of the room. *Required*.
+        """
+        self.start = start_point
+        self.stop  = start_point + size - 1
+        assert self.stop >= self.start
+
+    def __iter__ (self):
+        for pos in RectangleIterator(self.start, Coord(self.stop.x, self.start.y) + 1):
+            yield pos
+        for pos in RectangleIterator(Coord(self.start.x, self.stop.y), self.stop + 1):
+            yield pos
+        for pos in RectangleIterator(self.start, Coord(self.start.x, self.stop.y) + 1):
+            yield pos
+        for pos in RectangleIterator(Coord(self.stop.x, self.start.y), self.stop + 1):
+            yield pos
+
+    def __repr__ (self):
+        return "<RoomWallIterator: %s to %s>" % (self.start, self.stop)
+
 class DB_Room (object):
     """
     A database representation of a room, used to compare actual room layout

@@ -18,6 +18,7 @@ WALL = TextFeature("#", Colours.LIGHTGRAY, "wall", traversable=False)
 CLOSED_DOOR = TextFeature("+", Colours.LIGHTGRAY, "closed door", traversable=True)
 OPEN_DOOR   = CLOSED_DOOR.derived_feature("open door", "An open door.", glyph="'")
 LOCKED_DOOR = CLOSED_DOOR.derived_feature("locked door", traversable=False)
+PORTAL      = CLOSED_DOOR.derived_feature("entrance door", colour=Colours.BROWN, traversable=False)
 
 # Windows
 WINDOW_V = TextFeature("|", Colours.LIGHTCYAN, "window", traversable=False)

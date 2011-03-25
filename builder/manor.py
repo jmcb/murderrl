@@ -696,6 +696,37 @@ class ManorCollection (builder.BuilderCollection):
             if arp.fill_from_database(utility):
                 self.assign_adjacent_rooms(adj)
 
+    def add_entrance_portal (self):
+        """
+        In the entrance hall, replace one set of windows with entrance doors.
+        """
+        rm = self.get_room(self.entrance_hall)
+
+        candidates = []
+        found_window = False
+        for pos in room.RoomWallIterator(rm.pos(), rm.size()):
+            if feature_is_window(self.get_feature(pos)):
+                if not found_window:
+                    candidates.append(pos)
+                    found_window = True
+            else:
+                found_window = False
+
+        if len(candidates) == 0:
+            return
+
+        door_pos = random.choice(candidates)
+        stop     = rm.pos() + rm.size() - 1
+        if self.get_feature(door_pos) == WINDOW_V:
+            corner = coord.Coord(door_pos.x, stop.y)
+        else:
+            corner = coord.Coord(stop.x, door_pos.y)
+        for pos in coord.RectangleIterator(door_pos, corner + 1):
+            if feature_is_window(self.get_feature(pos)):
+                self.features.__setitem__(pos, PORTAL)
+            else:
+                break
+
     def init_room_names (self, list = None):
         """
         Sets room names for all rooms within the manor.
@@ -770,6 +801,7 @@ class ManorCollection (builder.BuilderCollection):
             self.entrance_hall = 0
         else:
             self.entrance_hall = random.choice(e_hall_candidates)
+            self.add_entrance_portal()
         rp = self.room_props[self.entrance_hall]
         rp.name = "entrance hall"
         rp.has_data = True
