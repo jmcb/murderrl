@@ -337,9 +337,10 @@ class Game (object):
         self.message      = None    # A message displayed for one turn.
         self.dir_running  = DIR_NOWHERE # Direction we are running (if any).
         self.travel_path  = []
-        self.init_command_parameters()
         self.quit_game    = False
         self.wait_for_key = True # If false, handle NPC movement without waiting for player key.
+        self.turns        = 0
+        self.init_command_parameters()
 
     def init_command_parameters (self):
         """
@@ -359,6 +360,18 @@ class Game (object):
         """
         return "Welcome to %s! To view the list of commands, press 'h'." % randname.get_random_manor_name(self.manor_name)
 
+    def get_time (self):
+        """
+        Translates the turn counter into a time statement and returns.
+        """
+        hours   = 8 + self.turns / 60
+        if hours < 10:
+            hours = "0%s" % hours
+        minutes = self.turns % 60
+        if minutes < 10:
+            minutes = "0%s" % minutes
+        return "%s:%s" % (hours, minutes)
+
     def draw_header (self):
         """
         Writes some header information above the map.
@@ -366,6 +379,7 @@ class Game (object):
         curr = self.get_current_room()
         name = curr.room_name(True)
         print_line("%s%s." % (name[0].upper(), name[1:]))
+        print_line("T: %s" % self.get_time(), coord.Coord(MAX_COLUMNS-10, 0))
 
     def draw_feature_grid (self):
         """
@@ -641,6 +655,7 @@ class Game (object):
             return
         idx = candidates[0]
         self.message = "%s says, %s" % (sl.get_suspect(idx).get_name(), sl.get_alibi_statement(idx))
+        self.turns   += 1
 
     def cmd_display_suspect_list (self):
         """
@@ -798,6 +813,7 @@ class Game (object):
                 self.travel_path      = []
         else:
             self.did_move = True
+            self.turns   += 1
 
     def handle_commands (self):
         """
