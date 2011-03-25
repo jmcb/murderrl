@@ -230,6 +230,7 @@ class ManorCollection (builder.BuilderCollection):
         self.init_features()
         # Add doors along corridors.
         self.add_doors()
+        self.maybe_remove_bonus_doors()
         # Add windows.
         self.add_windows()
         # Add doors to rooms still missing them.
@@ -437,6 +438,43 @@ class ManorCollection (builder.BuilderCollection):
             else: # horizontal corridor
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x, pos.y + h), DIR_WEST)
                 self.add_doors_along_corridor(coord.Coord(pos.x, pos.y), coord.Coord(pos.x + w, pos.y + h), DIR_EAST)
+
+    def maybe_remove_bonus_doors (self):
+        """
+        For some rooms with exits to more than one corridor, possibly remove
+        one of these exits.
+        """
+        for r in self.rooms:
+            if coinflip():
+                continue
+            rp = self.room_props[r]
+            corrs = []
+            for c in rp.adj_rooms:
+                if c in self.corridors:
+                    corrs.append(c)
+            if len(corrs) < 2:
+                continue
+
+            # Randomly pick a door adjacent to one of the corridors.
+            rm    = self.get_room(r)
+            doors = []
+            for pos in room.RoomWallIterator(rm.pos(), rm.size()):
+                if feature_is_door(self.get_feature(pos)):
+                    doors.append(pos)
+            door_pos = random.choice(doors)
+            dirs = [DIR_NORTH, DIR_SOUTH, DIR_EAST, DIR_WEST]
+            corr = None
+            for d in dirs:
+                corr = self.get_corridor_index(door_pos + d)
+                if corr != None:
+                    break
+            if corr == None:
+                continue
+            print "Change door pos (%s) to a wall" % door_pos
+            self.features.__setitem__(door_pos, WALL)
+            # Update the adjoining rooms of both room and corridor.
+            rp.adj_rooms.remove(corr)
+            self.room_props[corr].adj_rooms.remove(r)
 
     def pick_door_along_wall (self, start, stop, offset):
         """
