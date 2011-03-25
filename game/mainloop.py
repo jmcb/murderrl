@@ -49,6 +49,8 @@ screen = console.select()
 MSG_LINE  = 22
 MSG_START = coord.Coord(0, MSG_LINE)
 
+NUM_SUSPECTS = 10
+
 class Game (object):
     """
     The module to handle the main game loop.
@@ -61,7 +63,7 @@ class Game (object):
                    *Default random*.
         """
         # First, build the manor.
-        self.base_manor = manor.ManorCollection(builder.builder_by_type(type))
+        self.base_manor = manor.ManorCollection(builder.builder_by_type(type, min_rooms=NUM_SUSPECTS + 2))
 
         # Add doors and windows, etc.
         self.base_manor.add_features()
@@ -94,7 +96,7 @@ class Game (object):
         """
         Initialise the suspect list, generate bedrooms.
         """
-        self.suspect_list = person.SuspectList(10)
+        self.suspect_list = person.SuspectList(NUM_SUSPECTS)
 
         sl = self.suspect_list
         self.manor_name = sl.get_suspect(0).last
@@ -216,7 +218,11 @@ class Game (object):
                 continue
 
             s     = sl.get_suspect(i)
-            rid   = s.alibi.rid
+            alibi = s.alibi
+            if alibi == None:
+                rid = random.choice(self.base_manor.rooms)
+            else:
+                rid = s.alibi.rid
             room  = self.base_manor.get_room(rid)
             start = room.pos() + 1
             stop  = room.pos() + room.size() - 2

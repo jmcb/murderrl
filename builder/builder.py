@@ -185,11 +185,12 @@ def random_room_height ():
         height -= 1
     return height
 
-def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=None, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False,top_height=None, bottom_height=None):
+def base_builder (min_rooms=0, top_left=None, top_right=None, bottom_left=None, bottom_right=None, tl_corr=False, tr_corr=False, bl_corr=False, br_corr=False,top_height=None, bottom_height=None):
     """
     Attempts to build a basic rectangular manor. It returns ShapeCollection 
     and a list of Room objects.
 
+    :``min_rooms``: The minimum number of rooms. *Default None*.
     :``top_left``: The width of the top left room. Random, if none. *Default None*.
     :``top_right``: The width of the top right room. Random, if none. *Default None*.
     :``bottom_left``: The width of the bottom left room. Random, if none. *Default None*.
@@ -307,6 +308,10 @@ def base_builder (top_left=None, top_right=None, bottom_left=None, bottom_right=
     last = room.Room(width=bottom_right, height=height2)
     row2.append(last)
     print "\nrow1: %s rooms, row2: %s rooms, manor width: %s" % (len(row1), len(row2), manor_width)
+
+    # Try to get the minimum number of rooms.
+    if len(row1) + len(row2) < min_rooms:
+        return base_builder(min_rooms - 1)
 
     # Now, start drawing it! YAY!
 
@@ -513,7 +518,7 @@ def build_leg (rooms_tall=2, rooms_wide=2, width_left=12, width_right=12, make_c
 
     return leg_rooms
 
-def build_L (base=None, rooms=2, rooms_wide=2):
+def build_L (base=None, min_rooms=0, rooms=2, rooms_wide=2):
     """
     Modifies the results of base_builder() to result in an L shape in any
     orientation.
@@ -568,7 +573,7 @@ def build_L (base=None, rooms=2, rooms_wide=2):
         bht = corr_offset
 
     if base is None:
-        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc,top_height=tht, bottom_height=bht)
+        base = base_builder(min_rooms=min_rooms-4, top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc, top_height=tht, bottom_height=bht)
 
     # Draw the new rooms.
     new_rooms = build_leg(rooms, rooms_wide, width_left=left, width_right=right)
@@ -579,7 +584,7 @@ def build_L (base=None, rooms=2, rooms_wide=2):
     base = attach_leg(base, new_rooms, side=side, placement=placement, corr_offset=corr_offset, x_offset=offset)
     return base
 
-def build_Z (base=None):
+def build_Z (base=None, min_rooms=0):
     """
     Modifies the results of base_builder() to result in an L shape in any
     orientation. Not implemented.
@@ -589,10 +594,10 @@ def build_Z (base=None):
                base_builder. *Default None*.
     """
     if base is None:
-        base = base_builder()
+        base = base_builder(min_rooms=min_rooms)
     return base
 
-def build_N (base=None):
+def build_N (base=None, min_rooms=0):
     """
     Modifies the results of base_builder() to result in an L shape in any
     orientation. Not implemented.
@@ -602,10 +607,10 @@ def build_N (base=None):
                base_builder. *Default None*.
     """
     if base is None:
-        base = base_builder()
+        base = base_builder(min_rooms=min_rooms)
     return base
 
-def build_O (base=None):
+def build_O (base=None, min_rooms=0):
     """
     Modifies the results of base_builder() to result in an L shape in any
     orientation. Not implemented.
@@ -615,10 +620,10 @@ def build_O (base=None):
                base_builder. *Default None*.
     """
     if base is None:
-        base = base_builder()
+        base = base_builder(min_rooms=min_rooms)
     return base
 
-def build_H (base=None):
+def build_H (base=None, min_rooms=0):
     """
     Modifies the results of base_builder() to result in an H-shaped layout.
 
@@ -632,15 +637,15 @@ def build_H (base=None):
     bht = random_room_height()
 
     if base is None:
-        base = base_builder(top_left=outer, top_right=outer, bottom_left=outer, bottom_right=outer, 
+        base = base_builder(min_rooms=min_rooms-16, top_left=outer, top_right=outer, bottom_left=outer, bottom_right=outer, 
         tl_corr=True, tr_corr=True, bl_corr=True, br_corr=True, top_height=tht, bottom_height=bht)
 
-    base = build_U(base, placement=PLACE_TOP, outer=outer, inner=inner, room_height=tht)
-    base = build_U(base, placement=PLACE_BOTTOM, outer=outer, inner=inner, room_height=bht)
+    base = build_U(base, min_rooms=min_rooms, placement=PLACE_TOP, outer=outer, inner=inner, room_height=tht)
+    base = build_U(base, min_rooms=min_rooms, placement=PLACE_BOTTOM, outer=outer, inner=inner, room_height=bht)
 
     return base
 
-def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None, room_height=None):
+def build_U (base=None, min_rooms=0, rooms=2, rooms_wide=2, placement=None, outer=None, inner=None, room_height=None):
     """
     Modifies the results of base_builder() to result in an U-shaped layout.
 
@@ -693,7 +698,7 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
             blw = outer
             brw = outer
 
-        base = base_builder(top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc, top_height=tht, bottom_height=bht)
+        base = base_builder(min_rooms=min_rooms-8, top_left=tlw, top_right=trw, bottom_left=blw, bottom_right=brw, tl_corr=tlc, tr_corr=trc, bl_corr=blc, br_corr=brc, top_height=tht, bottom_height=bht)
 
     leg_width = outer + inner + 1
     distance  = base.width() - 2 * leg_width
@@ -717,7 +722,7 @@ def build_U (base=None, rooms=2, rooms_wide=2, placement=None, outer=None, inner
     base = attach_leg(base, new_rooms_R, side=SIDE_RIGHT, placement=placement, corr_offset=room_height, x_offset=base.width() - outer - 1)
     return base
 
-def builder_by_type (type = None):
+def builder_by_type (type = None, min_rooms=0):
     """
     Creates and returns a manor of a given layout type.
 
@@ -729,46 +734,53 @@ def builder_by_type (type = None):
                ``None``: random layout.
     """
     if type == None:
-        return build_random()
+        return build_random(min_rooms=min_rooms)
     if type == 'B':
-        return base_builder()
+        return base_builder(min_rooms=min_rooms)
     if type == 'L':
-        return build_L()
+        return build_L(min_rooms=min_rooms)
     if type == 'U':
-        return build_U()
+        return build_U(min_rooms=min_rooms)
     if type == 'H':
-        return build_H()
+        return build_H(min_rooms=min_rooms)
     # The other types don't exist yet and fall back on the base_builder.
     if type == 'O':
-        return build_O()
+        return build_O(min_rooms=min_rooms)
     if type == 'N':
-        return build_N()
+        return build_N(min_rooms=min_rooms)
     if type == 'Z':
-        return build_Z()
+        return build_Z(min_rooms=min_rooms)
     else:
-        return base_builder()
+        return base_builder(min_rooms=min_rooms)
 
-def build_random (base=None):
+def build_random (base=None, min_rooms=0):
     """
     Creates and returns a manor of a random layout type.
 
     :``base``: The base shape collection. If None, a new base will be built from
                base_builder. *Default None*.
     """
-    l_list = [L_LAYOUT, Z_LAYOUT, N_LAYOUT, H_LAYOUT, O_LAYOUT, U_LAYOUT]
+    l_list = [Z_LAYOUT, N_LAYOUT, O_LAYOUT, L_LAYOUT, U_LAYOUT, H_LAYOUT]
     layout = random.choice(l_list)
 
+    if min_rooms > 25:
+        layout = H_LAYOUT
+    elif min_rooms > 20:
+        layout = random.choice(l_list[-2:])
+    elif min_rooms > 15:
+        layout = random.choice(l_list[-3:])
+
     if layout == L_LAYOUT:
-        return build_L(base)
+        return build_L(base, min_rooms=min_rooms)
     elif layout == Z_LAYOUT:
-        return build_Z(base)
+        return build_Z(base, min_rooms=min_rooms)
     elif layout == N_LAYOUT:
-        return build_N(base)
+        return build_N(base, min_rooms=min_rooms)
     elif layout == H_LAYOUT:
-        return build_H(base)
+        return build_H(base, min_rooms=min_rooms)
     elif layout == O_LAYOUT:
-        return build_O(base)
+        return build_O(base, min_rooms=min_rooms)
     elif layout == U_LAYOUT:
-        return build_U(base)
+        return build_U(base, min_rooms=min_rooms)
     else:
-        return base_builder()
+        return base_builder(min_rooms=min_rooms)
