@@ -53,11 +53,13 @@ class Person (object):
         self.set_random_last_name(last)
         self.set_random_age(age)
 
-        self.hair = None
-        self.rel  = []
+        self.hair  = None
+        self.rel   = []
         self.title = ''
         self.occupation = ''
         self.alibi = None
+        self.pos   = None
+        self.glyph = None
 
     def __str__ (self, desc_hair = False):
         """
@@ -886,6 +888,7 @@ class SuspectList (object):
                 if oldname == s.first:
                     return
             n_append(s.first[0])
+            s.glyph = s.first[0]
 
     def add_honorifics (self):
         """

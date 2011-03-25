@@ -90,3 +90,9 @@ class ViewPort (object):
                 sect.normalise(height=height)
 
         return sect
+
+    def pos_in_section (self, pos):
+        if (pos.x <= self._left or pos.x >= self._left + self._width
+        or pos.y <= self._top or pos.y >= self._top + self._height):
+            return False
+        return True

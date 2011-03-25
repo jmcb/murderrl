@@ -69,6 +69,7 @@ class Game (object):
         self.add_suspects()
 
         self.add_alibis()
+        self.init_suspect_positions()
         self.suspect_list.add_hair_colours()
         self.add_victim_body()
 
@@ -204,7 +205,32 @@ class Game (object):
             else:
                 print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
 
+    def init_suspect_positions (self):
+        """
+        Initialises the suspects' location to a random position in their
+        alibi room.
+        """
+        sl = self.suspect_list
+        for i in xrange(len(sl.suspects)):
+            if i == sl.victim:
+                continue
+
+            s     = sl.get_suspect(i)
+            rid   = s.alibi.rid
+            room  = self.base_manor.get_room(rid)
+            start = room.pos() + 1
+            stop  = room.pos() + room.size() - 2
+            while True:
+                s.pos = coord.Coord(random.randint(start.x, stop.x), random.randint(start.y, stop.y))
+                if self.base_manor.get_feature(s.pos).traversable():
+                    break
+
     def describe_body (self, p):
+        """
+        Returns a flavourful description of the victim's body.
+
+        :``p``: The victim's Person object. *Required*.
+        """
         if coinflip():
             name = p.get_name()
             if one_chance_in(4):
@@ -325,6 +351,21 @@ class Game (object):
                 col = self.base_manor.get_feature(real_coord).colour()
             screen.put(char, pos+1, col)
 
+    def draw_suspects (self):
+        """
+        Draws all suspects at their current position onto the screen.
+        """
+        sl = self.suspect_list
+        for i in xrange(len(sl.suspects)):
+            if sl.victim == i:
+                continue
+            p = sl.get_suspect(i)
+            pos = p.pos
+            if not self.vp.pos_in_section(pos):
+                continue
+            canvas_pos = coord.Coord(pos.x - self.vp._left, pos.y - self.vp._top)
+            screen.put(p.glyph, canvas_pos + 1, Colours.WHITE)
+
     def draw_viewport (self):
         """
         Draws the game map, including the player glyph, onto the screen.
@@ -343,6 +384,7 @@ class Game (object):
         # Draw the player.
         canvas_pos = coord.Coord(self.player_pos.x - self.vp._left, self.player_pos.y - self.vp._top)
         screen.put("@", canvas_pos + 1, Colours.YELLOW)
+        self.draw_suspects()
 
     def get_current_room_id (self, pos = None):
         """
@@ -488,7 +530,7 @@ class Game (object):
         feat = self.base_manor.get_feature(pos)
         self.message = feat.description()
 
-    def pos_in_room (self, pos):
+    def pos_in_travel_room (self, pos):
         """
         A helper method to check whether travel has reached the target room.
 
@@ -509,7 +551,7 @@ class Game (object):
             return
 
         self.travel_target_room = room_id
-        path = pathfind.Pathfind(self.base_manor.features, self.player_pos, None, self.pos_in_room).get_path()
+        path = pathfind.Pathfind(self.base_manor.features, self.player_pos, None, self.pos_in_travel_room).get_path()
         if path != None:
             self.travel_path = path
         else:
@@ -705,7 +747,6 @@ class Game (object):
         """
         curr_pos = self.player_pos
         if len(self.travel_path) > 0:
-            # self.player_pos = self.travel_path.pop()
             next_pos = self.travel_path.pop()
             self.last_move = next_pos - curr_pos
         elif self.dir_running == DIR_NOWHERE:
@@ -738,6 +779,41 @@ class Game (object):
 
         return True
 
+    def move_suspects (self):
+        """
+        Handle suspect movement: Randomly picks a free adjacent position.
+        """
+        sl = self.suspect_list
+        dirs = [DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST]
+        for i in xrange(len(sl.suspects)):
+            if sl.victim == i:
+                continue
+
+            s = sl.get_suspect(i)
+            valid_moves = []
+            for d in dirs:
+                pos = s.pos + d
+                if pos == self.player_pos:
+                    continue
+                if not self.base_manor.get_feature(pos).traversable():
+                    continue
+
+                # Make sure that we don't walk into another suspect.
+                is_valid = True
+                for s2 in sl.suspects:
+                    if s != s2 and pos == s2.pos:
+                        is_valid = False
+                        break
+                if not is_valid:
+                    continue
+                valid_moves.append(pos)
+
+            if len(valid_moves) == 0:
+                continue
+
+            # Set the new position.
+            s.pos = random.choice(valid_moves)
+
     def do_loop (self):
         """
         Run the actual game loop. Returns if we encounter an invalid keypress.
@@ -754,3 +830,5 @@ class Game (object):
 
             if self.quit_game:
                 return
+
+            self.move_suspects()
