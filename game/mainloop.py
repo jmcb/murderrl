@@ -300,13 +300,14 @@ class Game (object):
         self.player_pos = coord.Coord(ehall.pos().x + ehall.size().x/2, ehall.pos().y + ehall.size().y/2)
 
         self.init_command_list()
-        self.game_start  = True    # Game just started.
-        self.debugging   = False   # debugging mode
-        self.message     = None    # A message displayed for one turn.
-        self.dir_running = DIR_NOWHERE # Direction we are running (if any).
-        self.travel_path = []
+        self.game_start   = True    # Game just started.
+        self.debugging    = False   # debugging mode
+        self.message      = None    # A message displayed for one turn.
+        self.dir_running  = DIR_NOWHERE # Direction we are running (if any).
+        self.travel_path  = []
         self.init_command_parameters()
-        self.quit_game   = False
+        self.quit_game    = False
+        self.wait_for_key = True # If false, handle NPC movement without waiting for player key.
 
     def init_command_parameters (self):
         """
@@ -751,7 +752,7 @@ class Game (object):
             self.last_move = next_pos - curr_pos
         elif self.dir_running == DIR_NOWHERE:
             # Get a key.
-            ch = screen.get(block=True)
+            ch = screen.get(block=self.wait_for_key)
 
             if ch > 0 and ch <= 256:
                 self.did_move = False
