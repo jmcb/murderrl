@@ -16,7 +16,7 @@ def print_line (text, pos = POS_ORIGIN, col = Colours.LIGHTGRAY):
     for ind, char in enumerate(text):
         screen.put(char, Coord(pos.x+ind, pos.y), col)
 
-def print_text (text, pos = POS_ORIGIN, max_columns = 70):
+def print_text (text, pos = POS_ORIGIN, max_columns = 70, col = Colours.LIGHTGRAY):
     """
     Chops a text into several lines and prints it to the screen, beginning
     at coordinate pos. Chopping happens at position max_columns; no attempt
@@ -27,16 +27,16 @@ def print_text (text, pos = POS_ORIGIN, max_columns = 70):
     :``max_columns``: After this column, the text is wrapped onto the next line. 
                       *Default 70*.
     """
-    line = pos.y
-    col  = 0
+    line   = pos.y
+    column = pos.x
     for char in text:
-        if (char == "\n" or col > max_columns):
-            col   = 0
-            line += 1
+        if (char == "\n" or column > max_columns):
+            column = pos.x
+            line  += 1
             if char == "\n":
                continue
-        screen.put(char, Coord(col, pos.y + line))
-        col += 1
+        screen.put(char, Coord(column, line), col)
+        column += 1
 
 def print_screen (text, pos = POS_ORIGIN, max_columns = 70):
     """

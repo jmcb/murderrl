@@ -46,8 +46,12 @@ screen = console.select()
 
 # The message line.
 # Following lines may get used for debugging output.
-MSG_LINE  = 22
-MSG_START = coord.Coord(0, MSG_LINE)
+MAP_OFFSET = coord.Coord(1, 2)
+MSG_LINE   = 23
+MSG_START  = coord.Coord(0, MSG_LINE)
+
+MAX_COLUMNS = 70
+MAX_ROWS    = 20
 
 NUM_SUSPECTS = 10
 
@@ -86,8 +90,8 @@ class Game (object):
 
         # Initialise the view port.
         self.vp = viewport.ViewPort(buffer=self.canvas,
-                                    width =min(self.canvas.size().width, 70),
-                                    height=min(self.canvas.size().height, 20))
+                                    width =min(self.canvas.size().width, MAX_COLUMNS),
+                                    height=min(self.canvas.size().height, MAX_ROWS))
 
         # Initialise a couple of other variables.
         self.initialise_parameters()
@@ -355,6 +359,11 @@ class Game (object):
         """
         return "Welcome to %s! To view the list of commands, press 'h'." % randname.get_random_manor_name(self.manor_name)
 
+    def draw_header (self):
+        curr = self.get_current_room()
+        name = curr.room_name(True)
+        print_line("%s%s." % (name[0].upper(), name[1:]))
+
     def draw_feature_grid (self):
         """
         Draws the feature grid onto the screen. (Only in debug mode.)
@@ -365,7 +374,7 @@ class Game (object):
             real_coord = pos + coord.Coord(self.vp._left, self.vp._top)
             char = self.base_manor.get_feature(real_coord).glyph()
             col  = self.base_manor.get_feature(real_coord).colour()
-            screen.put(char, pos+1, col)
+            screen.put(char, pos + MAP_OFFSET, col)
 
     def draw_canvas (self):
         """
@@ -378,7 +387,7 @@ class Game (object):
             elif char != "#" and char != ".":
                 real_coord = pos + coord.Coord(self.vp._left, self.vp._top)
                 col = self.base_manor.get_feature(real_coord).colour()
-            screen.put(char, pos+1, col)
+            screen.put(char, pos + MAP_OFFSET, col)
 
     def draw_suspects (self):
         """
@@ -393,7 +402,7 @@ class Game (object):
             if not self.vp.pos_in_section(pos):
                 continue
             canvas_pos = coord.Coord(pos.x - self.vp._left, pos.y - self.vp._top)
-            screen.put(p.glyph, canvas_pos + 1, Colours.WHITE)
+            screen.put(p.glyph, canvas_pos + MAP_OFFSET, Colours.WHITE)
 
     def draw_viewport (self):
         """
@@ -412,7 +421,7 @@ class Game (object):
 
         # Draw the player.
         canvas_pos = coord.Coord(self.player_pos.x - self.vp._left, self.player_pos.y - self.vp._top)
-        screen.put("@", canvas_pos + 1, Colours.YELLOW)
+        screen.put("@", canvas_pos + MAP_OFFSET, Colours.YELLOW)
         self.draw_suspects()
 
     def get_current_room_id (self, pos = None):
@@ -451,7 +460,7 @@ class Game (object):
 
         :``text``: The message to be printed.
         """
-        print_line(text, MSG_START)
+        print_text(text, MSG_START, MAX_COLUMNS)
 
     def print_debugging_messages (self):
         """
@@ -519,9 +528,6 @@ class Game (object):
         if self.debugging:
             # Debugging information.
             self.print_debugging_messages()
-        else:
-            curr = self.get_current_room()
-            print_line("You are currently %s %s." % (curr.prep, curr.room_name(True)), coord.Coord(0, MSG_LINE+1))
 
     def update_screen (self):
         """
@@ -530,6 +536,7 @@ class Game (object):
         # Note: Currently the screen gets cleared completely. Splitting that
         #       for map/message area could be useful. (jpeg)
         screen.clear(" ")
+        self.draw_header()
         self.draw_viewport()
         self.draw_messages()
 
