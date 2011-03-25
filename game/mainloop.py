@@ -360,6 +360,9 @@ class Game (object):
         return "Welcome to %s! To view the list of commands, press 'h'." % randname.get_random_manor_name(self.manor_name)
 
     def draw_header (self):
+        """
+        Writes some header information above the map.
+        """
         curr = self.get_current_room()
         name = curr.room_name(True)
         print_line("%s%s." % (name[0].upper(), name[1:]))
@@ -619,6 +622,26 @@ class Game (object):
         m.do_menu()
         # self.update_screen()
 
+    def cmd_question_suspect (self):
+        """
+        Get the nearest suspect's alibi statement.
+        """
+        candidates = []
+        sl = self.suspect_list
+        for idx in xrange(sl.no_of_suspects()):
+            if idx == sl.victim:
+                continue
+            s = sl.get_suspect(idx)
+            if (self.player_pos.x - 1 <= s.pos.x and s.pos.x <= self.player_pos.x + 1
+            and self.player_pos.y - 1 <= s.pos.y and s.pos.y <= self.player_pos.y + 1):
+                candidates.append(idx)
+
+        if len(candidates) == 0:
+            self.message = "There's no one here to question!"
+            return
+        idx = candidates[0]
+        self.message = "%s says, %s" % (sl.get_suspect(idx).get_name(), sl.get_alibi_statement(idx))
+
     def cmd_display_suspect_list (self):
         """
         Display the suspects in a menu. Choosing one of them displays a
@@ -679,6 +702,7 @@ class Game (object):
         self.commands.append(Command("a", self.cmd_accuse_murderer, "accuse a suspect of being the murderer and end the game"))
         self.commands.append(Command("d", self.cmd_describe_room, "describe current room"))
         self.commands.append(Command("h", self.cmd_display_command_help, "display this screen"))
+        self.commands.append(Command("q", self.cmd_question_suspect, "question the nearest suspect"))
         self.commands.append(Command("s", self.cmd_display_suspect_list, "display the list of suspects"))
         self.commands.append(Command("t", self.cmd_travel_menu, "travel to another room"))
         self.commands.append(Command("x", self.cmd_describe_feature, "examine current feature"))
