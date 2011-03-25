@@ -131,81 +131,103 @@ class Game (object):
         m  = self.base_manor
         rprops = m.room_props
 
-        # Rooms that are not used in an alibi yet. To begin with, all of them.
-        rids = m.rooms[:]
+        # Try up to 5 times to assign alibis to each of the suspects.
+        for i in xrange(5):
+            print "%s. attempt at setting alibis" % (i+1)
 
-        # First, pick the murder room (stored as victim's "alibi").
-        r = self.add_alibi_for_suspect(sl.victim, rids)
-        if r == None:
-            print "Found no murder room! Exit early."
-            return False
+            # Reset alibis.
+            for s in sl.suspects:
+                s.alibi = None
 
-        print "Murder room: %s (%s, Victim: %s)" % (rprops[r].name, r, sl.get_victim().get_name())
-        rids.remove(r)
-        for adj in rprops[r].adj_rooms:
-            if rprops[adj].is_corridor:
-                continue
-            print "block adjoining room %s (%s)" % (rprops[adj].name, adj)
-            rids.remove(adj)
+            # Rooms that are not used in an alibi yet. To begin with, all of them.
+            rids = m.rooms[:]
 
-        r = self.add_alibi_for_suspect(sl.murderer, rids)
-        if r != None:
-            print "Alibi room for murderer: %s (%s, %s)" % (rprops[r].name, r, sl.get_murderer().get_name())
-            sl.get_murderer().set_alibi(r, rprops[r].name)
+            # First, pick the murder room (stored as victim's "alibi").
+            r = self.add_alibi_for_suspect(sl.victim, rids)
+            if r == None:
+                print "Found no murder room! Exit early."
+                return False
+
+            print "Murder room: %s (%s, Victim: %s)" % (rprops[r].name, r, sl.get_victim().get_name())
             rids.remove(r)
-        else:
-            print "Found no alibi room for murderer (%s)" % sl.get_murderer().get_name()
-        murderer_room = r
-
-        # Suspects that don't have an alibi yet.
-        sids = range(0, len(sl.suspects))
-        sids.remove(sl.victim)
-        sids.remove(sl.murderer)
-
-        N = len(sids)
-        PAIRS = max(1, random.randint((N+1)/5, (N+1)/3))
-        for i in xrange(0, PAIRS):
-            idx1 = random.choice(sids)
-            sids.remove(idx1)
-            p1 = sl.get_suspect(idx1)
-            # If this person has relatives, it is highly likely one of them
-            # was the witness.
-            if coinflip() and len(p1.rel) > 0:
-                rel  = random.choice(p1.rel)
-                idx2 = rel[0]
-                p2   = sl.get_suspect(idx2)
-                if idx2 in sids:
-                    sids.remove(idx2)
-                    r = m.pick_room_for_suspect(rids, idx1, idx2)
-                    if r == None:
-                        return False
-                    print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
-                    sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
-                    rids.remove(r)
+            for adj in rprops[r].adj_rooms:
+                if rprops[adj].is_corridor:
                     continue
+                print "block adjoining room %s (%s)" % (rprops[adj].name, adj)
+                rids.remove(adj)
 
-            idx2 = random.choice(sids)
-            sids.remove(idx2)
-            r = m.pick_room_for_suspect(rids, idx1, idx2)
+            r = self.add_alibi_for_suspect(sl.murderer, rids)
             if r != None:
-                print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                print "Alibi room for murderer: %s (%s, %s)" % (rprops[r].name, r, sl.get_murderer().get_name())
+                sl.get_murderer().set_alibi(r, rprops[r].name)
                 rids.remove(r)
-                sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
             else:
-                print "Found no alibi room for %s and %s" % (sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                print "Found no alibi room for murderer (%s)" % sl.get_murderer().get_name()
+                continue
+            murderer_room = r
 
-        # Shuffle the remaining list.
-        random.shuffle(sids)
+            # Suspects that don't have an alibi yet.
+            sids = range(0, sl.no_of_suspects())
+            sids.remove(sl.victim)
+            sids.remove(sl.murderer)
 
-        # The remaining suspects don't have a witness.
-        for s in sids:
-            r = self.add_alibi_for_suspect(s, rids)
-            if r != None:
-                print "%s (%s) for %s" % (rprops[r].name, r, sl.get_suspect(s).get_name())
-                rids.remove(r)
-                sl.get_suspect(s).set_alibi(r, rprops[r].name)
-            else:
-                print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
+            N = len(sids)
+            PAIRS = max(1, random.randint((N+1)/5, (N+1)/3))
+            need_reroll = False
+            for i in xrange(0, PAIRS):
+                idx1 = random.choice(sids)
+                sids.remove(idx1)
+                p1 = sl.get_suspect(idx1)
+
+                # If this person has relatives, it is highly likely one of them
+                # was the witness.
+                if coinflip() and len(p1.rel) > 0:
+                    rel  = random.choice(p1.rel)
+                    idx2 = rel[0]
+                    p2   = sl.get_suspect(idx2)
+                    if idx2 in sids:
+                        sids.remove(idx2)
+                        r = m.pick_room_for_suspect(rids, idx1, idx2)
+                        if r == None:
+                            return False
+                        print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                        sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
+                        rids.remove(r)
+                        continue
+
+                idx2 = random.choice(sids)
+                sids.remove(idx2)
+                r = m.pick_room_for_suspect(rids, idx1, idx2)
+                if r != None:
+                    print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                    rids.remove(r)
+                    sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
+                else:
+                    print "Found no alibi room for %s and %s" % (sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
+                    need_reroll = True
+                    break
+
+            if need_reroll:
+                continue
+
+            # Shuffle the remaining list.
+            random.shuffle(sids)
+
+            # The remaining suspects don't have a witness.
+            for s in sids:
+                r = self.add_alibi_for_suspect(s, rids)
+                if r != None:
+                    print "%s (%s) for %s" % (rprops[r].name, r, sl.get_suspect(s).get_name())
+                    rids.remove(r)
+                    sl.get_suspect(s).set_alibi(r, rprops[r].name)
+                else:
+                    print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
+                    need_reroll = True
+                    break
+
+            if need_reroll:
+                continue
+            break
 
     def init_suspect_positions (self):
         """
