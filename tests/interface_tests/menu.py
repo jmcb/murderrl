@@ -42,9 +42,10 @@ def main (num = 10, sorted = True):
 
     m = Menu("Suspects")
     if sorted:
-        sl.get_victim().have_seen = True
+        sl.get_victim().have_seen  = True
+        sl.get_victim().suspicious = False
         e = Entry('x', "Victim: " + str(sl.get_victim()),
-                  sl.get_suspect_description, sl.victim, sl.get_victim().first[0].lower())
+                  sl.describe_suspect, sl.victim, sl.get_victim().first[0].lower(), colour=highlight_colour(False))
         m.add_entry(e)
 
         # Construct a list of (index, first name) tuples.
@@ -61,17 +62,20 @@ def main (num = 10, sorted = True):
             sl.get_suspect(idx).have_seen = True
             if not sl.is_victim(idx):
                 p = sl.get_suspect(idx)
-                e = Entry(p.first[0].lower(), p, sl.get_suspect_description, idx)
+                e = Entry(p.first[0].lower(), p, sl.describe_suspect, idx)
                 m.add_entry(e)
     else:
+        sl.get_victim().have_seen  = True
+        sl.get_victim().suspicious = False
         e = Entry('x', "Victim: " + str(sl.get_victim()),
-                  sl.get_suspect_description, sl.victim, 'v')
+                  sl.describe_suspect, sl.victim, 'v')
         m.add_entry(e)
         total_suspects = xrange(len(sl.suspects))
         for i in total_suspects:
+            sl.get_suspect(i).have_seen = True
             if not sl.is_victim(i):
                 p = sl.get_suspect(i)
-                e = Entry(chr(ord('a') + i), p, sl.get_suspect_description, i)
+                e = Entry(chr(ord('a') + i), p, sl.describe_suspect, i)
                 m.add_entry(e)
 
     screen.init()

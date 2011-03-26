@@ -2,6 +2,7 @@
 import curses
 from library import coord, shape, collection, viewport
 from interface import console
+from library.colour import Colours
 from output import *
 
 screen = console.select()
@@ -10,7 +11,7 @@ class Entry (object):
     """
     A representation of a menu entry.
     """
-    def __init__ (self, key, desc, action, arg = None, key2 = None):
+    def __init__ (self, key, desc, action, arg = None, key2 = None, colour = Colours.LIGHTGRAY):
         """
         Initialize the entry.
 
@@ -28,6 +29,7 @@ class Entry (object):
         self.action = action
         self.arg    = arg
         self.key2   = key2
+        self.colour = colour
 
     def __str__ (self):
         """
@@ -89,7 +91,7 @@ class Menu (object):
 
         mlist = self.mlist
         for i in xrange(len(mlist)):
-            print_line(mlist[i].__str__(), coord.Coord(0, line + i))
+            print_line(mlist[i].__str__(), coord.Coord(0, line + i), mlist[i].colour)
 
     def process_key (self, key = None):
         """
@@ -108,9 +110,9 @@ class Menu (object):
         mlist = self.mlist
         for i in xrange(len(mlist)):
             if mlist[i].key_matches(chr(key)):
-                fulldesc = mlist[i].activate()
-                if fulldesc:
-                    print_screen(fulldesc)
+                colour = mlist[i].activate()
+                if colour != None:
+                    mlist[i].colour = colour
                 return self.do_loop
 
         return False
@@ -207,9 +209,9 @@ class ScrollMenu (Menu):
             mlist = self.mlist
             for i in xrange(len(mlist)):
                 if mlist[i].key_matches(chr(key)):
-                    fulldesc = mlist[i].activate()
-                    if fulldesc:
-                        print_screen(fulldesc)
+                    colour = mlist[i].activate()
+                    if colour != None:
+                        mlist[i].colour = colour
                     return self.do_loop
             return False
 

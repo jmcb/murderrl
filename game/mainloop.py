@@ -678,7 +678,8 @@ class Game (object):
         """
         m  = menu.Menu("List of suspects")
         sl = self.suspect_list
-        e  = menu.Entry('x', "Victim: " + sl.get_victim().get_name(), sl.get_suspect_description, sl.victim, sl.get_victim().first[0].lower())
+        sl.get_victim().suspicious = False
+        e  = menu.Entry('x', "Victim: " + sl.get_victim().get_name(), sl.describe_suspect, sl.victim, sl.get_victim().first[0].lower(), colour=highlight_colour(sl.get_victim().suspicious))
         m.add_entry(e)
 
         # Sort the list by name.
@@ -687,7 +688,7 @@ class Game (object):
         for i in list:
             if not sl.is_victim(i):
                 p = sl.get_suspect(i)
-                e = menu.Entry(p.first[0].lower(), p, sl.get_suspect_description, i)
+                e = menu.Entry(p.first[0].lower(), p, sl.describe_suspect, i, colour=highlight_colour(p.suspicious))
                 m.add_entry(e)
         m.do_menu()
 

@@ -7,6 +7,9 @@ import random, math
 from randname import *
 from library.random_util import *
 from alibi import *
+from interface import console, output
+
+screen = console.select()
 
 # Roles, in plural as they're currently only used as header listing.
 ROLE_OWNER   = 'Owners'
@@ -60,7 +63,8 @@ class Person (object):
         self.alibi = None
         self.pos   = None
         self.glyph = None
-        self.have_seen = False
+        self.have_seen  = False
+        self.suspicious = None # Suspect is marked as highly suspicious.
 
     def __str__ (self, desc_hair = False):
         """
@@ -671,17 +675,39 @@ class SuspectList (object):
         :``idx``: An index of the suspects[] list. *Required*.
         """
         desc = self.get_suspect_description(idx)
-
         p = self.get_suspect(idx)
-        has_witness = False
-        if p.has_alibi_witness():
-            desc += "\nPress 'w' to check the witness."
-            has_witness = True
-        print desc
+
+        witness_prompt = False
+        if p.have_seen:
+            has_witness = False
+            if p.has_alibi_witness():
+                desc += "\nPress 'w' to check the witness."
+                witness_prompt = True
+
+        if idx != self.victim:
+            desc += "\n"
+            if p.suspicious != False:
+                desc += "\nMark suspect as cleared with 'c'."
+            if p.suspicious != True:
+                desc += "\nMark suspect as particularly suspicious with 's'."
+            if p.suspicious != None:
+                desc += "\nUnmark suspect with 'u'."
+
+        screen.clear(" ")
+        output.print_text(desc)
 
         key = screen.get(block=True)
-        if (has_witness and chr(key) == 'w'):
-            self.describe_suspect(p.alibi.witness)
+        if idx != self.victim and key > 0 and key <= 256:
+            if witness_prompt and chr(key) == 'w':
+                self.describe_suspect(p.alibi.witness)
+            elif chr(key) == 'c':
+                p.suspicious = False
+            elif chr(key) == 's':
+                p.suspicious = True
+            elif chr(key) == 'u':
+                p.suspicious = None
+
+        return output.highlight_colour(p.suspicious)
 
     def get_short_alibi_description (self, idx):
         """

@@ -51,3 +51,11 @@ def print_screen (text, pos = POS_ORIGIN, max_columns = 70):
     screen.clear(" ")
     print_text(text, pos)
     screen.get(block=True)
+
+def highlight_colour (highlight):
+    if highlight == True:
+        return Colours.WHITE
+    elif highlight == False:
+        return Colours.DARKGRAY
+    else:
+        return Colours.LIGHTGRAY
