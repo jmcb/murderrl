@@ -60,6 +60,7 @@ class Person (object):
         self.alibi = None
         self.pos   = None
         self.glyph = None
+        self.have_seen = False
 
     def __str__ (self, desc_hair = False):
         """
@@ -623,13 +624,18 @@ class SuspectList (object):
         if first:
             desc += "%s none\n" % tmp
 
-        desc += "\nHair colour: %s\n" % p.hair
-        if idx == self.victim:
-            desc += "\nThe clue: a %s hair!\n" % self.get_murderer().hair
+        if p.have_seen:
+            desc += "\nHair colour: %s\n" % p.hair
+            if idx == self.victim:
+                desc += "\nThe clue: a %s hair!\n" % self.get_murderer().hair
+            else:
+                desc += "\nAlibi: %s\n" % self.get_alibi_statement(idx)
+                if p.has_alibi_witness():
+                    has_witness = True
+        elif idx == self.victim:
+            desc += "\nYou haven't examined the body yet."
         else:
-            desc += "\nAlibi: %s\n" % self.get_alibi_statement(idx)
-            if p.has_alibi_witness():
-                has_witness = True
+            desc += "\nYou haven't talked to this suspect yet."
 
         return desc
 

@@ -296,17 +296,17 @@ class Game (object):
 
         assert(len(candidates) > 0)
 
-        victim_name = sl.get_victim().get_name()
-        name = "the mangled body of %s" % victim_name
-        description = self.describe_body(sl.get_victim())
-        description = description[0].upper() + description[1:]
+        victim_name  = sl.get_victim().get_name()
+        name         = "the mangled body of %s" % victim_name
+        description  = self.describe_body(sl.get_victim())
+        description  = description[0].upper() + description[1:]
         feat = BODY.derived_feature(name, description, has_article=True)
 
-        body_pos = random.choice(candidates)
-        self.base_manor.features.__setitem__(body_pos, feat)
+        self.body_pos = random.choice(candidates)
+        self.base_manor.features.__setitem__(self.body_pos, feat)
         rp = self.base_manor.room_props[murder_room]
 
-        features = self.base_manor.get_nearby_interesting_feature(body_pos)
+        features = self.base_manor.get_nearby_interesting_feature(self.body_pos)
 
         nearby_feat = ""
         if len(features) > 0:
@@ -582,6 +582,10 @@ class Game (object):
 
         feat = self.base_manor.get_feature(pos)
         self.message = feat.description()
+        sl = self.suspect_list
+        if pos == self.body_pos and not sl.get_victim().have_seen:
+            self.message += "\nYou find an alien %s hair!" % sl.get_murderer().hair
+            sl.get_victim().have_seen = True
 
     def pos_in_travel_room (self, pos):
         """
@@ -653,9 +657,11 @@ class Game (object):
         if len(candidates) == 0:
             self.message = "There's no one here to question!"
             return
+
         idx = candidates[0]
         self.message = "%s says, %s" % (sl.get_suspect(idx).get_name(), sl.get_alibi_statement(idx))
         self.turns   += 1
+        sl.get_suspect(idx).have_seen = True
 
     def cmd_display_suspect_list (self):
         """
