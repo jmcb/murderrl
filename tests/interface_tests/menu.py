@@ -42,6 +42,7 @@ def main (num = 10, sorted = True):
 
     m = Menu("Suspects")
     if sorted:
+        sl.get_victim().have_seen = True
         e = Entry('x', "Victim: " + str(sl.get_victim()),
                   sl.get_suspect_description, sl.victim, sl.get_victim().first[0].lower())
         m.add_entry(e)
@@ -57,6 +58,7 @@ def main (num = 10, sorted = True):
         total_suspects = xrange(len(sl.suspects))
         for i in xrange(sl.no_of_suspects()):
             idx = name_list[i][0]
+            sl.get_suspect(idx).have_seen = True
             if not sl.is_victim(idx):
                 p = sl.get_suspect(idx)
                 e = Entry(p.first[0].lower(), p, sl.get_suspect_description, idx)
