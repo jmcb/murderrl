@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-A demo of our @ detective walking through an otherwise empty manor. :P
-Toggle canvas vs. feature view with 't'. (Should be identical.)
+Play the actual game. Let the sleuthing begin!
 """
 
 import interface.console
@@ -15,5 +14,5 @@ def main ():
     game.do_loop()
     screen.deinit()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     screen.wrapper(main)
