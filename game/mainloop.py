@@ -236,25 +236,33 @@ class Game (object):
     def init_suspect_positions (self):
         """
         Initialises the suspects' location to a random position in their
-        alibi room.
+        bedroom or, if that doesn't exist, a random room in the manor..
         """
         sl = self.suspect_list
-        for i in xrange(len(sl.suspects)):
+        rooms = []
+        for s in xrange(sl.no_of_suspects()):
+            rooms.append(None)
+
+        m = self.base_manor
+        for r in m.rooms:
+            for i in m.room_props[r].owners:
+                rooms[i] = r
+
+        for i in xrange(sl.no_of_suspects()):
             if i == sl.victim:
                 continue
 
-            s     = sl.get_suspect(i)
-            alibi = s.alibi
-            if alibi == None:
-                rid = random.choice(self.base_manor.rooms)
-            else:
-                rid = s.alibi.rid
-            room  = self.base_manor.get_room(rid)
+            if rooms[i] == None:
+                rooms[i] = random.choice(m.rooms)
+
+            room  = m.get_room(rooms[i])
             start = room.pos() + 1
             stop  = room.pos() + room.size() - 2
+
+            s = sl.get_suspect(i)
             while True:
                 s.pos = coord.Coord(random.randint(start.x, stop.x), random.randint(start.y, stop.y))
-                if self.base_manor.get_feature(s.pos).traversable():
+                if m.get_feature(s.pos).traversable():
                     break
 
     def describe_body (self, p):
