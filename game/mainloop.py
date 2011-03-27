@@ -373,6 +373,7 @@ class Game (object):
         self.tried_move_feat  = NOTHING     # The feature the player tried to move on.
         self.was_running      = (self.dir_running != DIR_NOWHERE)
         self.did_switch       = False       # switched to debug mode
+        self.time_passed      = False
 
     def get_welcome_message (self):
         """
@@ -694,7 +695,7 @@ class Game (object):
         rid = self.get_current_room_id(p.pos)
         self.message = "%s says, %s" % (p.get_name(), sl.get_alibi_statement(idx, rid))
         p.have_seen  = True
-        self.turns  += 1
+        self.time_passed = True
 
     def cmd_display_suspect_list (self):
         """
@@ -814,8 +815,7 @@ class Game (object):
         Check whether the planned move is valid. If so, actually move the
         player. Otherwise, change a few parameters.
         """
-        curr_pos = self.player_pos
-        next_pos = curr_pos + self.last_move
+        next_pos = self.player_pos + self.last_move
         if (next_pos.x < 0 or next_pos.y < 0
         or next_pos.x >= self.base_manor.size().x or next_pos.y >= self.base_manor.size().y):
             self.move_was_blocked = True
@@ -824,20 +824,20 @@ class Game (object):
             if not self.debugging and not self.tried_move_feat.traversable():
                 self.move_was_blocked = True
             else:
-                curr_pos += self.last_move
+                self.player_pos = next_pos
                 if self.dir_running != DIR_NOWHERE:
                     # check whether we need to stop
-                    if (feature_is_door(self.base_manor.get_feature(curr_pos))
+                    if (feature_is_door(self.base_manor.get_feature(self.player_pos))
                     or self.debugging and not self.tried_move_feat.traversable()):
                         self.dir_running = DIR_NOWHERE
                     else:
-                        in_corr = (self.base_manor.get_corridor_index(curr_pos) != None)
+                        in_corr = (self.base_manor.get_corridor_index(self.player_pos) != None)
                         dirs = (DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST)
                         for d in dirs:
                             if d == self.dir_running or DIR_NOWHERE - d == self.dir_running:
                                 continue
-                            if (in_corr and self.base_manor.get_feature(curr_pos + d) == FLOOR
-                            or feature_is_door(self.base_manor.get_feature(curr_pos + d))):
+                            if (in_corr and self.base_manor.get_feature(self.player_pos + d) == FLOOR
+                            or feature_is_door(self.base_manor.get_feature(self.player_pos + d))):
                                 self.dir_running = DIR_NOWHERE
                                 break
 
@@ -851,8 +851,13 @@ class Game (object):
                 self.dir_running      = DIR_NOWHERE
                 self.travel_path      = []
         else:
-            self.did_move = True
-            self.turns   += 1
+            for s in self.suspect_list.suspects:
+                if s.pos == self.player_pos:
+                    s.pos = s.pos - self.last_move
+                    break
+
+            self.did_move    = True
+            self.time_passed = True
 
     def handle_commands (self):
         """
@@ -913,21 +918,28 @@ class Game (object):
                 if not self.base_manor.get_feature(pos).traversable():
                     continue
 
-                # Make sure that we don't walk into another suspect.
-                is_valid = True
-                for s2 in sl.suspects:
-                    if s != s2 and pos == s2.pos:
-                        is_valid = False
-                        break
-                if not is_valid:
-                    continue
                 valid_moves.append(pos)
 
             if len(valid_moves) == 0:
                 continue
 
+            new_pos = random.choice(valid_moves)
+
+            # If we walk into another suspect, swap positions.
+            for s2 in sl.suspects:
+                if s != s2 and new_pos == s2.pos:
+                    s2.pos = s.pos
+                    break
+
             # Set the new position.
-            s.pos = random.choice(valid_moves)
+            s.pos = new_pos
+
+    def handle_time (self):
+        """
+        A turn has passed: Increase turn counter, move suspects.
+        """
+        self.move_suspects()
+        self.turns += 1
 
     def do_loop (self):
         """
@@ -946,4 +958,5 @@ class Game (object):
             if self.quit_game:
                 return
 
-            self.move_suspects()
+            if not self.wait_for_key or self.time_passed:
+                self.handle_time()
