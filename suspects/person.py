@@ -736,7 +736,7 @@ class SuspectList (object):
             witness = "alone"
         return "%s, %s" % (a.rname, witness)
 
-    def get_alibi_statement (self, idx):
+    def get_alibi_statement (self, idx, rid = None):
         """
         Returns the reply to the question, "Where were you yesterday at 8 pm?"
 
@@ -751,7 +751,8 @@ class SuspectList (object):
         if p.has_alibi_witness():
             witness = self.call_relative(idx, a.witness)
 
-        return "\"%s\"" % db_get_alibi_statement(a.rname, witness)
+        here = (rid == a.rid)
+        return "\"%s\"" % db_get_alibi_statement(a.rname, witness, here)
 
     def pick_victim (self):
         """

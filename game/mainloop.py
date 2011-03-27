@@ -690,9 +690,11 @@ class Game (object):
             return
 
         idx = candidates[0]
-        self.message = "%s says, %s" % (sl.get_suspect(idx).get_name(), sl.get_alibi_statement(idx))
-        self.turns   += 1
-        sl.get_suspect(idx).have_seen = True
+        p   = sl.get_suspect(idx)
+        rid = self.get_current_room_id(p.pos)
+        self.message = "%s says, %s" % (p.get_name(), sl.get_alibi_statement(idx, rid))
+        p.have_seen  = True
+        self.turns  += 1
 
     def cmd_display_suspect_list (self):
         """

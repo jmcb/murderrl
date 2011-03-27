@@ -38,14 +38,13 @@ def db_get_entry (db_name):
     """
     return db.get_database(db_name).random()
 
-def db_get_alibi_statement (room, witness = None):
+def db_get_alibi_statement (room, witness = None, here = False):
     """
     Returns a randomized alibi statement containing room and witness.
 
     :``room``: The alibi room. *Required*
     :``witness``: The witness' name, if any. *Default None*
     """
-
     if witness:
         alibi = db_get_entry(DB_ALIBI_WITNESS)
         alibi = alibi.replace("<witness>", witness)
@@ -54,6 +53,8 @@ def db_get_alibi_statement (room, witness = None):
         if alibi.rfind("<alone>") != -1:
             alibi = alibi.replace("<alone>", db_get_entry(DB_SYNONYM_ALONE))
 
+    if here:
+        alibi = alibi.replace("in <room>", "here in <room>")
     alibi = alibi.replace("<room>", room)
 
     if alibi.rfind("<time>") != -1:
