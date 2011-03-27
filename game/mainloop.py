@@ -358,8 +358,8 @@ class Game (object):
         Initialise the simple parameters.
         """
         # Initially place the player in the centre of the entrance hall.
-        ehall = self.base_manor.get_room(self.base_manor.entrance_hall)
-        self.player_pos = coord.Coord(ehall.pos().x + ehall.size().x/2, ehall.pos().y + ehall.size().y/2)
+        manor = self.base_manor
+        self.player_pos = manor.get_random_pos_in_room(manor.entrance_hall)
 
         self.init_command_list()
         self.game_start   = True    # Game just started.
@@ -682,30 +682,57 @@ class Game (object):
         m.do_menu()
         # self.update_screen()
 
+    def question_suspect (self, idx):
+        """
+        Get a suspect's alibi statement.
+
+        :``idx``: Suspect index of the suspect list. *Required*.
+        """
+        sl  = self.suspect_list
+        s   = sl.get_suspect(idx)
+        rid = self.get_current_room_id(s.pos)
+        self.message = "%s says, %s" % (s.get_name(), sl.get_alibi_statement(idx, rid))
+        s.have_seen  = True
+        self.time_passed = True
+
     def cmd_question_suspect (self):
         """
         Get the nearest suspect's alibi statement.
+        Prompt the player if there are several suspects within range.
         """
         candidates = []
         sl = self.suspect_list
+        rm = self.get_current_room_id()
         for idx in xrange(sl.no_of_suspects()):
             if idx == sl.victim:
                 continue
+
             s = sl.get_suspect(idx)
-            if (self.player_pos.x - 1 <= s.pos.x and s.pos.x <= self.player_pos.x + 1
-            and self.player_pos.y - 1 <= s.pos.y and s.pos.y <= self.player_pos.y + 1):
-                candidates.append(idx)
+            if s.pos.dist(self.player_pos) > 3:
+                continue
+
+            rid = self.get_current_room_id(s.pos)
+            if rid != rm and s.pos.dist(self.player_pos) > 1:
+                continue
+
+            candidates.append(idx)
 
         if len(candidates) == 0:
             self.message = "There's no one here to question!"
             return
 
-        idx = candidates[0]
-        p   = sl.get_suspect(idx)
-        rid = self.get_current_room_id(p.pos)
-        self.message = "%s says, %s" % (p.get_name(), sl.get_alibi_statement(idx, rid))
-        p.have_seen  = True
-        self.time_passed = True
+        if len(candidates) > 1:
+            m  = menu.Menu("Question whom?", False)
+            sl = self.suspect_list
+            candidates.sort(cmp=lambda a, b: cmp(sl.get_suspect(a).first, sl.get_suspect(b).first))
+            for i in candidates:
+                if not sl.is_victim(i):
+                    p = sl.get_suspect(i)
+                    e = menu.Entry(p.first[0].lower(), p, self.question_suspect, i)
+                    m.add_entry(e)
+            m.do_menu()
+        else:
+            self.question_suspect(candidates[0])
 
     def cmd_display_suspect_list (self):
         """
@@ -915,7 +942,6 @@ class Game (object):
         """
         sl    = self.suspect_list
         manor = self.base_manor
-        dirs  = [DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST]
         for i in xrange(len(sl.suspects)):
             if sl.victim == i:
                 continue
@@ -931,8 +957,7 @@ class Game (object):
                     continue
             else:
                 valid_moves = []
-                for d in dirs:
-                    pos = s.pos + d
+                for pos in AdjacencyIterator(s.pos):
                     if pos == self.player_pos:
                         continue
                     if not manor.get_feature(pos).traversable():

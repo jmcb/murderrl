@@ -186,6 +186,21 @@ class Coord (object):
         yield self.x
         yield self.y
 
+    def dist (self, pos):
+        """
+        Returns the distance between this coordinate and another one.
+
+        :``pos``: Another coordinate. *Required*.
+        """
+        dist_x = pos.x - self.x
+        dist_y = pos.y - self.y
+        if dist_x < 0:
+            dist_x *= -1
+        if dist_y < 0:
+            dist_y *= -1
+
+        return max(dist_x, dist_y)
+
 class Size (Coord):
     """
     A specific representation of size using width and height.
