@@ -8,6 +8,7 @@ from randname import *
 from library.random_util import *
 from alibi import *
 from interface import console, output
+from library.colour import Colours
 
 screen = console.select()
 
@@ -685,7 +686,12 @@ class SuspectList (object):
                 witness_prompt = True
 
         if idx != self.victim:
-            desc += "\n"
+            if p.suspicious != None:
+                if p.suspicious == True:
+                    status = "highly suspect"
+                else:
+                    status = "cleared"
+                desc += "\n\n%s is currently marked as %s." % (p.get_name(), status)
             if p.suspicious != False:
                 desc += "\nMark suspect as cleared with 'c'."
             if p.suspicious != True:
@@ -697,7 +703,10 @@ class SuspectList (object):
         output.print_text(desc)
 
         key = screen.get(block=True)
-        if idx != self.victim and key > 0 and key <= 256:
+        if idx == self.victim:
+            return Colours.BROWN
+
+        if key > 0 and key <= 256:
             if witness_prompt and chr(key) == 'w':
                 self.describe_suspect(p.alibi.witness)
             elif chr(key) == 'c':
