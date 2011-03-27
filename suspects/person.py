@@ -978,7 +978,7 @@ class SuspectList (object):
                 else:
                     s.occupation = random.choice(jobs_staff_male)
 
-    def create_paired_alibi (self, p1, p2, rid, rname):
+    def create_paired_alibi (self, p1, p2, rid, rprop):
         """
         Set mutual alibis for two suspects confirming one another.
 
@@ -987,8 +987,23 @@ class SuspectList (object):
         :``rid``: Room index. *Required*.
         :``rname``: Room name. *Required*.
         """
-        self.get_suspect(p1).set_alibi(rid, rname, p2)
-        self.get_suspect(p2).set_alibi(rid, rname, p1)
+        if isinstance(rprop, str):
+            rname1 = rprop
+            rname2 = rprop
+        else:
+            rname1 = rprop.room_name(True)
+            rname2 = rprop.room_name(True)
+            if p1 in rprop.owners:
+                if p2 in rprop.owners:
+                    rname1 = "our bedroom"
+                    rname2 = rname1
+                else:
+                    rname1 = "my bedroom"
+            elif p2 in rprop.owners:
+                rname2 = "my bedroom"
+
+        self.get_suspect(p1).set_alibi(rid, rname1, p2)
+        self.get_suspect(p2).set_alibi(rid, rname2, p1)
 
     def create_alibis (self, rooms):
         """

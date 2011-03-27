@@ -4,8 +4,9 @@ import database.database as db
 from suspects.person import *
 from interface.menu import *
 from interface import console
+from library.colour import Colours
 
-screen = console.select()
+# screen = console.select()
 
 def get_rooms (num = 10):
     """
@@ -42,10 +43,9 @@ def main (num = 10, sorted = True):
 
     m = Menu("Suspects")
     if sorted:
-        sl.get_victim().have_seen  = True
-        sl.get_victim().suspicious = False
+        sl.get_victim().have_seen = True
         e = Entry('x', "Victim: " + str(sl.get_victim()),
-                  sl.describe_suspect, sl.victim, sl.get_victim().first[0].lower(), colour=highlight_colour(False))
+                  sl.describe_suspect, sl.victim, sl.get_victim().first[0].lower(), colour=Colours.BROWN)
         m.add_entry(e)
 
         # Construct a list of (index, first name) tuples.
@@ -65,10 +65,9 @@ def main (num = 10, sorted = True):
                 e = Entry(p.first[0].lower(), p, sl.describe_suspect, idx)
                 m.add_entry(e)
     else:
-        sl.get_victim().have_seen  = True
-        sl.get_victim().suspicious = False
+        sl.get_victim().have_seen = True
         e = Entry('x', "Victim: " + str(sl.get_victim()),
-                  sl.describe_suspect, sl.victim, 'v')
+                  sl.describe_suspect, sl.victim, 'v', colour=Colours.BROWN)
         m.add_entry(e)
         total_suspects = xrange(len(sl.suspects))
         for i in total_suspects:
@@ -78,7 +77,6 @@ def main (num = 10, sorted = True):
                 e = Entry(chr(ord('a') + i), p, sl.describe_suspect, i)
                 m.add_entry(e)
 
-    screen.init()
     m.do_menu()
     screen.deinit()
 
@@ -104,4 +102,5 @@ if __name__ == "__main__":
             pass
 
     # main(max_suspects, True)
+    screen.init()
     screen.wrapper(main)
