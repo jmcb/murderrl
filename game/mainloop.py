@@ -122,7 +122,7 @@ class Game (object):
         if r == None:
             return None
 
-        self.suspect_list.get_suspect(sid).set_alibi(r, self.base_manor.room_props[r].name)
+        self.suspect_list.get_suspect(sid).set_alibi(r, self.base_manor.room_props[r].room_name(True))
         return r
 
     def add_alibis (self):
@@ -163,7 +163,7 @@ class Game (object):
             r = self.add_alibi_for_suspect(sl.murderer, rids)
             if r != None:
                 print "Alibi room for murderer: %s (%s, %s)" % (rprops[r].name, r, sl.get_murderer().get_name())
-                sl.get_murderer().set_alibi(r, rprops[r].name)
+                sl.get_murderer().set_alibi(r, rprops[r].room_name(True))
                 rids.remove(r)
             else:
                 print "Found no alibi room for murderer (%s)" % sl.get_murderer().get_name()
@@ -195,7 +195,7 @@ class Game (object):
                         if r == None:
                             return False
                         print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
-                        sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
+                        sl.create_paired_alibi(idx1, idx2, r, rprops[r].room_name(True))
                         rids.remove(r)
                         continue
 
@@ -205,7 +205,7 @@ class Game (object):
                 if r != None:
                     print "%s (%s) for %s and %s" % (rprops[r].name, r, sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
                     rids.remove(r)
-                    sl.create_paired_alibi(idx1, idx2, r, rprops[r].name)
+                    sl.create_paired_alibi(idx1, idx2, r, rprops[r].room_name(True))
                 else:
                     print "Found no alibi room for %s and %s" % (sl.get_suspect(idx1).get_name(), sl.get_suspect(idx2).get_name())
                     need_reroll = True
@@ -223,7 +223,7 @@ class Game (object):
                 if r != None:
                     print "%s (%s) for %s" % (rprops[r].name, r, sl.get_suspect(s).get_name())
                     rids.remove(r)
-                    sl.get_suspect(s).set_alibi(r, rprops[r].name)
+                    sl.get_suspect(s).set_alibi(r, rprops[r].room_name(True))
                 else:
                     print "Found no alibi room for %s" % sl.get_suspect(s).get_name()
                     need_reroll = True

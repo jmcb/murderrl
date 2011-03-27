@@ -20,7 +20,7 @@ def get_rooms (num = 10):
     for i in xrange(num):
         new_room = dbr.random_pop()
         if (new_room):
-            new_room = new_room.name
+            new_room = "the %s" % new_room.name
         else:
             new_room = "nowhere"
         rooms.append(new_room)

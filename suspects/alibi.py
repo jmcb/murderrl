@@ -55,8 +55,6 @@ def db_get_alibi_statement (room, witness = None):
             alibi = alibi.replace("<alone>", db_get_entry(DB_SYNONYM_ALONE))
 
     alibi = alibi.replace("<room>", room)
-    # HACK: specialcase porch preposition
-    alibi = alibi.replace("in the porch", "on the porch")
 
     if alibi.rfind("<time>") != -1:
         alibi = alibi.replace("<time>", db_get_entry(DB_SYNONYM_TIME))

@@ -1,14 +1,14 @@
-%
 # Alibi statements without a witness.
-I was in the <room>.
 %
-I was <alone> in the <room>.
+I was in <room>.
 %
-I was in the <room> <time>.
+I was <alone> in <room>.
 %
-I was <alone> <time>, in the <room>.
+I was in <room> <time>.
 %
-I was in the <room>, but I was <alone> <time>.
+I was <alone> <time>, in <room>.
 %
-I don't have any witnesses, but I was in the <room> <time>.
+I was in <room>, but I was <alone> <time>.
+%
+I don't have any witnesses, but I was in <room> <time>.
 %
