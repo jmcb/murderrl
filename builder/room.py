@@ -316,7 +316,7 @@ class RoomProps (Room):
 
         return desc
 
-    def get_room_description (self):
+    def get_room_description (self, persons = []):
         """
         Returns a room's description.
         """
@@ -339,10 +339,17 @@ class RoomProps (Room):
         if self.description != "":
             desc += "\n\n%s" % self.description
 
+        if len(persons) > 0:
+            if len(persons) == 1:
+                verb = "is"
+            else:
+                verb = "are"
+            desc += "\n\n%s also %s here." % (join_strings(persons), verb)
+
         return desc
 
-    def describe (self):
+    def describe (self, persons = []):
         """
         Print a room description.
         """
-        print_screen(self.get_room_description())
+        print_screen(self.get_room_description(persons))

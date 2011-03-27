@@ -588,7 +588,18 @@ class Game (object):
             pos = self.player_pos
 
         room = self.get_current_room(pos)
-        room.describe()
+
+        persons = []
+        curr_room = self.get_current_room()
+        sl = self.suspect_list
+        for sid in xrange(sl.no_of_suspects()):
+            if sid == sl.victim:
+                continue
+            p = sl.get_suspect(sid)
+            if self.get_current_room(p.pos) == curr_room:
+                persons.append(p.get_fullname())
+
+        room.describe(persons)
 
     def cmd_describe_feature (self, pos = None):
         """
