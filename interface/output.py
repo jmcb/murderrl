@@ -5,7 +5,7 @@ from library.colour import Colours
 
 screen = console.select()
 
-def print_line (text, pos = POS_ORIGIN, col = Colours.LIGHTGRAY):
+def print_line (text, pos = POS_ORIGIN, colour = Colours.LIGHTGRAY):
     """
     Prints a line of text beginning at the coordinate pos.
 
@@ -14,9 +14,9 @@ def print_line (text, pos = POS_ORIGIN, col = Colours.LIGHTGRAY):
     :``col``: The output colour. *Default lightgray*.
     """
     for ind, char in enumerate(text):
-        screen.put(char, Coord(pos.x+ind, pos.y), col)
+        screen.put(char, Coord(pos.x+ind, pos.y), colour)
 
-def print_text (text, pos = POS_ORIGIN, max_columns = 70, col = Colours.LIGHTGRAY):
+def print_text (text, pos = POS_ORIGIN, max_columns = 70, colour = Colours.LIGHTGRAY):
     """
     Chops a text into several lines and prints it to the screen, beginning
     at coordinate pos. Chopping happens at position max_columns; no attempt
@@ -27,16 +27,25 @@ def print_text (text, pos = POS_ORIGIN, max_columns = 70, col = Colours.LIGHTGRA
     :``max_columns``: After this column, the text is wrapped onto the next line. 
                       *Default 70*.
     """
-    line   = pos.y
-    column = pos.x
+    col     = 0
+    lastcol = 0
     for char in text:
-        if (char == "\n" or column > max_columns):
-            column = pos.x
-            line  += 1
-            if char == "\n":
-               continue
-        screen.put(char, Coord(column, line), col)
-        column += 1
+        if char == "\n":
+            print_line(text[:col], pos, colour)
+            print_text(text[col+1:], Coord(pos.x, pos.y+1), max_columns, colour)
+            return
+
+        if char == " ":
+            last_col = col
+
+        if col > max_columns:
+            print_line(text[:last_col], pos, colour)
+            print_text(text[last_col+1:], Coord(pos.x, pos.y+1), max_columns, colour)
+            return
+
+        col += 1
+
+    print_line(text, pos, colour)
 
 def print_screen (text, pos = POS_ORIGIN, max_columns = 70):
     """
