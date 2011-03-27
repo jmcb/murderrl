@@ -245,6 +245,20 @@ class Game (object):
                 continue
             break
 
+    def set_suspect_path (self, idx):
+        """
+        Picks an appropriate room for a given suspect and calculates and
+        returns a path to it.
+
+        :``idx``: Index of the suspect list. *Required*.
+        """
+        s = self.suspect_list.get_suspect(idx)
+        rid = self.base_manor.pick_room_for_suspect(self.base_manor.rooms, idx)
+        target_pos = self.base_manor.get_random_pos_in_room(rid)
+        path = pathfind.Pathfind(self.base_manor.features, s.pos, target_pos).get_path()
+        if path != None:
+            s.path = path
+
     def init_suspect_positions (self):
         """
         Initialises the suspects' location to a random position in their
@@ -255,9 +269,9 @@ class Game (object):
         for s in xrange(sl.no_of_suspects()):
             rooms.append(None)
 
-        m = self.base_manor
-        for r in m.rooms:
-            for i in m.room_props[r].owners:
+        manor = self.base_manor
+        for r in manor.rooms:
+            for i in manor.room_props[r].owners:
                 rooms[i] = r
 
         for i in xrange(sl.no_of_suspects()):
@@ -265,17 +279,13 @@ class Game (object):
                 continue
 
             if rooms[i] == None:
-                rooms[i] = random.choice(m.rooms)
-
-            room  = m.get_room(rooms[i])
-            start = room.pos() + 1
-            stop  = room.pos() + room.size() - 2
+                rooms[i] = random.choice(manor.rooms)
 
             s = sl.get_suspect(i)
-            while True:
-                s.pos = coord.Coord(random.randint(start.x, stop.x), random.randint(start.y, stop.y))
-                if m.get_feature(s.pos).traversable():
-                    break
+            s.pos = manor.get_random_pos_in_room(rooms[i])
+
+            if one_chance_in(5):
+                self.set_suspect_path(i)
 
     def describe_body (self, p):
         """
@@ -903,27 +913,37 @@ class Game (object):
         """
         Handle suspect movement: Randomly picks a free adjacent position.
         """
-        sl = self.suspect_list
-        dirs = [DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST]
+        sl    = self.suspect_list
+        manor = self.base_manor
+        dirs  = [DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST]
         for i in xrange(len(sl.suspects)):
             if sl.victim == i:
                 continue
 
             s = sl.get_suspect(i)
-            valid_moves = []
-            for d in dirs:
-                pos = s.pos + d
-                if pos == self.player_pos:
+            if len(s.path) == 0 and one_chance_in(30):
+                self.set_suspect_path(i)
+
+            if len(s.path) > 0:
+                if self.player_pos != s.path[-1]:
+                    new_pos = s.path.pop()
+                else:
                     continue
-                if not self.base_manor.get_feature(pos).traversable():
+            else:
+                valid_moves = []
+                for d in dirs:
+                    pos = s.pos + d
+                    if pos == self.player_pos:
+                        continue
+                    if not manor.get_feature(pos).traversable():
+                        continue
+
+                    valid_moves.append(pos)
+
+                if len(valid_moves) == 0:
                     continue
 
-                valid_moves.append(pos)
-
-            if len(valid_moves) == 0:
-                continue
-
-            new_pos = random.choice(valid_moves)
+                new_pos = random.choice(valid_moves)
 
             # If we walk into another suspect, swap positions.
             for s2 in sl.suspects:

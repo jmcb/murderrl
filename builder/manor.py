@@ -1362,6 +1362,21 @@ class ManorCollection (builder.BuilderCollection):
 
         return random.choice(candidates)
 
+    def get_random_pos_in_room (self, rid):
+        """
+        Returns a random traversable position in a given room.
+
+        :``rid``: Index of a manor's room. *Required*.
+        """
+        room  = self.get_room(rid)
+        start = room.pos() + 1
+        stop  = room.pos() + room.size() - 2
+
+        while True:
+            pos = coord.Coord(random.randint(start.x, stop.x), random.randint(start.y, stop.y))
+            if self.get_feature(pos).traversable():
+                return pos
+
     def pick_room_for_suspect (self, rids, idx1, idx2 = None, force_adj_corr = False):
         """
         Given a suspect id or pair of suspect ids, returns the index of a
