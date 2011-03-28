@@ -8,9 +8,11 @@ General or uncategorized
 1. Abstraction layer between Shape and the actual manor: background (floor or
    wall), middle ground (furniture?), foreground (player or other suspects or
    characters).
-2. Random character movement.
-3. Time passage implementation.
-4. Glyph definitions.
+   > Furniture glyphs get currently drawn directly onto the canvas (the 
+   > alternative being much slower), but the feature grid remains useful
+   > for handling colours and travel restrictions.
+2. Glyph definitions.
+   > Does this go beyond features and suspects?
 
 Suspect generation
 ==================
@@ -68,3 +70,5 @@ Recently completed
 2. A* or similar pathfinding mechanism.
 3. Find a good algorithm for compartmentalising the house into "domestic" and
    "utility" sections.
+4. Random character movement.
+5. Time passage implementation.
