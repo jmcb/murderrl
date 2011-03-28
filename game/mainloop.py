@@ -412,18 +412,6 @@ class Game (object):
         print_line("%s%s." % (name[0].upper(), name[1:]))
         print_line("T: %s" % self.get_time(), coord.Coord(MAX_COLUMNS-10, 0))
 
-    def draw_feature_grid (self):
-        """
-        Draws the feature grid onto the screen. (Only in debug mode.)
-        """
-        for pos in coord.RectangleIterator(self.sect.size()):
-            if pos >= self.base_manor.features.size():
-                continue
-            real_coord = pos + coord.Coord(self.vp._left, self.vp._top)
-            char = self.base_manor.get_feature(real_coord).glyph()
-            col  = self.base_manor.get_feature(real_coord).colour()
-            screen.put(char, pos + MAP_OFFSET, col)
-
     def draw_canvas (self):
         """
         Draws the section of the viewport that's currently visible onto the screen.
@@ -459,15 +447,9 @@ class Game (object):
         # The currently visible section of the viewport, centered on the player.
         self.vp.centre(self.player_pos, self.canvas.size())
         self.sect = self.vp.sect()
+        self.draw_canvas()
 
-        # Depending on the current toggle state (toggle key 't'), either draw
-        # the manor via the feature grid (debugging = true), or via the shape canvas.
-        if self.debugging:
-            self.draw_feature_grid()
-        else:
-            self.draw_canvas()
-
-        # Draw the player.
+        # Draw player and suspects.
         canvas_pos = coord.Coord(self.player_pos.x - self.vp._left, self.player_pos.y - self.vp._top)
         screen.put("@", canvas_pos + MAP_OFFSET, Colours.YELLOW)
         self.draw_suspects()
