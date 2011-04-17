@@ -65,6 +65,7 @@ class Person (object):
         self.pos   = None
         self.glyph = None
         self.path  = []
+        self.duration   = 0
         self.have_seen  = False
         self.suspicious = None # Suspect is marked as highly suspicious.
 

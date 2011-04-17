@@ -245,7 +245,7 @@ class Game (object):
                 continue
             break
 
-    def set_suspect_path (self, idx):
+    def set_suspect_path (self, idx, rid = None):
         """
         Picks an appropriate room for a given suspect and calculates and
         returns a path to it.
@@ -253,11 +253,18 @@ class Game (object):
         :``idx``: Index of the suspect list. *Required*.
         """
         s = self.suspect_list.get_suspect(idx)
-        rid = self.base_manor.pick_room_for_suspect(self.base_manor.rooms, idx)
+        if rid == None:
+            rid = self.base_manor.pick_room_for_suspect(self.base_manor.rooms, idx)
         target_pos = self.base_manor.get_random_pos_in_room(rid)
         path = pathfind.Pathfind(self.base_manor.features, s.pos, target_pos).get_path()
         if path != None:
             s.path = path
+            rp = self.base_manor.room_props[rid]
+            if self.suspect_list.murderer == idx:
+                name = "The murderer (%s)" % s.get_name()
+            else:
+                name = "%s" % s.get_name()
+            print "%s is heading for %s." % (name, rp.room_name(True))
 
     def init_suspect_positions (self):
         """
@@ -332,7 +339,8 @@ class Game (object):
         description  = description[0].upper() + description[1:]
         feat = BODY.derived_feature(name, description, has_article=True)
 
-        self.body_pos = random.choice(candidates)
+        self.body_pos       = random.choice(candidates)
+        sl.get_victim().pos = self.body_pos
         self.base_manor.features.__setitem__(self.body_pos, feat)
         rp = self.base_manor.room_props[murder_room]
 
@@ -918,6 +926,62 @@ class Game (object):
 
         return True
 
+    def move_suspect (self, i):
+        sl = self.suspect_list
+        s  = sl.get_suspect(i)
+        if len(s.path) == 0:
+            if s.duration > 0:
+                s.duration -= 1
+            elif one_chance_in(30):
+                self.set_suspect_path(i)
+
+        manor = self.base_manor
+        if len(s.path) > 0:
+            if self.player_pos == s.path[-1]:
+                return
+
+            new_pos = s.path.pop()
+            if len(s.path) == 0:
+                rp = manor.room_props[manor.get_room_index(new_pos)]
+                if i in rp.owners:
+                    if s.gender == 'f':
+                        pronoun = "her"
+                    else:
+                        pronoun = "his"
+                    room_name = "%s bedroom" % pronoun
+
+                    if self.turns > 780:
+                       s.duration = 500
+                else:
+                    room_name = rp.room_name(True)
+                print "%s has reached %s." % (s.get_name(), room_name)
+        else:
+            valid_moves = []
+            for pos in AdjacencyIterator(s.pos):
+                if pos == self.player_pos:
+                    continue
+                if not manor.get_feature(pos).traversable():
+                    continue
+                # Don't leave the room yet.
+                if s.duration > 0 and manor.get_room_index(pos) != manor.get_room_index(s.pos):
+                    continue
+
+                valid_moves.append(pos)
+
+            if len(valid_moves) == 0:
+                return
+
+            new_pos = random.choice(valid_moves)
+
+        # If we walk into another suspect, swap positions.
+        for s2 in sl.suspects:
+            if s != s2 and new_pos == s2.pos:
+                s2.pos = s.pos
+                break
+
+        # Set the new position.
+        s.pos = new_pos
+
     def move_suspects (self):
         """
         Handle suspect movement: Randomly picks a free adjacent position.
@@ -928,38 +992,7 @@ class Game (object):
             if sl.victim == i:
                 continue
 
-            s = sl.get_suspect(i)
-            if len(s.path) == 0 and one_chance_in(30):
-                self.set_suspect_path(i)
-
-            if len(s.path) > 0:
-                if self.player_pos != s.path[-1]:
-                    new_pos = s.path.pop()
-                else:
-                    continue
-            else:
-                valid_moves = []
-                for pos in AdjacencyIterator(s.pos):
-                    if pos == self.player_pos:
-                        continue
-                    if not manor.get_feature(pos).traversable():
-                        continue
-
-                    valid_moves.append(pos)
-
-                if len(valid_moves) == 0:
-                    continue
-
-                new_pos = random.choice(valid_moves)
-
-            # If we walk into another suspect, swap positions.
-            for s2 in sl.suspects:
-                if s != s2 and new_pos == s2.pos:
-                    s2.pos = s.pos
-                    break
-
-            # Set the new position.
-            s.pos = new_pos
+            self.move_suspect(i)
 
     def handle_time (self):
         """
