@@ -1,0 +1,48 @@
+
+Owners:
+-------
+***MURDERER***
+Suspect 1: Lord Augustus Oggerthorpe (m), blackhaired, aged 61
+    related to: 2. Gerald Oggerthorpe (child)
+                3. Florence Oggerthorpe (child)
+
+Family:
+-------
+Suspect 2: Dr. Gerald Oggerthorpe (m), brownhaired, aged 39
+    related to: 1. Augustus Oggerthorpe (parent)
+                4. Hilda Oggerthorpe (spouse)
+
+Suspect 3: Florence Oggerthorpe (f), blondhaired, aged 42
+    related to: 1. Augustus Oggerthorpe (parent)
+
+Suspect 4: Hilda Oggerthorpe (f), redhaired, aged 30
+    related to: 2. Gerald Oggerthorpe (spouse)
+
+Guests:
+-------
+Suspect 5: Penelope Hartleworth (f), blackhaired, aged 66
+    related to: 6. Samuel Hartleworth (spouse)
+                7. Cyril Hartleworth (child)
+                8. Russell Hartleworth (child)
+
+Suspect 6: Samuel Hartleworth (m), redhaired, aged 71
+    related to: 5. Penelope Hartleworth (spouse)
+                7. Cyril Hartleworth (child)
+                8. Russell Hartleworth (child)
+
+Suspect 7: Cyril Hartleworth (m), actor, blackhaired, aged 42
+    related to: 5. Penelope Hartleworth (parent)
+                6. Samuel Hartleworth (parent)
+
+***VICTIM***
+Suspect 8: Dr. Russell Hartleworth (m), blackhaired, aged 45
+    related to: 5. Penelope Hartleworth (parent)
+                6. Samuel Hartleworth (parent)
+
+Staff:
+------
+Suspect 9: William McCarthy (m), valet, blackhaired, aged 27
+
+Suspect 10: Esther MacCormack (f), parlourmaid, blondhaired, aged 43
+
+Suspect 11: John Newsmith (m), valet, brownhaired, aged 33

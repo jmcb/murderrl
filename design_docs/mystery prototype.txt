@@ -1,0 +1,100 @@
+Manor: 10 rooms, 1 corridor
+############################################################    Rooms:                  Alibis:     Clues:
+#..........#............#..........#............#..........#    1 kitchen               K   
+#..........+.......C....#..........#............#....F.G...#    2 dining room (sound)   C
+#..........#.....2......#....3.J...#.....4......+..........#    3 parlour               J           scissors
+#....1.....#............#..........#............#.....5....#    4 lounge               (D)
+#..........#............#..........#............#..........#    5 billiard room         F, G
+#..K.......######+############+##########+#######..........#    6 pantry (sound)                    knife, hair
+#..........#....................................#..........#    7 study = murder room               male voices reported
+#########+#########+#########+###########+#########+########    8 library (sound)       I           letter
+#............#..........#..........#..........#............#    9 conservatory          E, H
+#............#..........#.I........#.......H..#..B.........#   10 smoking room          B
+#.....6......#....7.X...#....8.....#....9.....#.....10.....#
+#............#.....D....#..........#.....E....#............#
+#............#..........#..........#..........#............#
+############################################################
+
+SuspectList: 10 suspects
+Family:                                 Servants:
+-------                                 ---------
+Archibald = victim                      Joseph, butler (calls the police)
+Beatrice, wife                          Kathleen, cook
+Caroline, daughter (finds the body)
+Desmond, son-in-law = murderer
+Edith, granddaughter
+Frederick, grandson
+
+Guests:
+-------
+George  |-> neighbours, married
+Harriet |
+Isobel, another guest
+
+The murder:
+-----------
+D. asks A. for a loan for his business, which A. refuses. 
+They argue, and the fight escalates. There are raised voices; at one point a 
+chair crashes to the (carpeted) floor. In blind fury, D. stabs A. with a knife.
+When D. realizes what he did, he flees to the lounge where he tries to calm
+down and pretend to be reading the newspaper. Once calmed down, he plans to 
+join F. and G. in their billiard game to have some witnesses, but he doesn't
+get around to doing that.
+I. and C. are close enough to have heard raised voices, they might even be
+able to tell that it was two men argueing. (C. would probably recognize the 
+voice of her husband, so they can't have been that loud. Neither woman is 
+able to make out any words.)
+When all has fallen quiet, C. is getting even more nervous and decides to 
+check out the study, where she finds her dead father.
+Her screams alert the nearby I, J, K, and also D, E, H.
+
+Immediate reactions:
+--------------------
+C. faints, E. is hysterical.
+D. and K. attempt to comfort them.
+H. goes to fetch her husband, accompanied by I.
+J. goes back to the parlour to call the police.
+
+Some time later, and under cover of the general shock and confusion, D. 
+manages to hide the knife in the pantry.
+
+Alibis:
+-------
+Confirmed:              Indirectly confirmed:
+F and G                 K, would have been seen by C.
+E and H                 B, would have been seen F and G.
+
+Suspicion:              Reactions:
+----------              ----------
+C. suspects  I.         B. seems remarkedly calm
+D. points at H.         C. is shocked and distraught
+F. suspects  J.         D. acts disbelieving ("Who would do such a thing?") and worried about his wife
+G. suspects  B.         E. is shocked and distraught
+H. suspects  F.         F. is impatient and angry
+I. suspects  D.         G. seems unconcerned
+                        H. is scared
+                        I. is inquisitive
+                        J. somehow feels responsible
+                        K. stays calm and practical ("People need to eat.")
+
+What the player knows:
+----------------------
+Action              Clue            Result
+Talk to suspects    Alibis          clears F/G, E/H, also K, B
+Talk to suspects    Sound           report male voices: D, F, G, J
+Search the manor    Knife           murder weapon
+                    -> Hair         hair colour matches D, F, H, I, K
+
+Red herring: suspicion, reaction, other objects
+------------
+Action              Fake clue       Findings
+Talk to suspects    Suspicion       1. D and H suspect people with a confirmed alibi
+                                       (althought they can't be expected to know that)
+                                    2. contradiction in C's interview (male voices, female suspect)
+
+Talk to suspects    Reaction        1. B, G, I, K seem unaffected
+                                    2. F seems aggressive
+                                    3. J blames himself
+
+Search the manor    Letter          incriminates F. (A. threatening to disinherit F.)
+Search the manor    Scissors        potential weapon

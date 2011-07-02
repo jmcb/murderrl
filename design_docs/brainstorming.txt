@@ -1,0 +1,118 @@
+Some brainstorming...
+
+One obvious thing that's still missing is the murder weapon and adding
+the hair clue to it instead of the body makes more sense. HAIR found
+on body could also belong to whoever found the body or anyone getting
+close to it afterwards, as well as to the victim's spouse or anyone he
+spent some time with that evening. Taking that into account, it's
+probably best if the HAIR clue is actually found on an item that was
+directly handled by the murderer, e.g. the WEAPON.
+
+This does leave us with the question of what examining the BODY can
+tell us: the type of murder, certainly, and thus allow the player to
+ignore items that don't match the method of killing. Also, from the
+body's position, whether the victim saw their murderer or whether they
+were killed from behind, which would indicate whether there might have
+been an argument beforehand and whether they had time to scream. The
+amount of blood supplies us with the likelihood of the murderer having
+got some of it on their clothes, in which case they will either have
+to clean it off themselves, try to smuggle the bloody clothing into
+the laundry, or hide it away. Either way, a change of clothing will
+have been in order. Anything else?
+
+Potential WEAPONS (and their original locations):
+- paperweight, letter opener (study, business room)
+- billiard queue (billiard room)
+- iron, scissors (laundry)
+- pan, knife (kitchen)
+- shovel, hammer (tool shed)
+- ...
+
+If the murder happened on the spur of the moment, the weapon is either
+an object was carrying around at the time (in which case, it will tell
+us something about the murderer) or an item that was just lying
+around. A planned murder, on the other hand, is more likely to have
+been committed with a weapon specifically acquired for that purpose.
+Either way, I'd expect the murderer to try disposing of the weapon
+(though this might mean putting it back where he found it).
+
+When I was talking this over with David a few weeks ago, he suggested
+an elaborate dialogue tree with the QUESTIONS you choose to ask
+affecting the suspect and thus the game. (He did say that if any
+action happens to make the game unwinnable, it should become so
+immediately, e.g. by the detective being murdered, the murderer being
+found by somebody else, or time being up). At the moment, I've got
+trouble thinking of any questions that would directly affect the game.
+I guess you could antagonize the witness, resulting in them refusing
+to cooperate, or conversely, it might take effort to make them open up
+and give you the true account of what happened. I said this before,
+but if there is a short list of questions that get asked every time,
+this just increases the time needed for the interrogation (so it takes
+5 turns rather than 1). For flavour reasons, it might still be
+interesting to let the player pick those questions from a menu rather
+than get the entire account at a single keypress. IMHO, the best
+solution is to handle the most pressing question (the alibi)
+automatically and allow the player the choice of whether they want to
+ask any of the other questions, something that might be more important
+later on when you've already eliminated some of the manor's
+inhabitants from the list of suspects.
+
+I've compiled a sizable list of questions an investigator might ask in
+a murder case, but most of them hinge on a more elaborate murder
+scheme than we currently have. (Who last saw the victim alive, and
+when? What impression did each of the witnesses get of the other
+suspects before and after the murder? What exactly was the motive? Who
+else might benefit from the death? Which of the suspects would have
+been physically capable of committing a murder of this type? What are
+the suspects' dirty little secrets?)
+
+I am currently considering using the suspects' travel behaviour to
+*simulate* the murder, though I've no idea how feasible that would be,
+let alone how to gather the information from this simulation to make
+the murder case subsequently solvable by the player.
+
+Also, the ALIBIS are awfully straightforward right now. There are a
+couple of ways to shake them up a bit:
+1. outright lies:
+- Suspects could pretend to have been alone to cover e.g. an affair.
+- Suspects could cover for one another, including (unknowingly) the murderer.
+- In that case, the player needs to be able to find contradictory
+evidence, so they can confront the suspect and get the real
+testimonial.
+
+2. unreliable witnesses.
+- A suspect might have been asleep at the time, and could still be
+referenced by someone else as a witness. Since they can't contradict
+the statement, the player'll have to treat the other suspect as having
+no witnesses, and the sleeping witness as cleared of suspicion (they
+_do_ have a witness).
+- At deeper questioning, it might turn out that a witness actually
+cannot say for certain that another person was with them the entire
+time.
+- Death happened delayed (poison) or wasn't noticed for some time.
+- Someone unfamiliar with the victim (one of the guests, maybe) might
+have thought they briefly saw them or heard their voice, only to have
+it later turn out that they confused them with someone else and that
+the victim was already dead at the time. This holds double if the
+victim has a twin of the same gender.
+- The murderer might purposefully have arranged for everyone believing
+the victim to be asleep or have gone out, delaying discovery of the
+death and thus widening the possible window of opportunity.
+
+<...>
+
+Oh, but a question came up while I was planning the thing: should
+murderrl use some kind of visibility scheme? Currently, you can see
+all suspects in all rooms that fit the current section of the screen,
+which is obviously really useful for debugging, but equally obviously
+not realistic at all. Restricting visibility to a single room would an
+obvious change (outside of debug mode, of course), but what if you're
+standing in a doorway? I think it'd be okay if you'd still see the
+entirety of the room, but the corridors tend to be rather long, so I
+guess it'd make sense to have some kind of maximum visibility range,
+on the grounds that the corridors are less well-lit than the rooms.
+Okay, so that covers rooms and corridors. Now what about corridor
+cross sections. As you near the end of one corridor, you should be
+able to view part of the adjoining corridors. Windows would be even
+more complicated but as we don't have a garden yet, it's not an issue
+right now.

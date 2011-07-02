@@ -1,0 +1,67 @@
+base:
+12  |||| (6x2)
+10  |    (5x2)
+
+wings: 2x2
+
+base layout: min.     10
+L-layout: 10 + 4    = 14
+U-layout: 10 + 8    = 18
+H-Layout: 10 + 16   = 26
+
+assign bed rooms:
+family first
+next, guests
+if there's enough rooms left, also servants
+
+basic room types:
+dining room
+kitchen
+entrance hall
+library
+study
+
+need to have at least 5 rooms left, that is (no_rooms - 5) for bed rooms
+
+if there's another corridor in addition to the main one, one of those areas
+could become the utility area, another one might become the bedroom area,
+and a third the guest bedroom and servant bedroom area.
+
+H-shape: max. 26 persons
+############       ############
+# master   #       #          #
+# bedrooms #       # utility  #
+#          #########  area    #
+#                             #
+#                             #
+#                             #
+#                             #
+# guest    ######### servant  #
+# bedrooms #       # bedrooms #
+#          #       #          #
+############       ############
+
+U-shape: max. 18 persons
+############       ############
+# master   #       #          # no servant bedrooms
+# bedrooms #       # utility  #
+#          #########  area    #
+#                             #
+#                             #
+###############################
+
+L-shape: max. 14 persons
+                   ############
+                   #          # no servant bedrooms
+                   # utility  #
+####################  area    #
+#                             #
+#                             #
+###############################
+
+base layout: max. 10 persons
+###############################
+#                             # segregation in bedroom/other halves
+#                             # no servant, no guest bedrooms
+###############################
+
